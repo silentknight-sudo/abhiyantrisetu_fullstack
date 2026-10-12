@@ -147,11 +147,25 @@ export function Hero() {
         >
           <SceneSlot
             // Soft edges so the 3D ground melts into the page instead of ending in a box.
-            className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_45%,transparent_75%)]"
+            className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_62%,transparent_88%)]"
             fallback={<Emblem rotate={emblemRotate} />}
           >
             {(active) => <HeroScene progress={scrollYProgress} active={active} />}
           </SceneSlot>
+          <div className="pointer-events-none absolute inset-x-2 top-4 flex justify-between gap-3 sm:inset-x-6 lg:top-[16%]">
+            <div className="rounded-2xl border border-border bg-surface/90 px-4 py-2 shadow-sm backdrop-blur">
+              <p className="font-display text-lg leading-tight font-semibold text-navy-700">
+                Service providers
+              </p>
+              <p className="text-xs text-text-muted">Verified pros and suppliers</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-surface/90 px-4 py-2 text-right shadow-sm backdrop-blur">
+              <p className="font-display text-lg leading-tight font-semibold text-navy-700">
+                Clients
+              </p>
+              <p className="text-xs text-text-muted">Homes, societies, builders</p>
+            </div>
+          </div>
         </motion.div>
       </motion.div>
 

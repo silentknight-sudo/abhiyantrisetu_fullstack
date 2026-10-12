@@ -1,6 +1,8 @@
 'use client';
 
 import { formatINR } from '@setu/domain';
+import { LAUNCHED } from '@/lib/launch';
+import { SoonBadge } from '../ComingSoon';
 import { BadgeCheck, IndianRupee, MessageCircle, Smartphone } from 'lucide-react';
 import { motion, useMotionTemplate, useScroll, useTransform } from 'motion/react';
 import Image from 'next/image';
@@ -42,7 +44,9 @@ export function Partners() {
       </motion.div>
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2">
         <div>
-          <SectionLabel dark>For plumbers, masons, contractors & suppliers</SectionLabel>
+          <SectionLabel dark>
+            For plumbers, masons, contractors & suppliers <SoonBadge dark />
+          </SectionLabel>
           <Reveal>
             <RevealHeading
               className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02]"
@@ -87,12 +91,14 @@ export function Partners() {
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="https://wa.me/911200000000?text=Join%20Setu%20Partner"
+              data-coming-soon={LAUNCHED ? undefined : 'Partner sign-up'}
               className="rounded-full bg-orange-400 px-6 py-3.5 font-bold text-navy-800 transition hover:bg-orange-300"
             >
               Join as a partner
             </a>
             <a
               href="mailto:partners@abhiyantrisetu.com?subject=Vendor%20portal"
+              data-coming-soon={LAUNCHED ? undefined : 'The supplier & rental portal'}
               className="rounded-full border border-white/20 px-6 py-3.5 font-semibold transition hover:bg-white/10"
             >
               Supplier & rental portal

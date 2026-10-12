@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LAUNCHED } from '@/lib/launch';
 import { SECTORS, SITE, TRADES } from '@/lib/content';
 import { Logo } from './Logo';
 
@@ -13,14 +14,24 @@ export function Footer() {
             {SITE.city}.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <span className="rounded-xl border border-white/15 px-4 py-2 text-xs">
-              <span className="block text-[10px] text-navy-300">Download on the</span>
-              <span className="font-semibold text-white">App Store</span>
-            </span>
-            <span className="rounded-xl border border-white/15 px-4 py-2 text-xs">
-              <span className="block text-[10px] text-navy-300">Get it on</span>
-              <span className="font-semibold text-white">Google Play</span>
-            </span>
+            {/* Store badges become links once the apps are published. */}
+            {['App Store', 'Google Play'].map((store) => (
+              <button
+                key={store}
+                type="button"
+                data-coming-soon={`The ${store} app`}
+                className="rounded-xl border border-white/15 px-4 py-2 text-left text-xs transition hover:border-orange-300"
+              >
+                <span className="block text-[10px] text-orange-300">
+                  {LAUNCHED
+                    ? store === 'App Store'
+                      ? 'Download on the'
+                      : 'Get it on'
+                    : 'Coming soon on'}
+                </span>
+                <span className="font-semibold text-white">{store}</span>
+              </button>
+            ))}
           </div>
         </div>
         <div>

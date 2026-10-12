@@ -7,6 +7,8 @@ export const SITE = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
   phone: '+91 120 000 0000',
   email: 'hello@abhiyantrisetu.com',
+  /** WhatsApp number for launch updates (placeholder until the business number is live). */
+  whatsapp: '911200000000',
   grievanceEmail: 'grievance@abhiyantrisetu.com',
 };
 

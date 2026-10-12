@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
+import { LAUNCHED } from '@/lib/launch';
 import { RevealHeading } from '../RevealHeading';
 
 export function FinalCta() {
@@ -37,7 +38,7 @@ export function FinalCta() {
             href="/post"
             className="rounded-full bg-navy-700 px-8 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-navy-800"
           >
-            Post a requirement, free
+            {LAUNCHED ? 'Post a requirement, free' : 'Get early access'}
           </Link>
           <Link
             href="/services"

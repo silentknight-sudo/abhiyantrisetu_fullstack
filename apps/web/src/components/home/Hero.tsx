@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
 import { FLOWS } from '@/lib/content';
+import { LAUNCHED, PRIMARY_CTA } from '@/lib/launch';
 import { HeroScene, SceneSlot } from '../three/Scenes';
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -83,7 +84,7 @@ export function Hero() {
             transition={{ duration: 0.6, ease }}
             className="text-sm font-semibold tracking-[0.3em] text-orange-600 uppercase"
           >
-            Greater Noida · Noida Extension
+            {LAUNCHED ? 'Greater Noida · Noida Extension' : 'Launching soon · Greater Noida'}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -118,7 +119,7 @@ export function Hero() {
               href="/post"
               className="inline-flex items-center justify-center rounded-full bg-navy-700 px-8 py-4 text-base font-semibold text-white shadow-[0_14px_30px_-12px_rgba(16,36,52,0.55)] transition hover:-translate-y-0.5 hover:bg-navy-800"
             >
-              Post a requirement
+              {PRIMARY_CTA}
             </Link>
             <Link
               href="#how"

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { LAUNCHED } from '@/lib/launch';
+import { ComingSoonPage } from './ComingSoonPage';
 import { PostRequirement } from './PostRequirement';
 
 export const metadata: Metadata = {
@@ -11,9 +13,13 @@ export const metadata: Metadata = {
 export default function PostPage() {
   return (
     <div className="min-h-screen bg-background pt-[72px]">
-      <Suspense>
-        <PostRequirement />
-      </Suspense>
+      {LAUNCHED ? (
+        <Suspense>
+          <PostRequirement />
+        </Suspense>
+      ) : (
+        <ComingSoonPage />
+      )}
     </div>
   );
 }

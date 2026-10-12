@@ -84,6 +84,7 @@ curl -XPOST localhost:4000/v1/auth/otp/verify -H 'content-type: application/json
 1. Import the GitHub repo in Vercel and set **Root Directory** to `apps/web`. `apps/web/vercel.json` already builds the shared packages first via Turborepo.
 2. Environment variables: `NEXT_PUBLIC_SITE_URL` (e.g. `https://abhiyantrisetu.com`) and `NEXT_PUBLIC_API_URL` (the deployed API). Without a reachable API, the `/post` form shows a connection error at the phone step; the rest of the site is static.
 3. Add the site's domain to the API's `CORS_ORIGINS`.
+4. **Pre-launch mode** is the default: posting, the apps, Setu AI and partner sign-up show _Coming soon_, and the main buttons say _Get early access_. Set `NEXT_PUBLIC_LAUNCHED=true` and redeploy on launch day to switch everything on.
 
 ## API (v1)
 

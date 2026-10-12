@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { PRIMARY_CTA } from '@/lib/launch';
 import { Logo } from './Logo';
 
 const NAV = [
@@ -63,7 +64,7 @@ export function Header() {
             href="/post"
             className="hidden rounded-full bg-navy-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(16,36,52,0.6)] transition hover:-translate-y-0.5 hover:bg-navy-800 sm:inline-flex"
           >
-            Post a requirement
+            {PRIMARY_CTA}
           </Link>
           <button
             type="button"
@@ -100,7 +101,7 @@ export function Header() {
                 onClick={() => setOpen(false)}
                 className="mt-2 rounded-full bg-navy-700 px-5 py-3 text-center font-semibold text-white"
               >
-                Post a requirement
+                {PRIMARY_CTA}
               </Link>
             </div>
           </motion.nav>

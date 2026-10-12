@@ -1,6 +1,8 @@
 'use client';
 
 import { t as strings } from '@setu/domain';
+import { LAUNCHED } from '@/lib/launch';
+import { SoonBadge } from '../ComingSoon';
 import { Camera, Mic, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { RevealHeading } from '../RevealHeading';
@@ -29,7 +31,9 @@ export function SetuAi() {
       />
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2">
         <div>
-          <SectionLabel>Setu AI</SectionLabel>
+          <SectionLabel>
+            Setu AI <SoonBadge />
+          </SectionLabel>
           <Reveal>
             <RevealHeading
               className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700"
@@ -78,7 +82,9 @@ export function SetuAi() {
               </span>
               <div>
                 <p className="font-bold text-navy-600">Setu AI</p>
-                <p className="text-xs text-success">Online · English, हिंदी, Hinglish</p>
+                <p className="text-xs text-success">
+                  {LAUNCHED ? 'Online' : 'Preview'} · English, हिंदी, Hinglish
+                </p>
               </div>
             </div>
             <div className="space-y-3 py-5">

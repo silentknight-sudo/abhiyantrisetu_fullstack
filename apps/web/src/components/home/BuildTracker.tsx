@@ -6,10 +6,12 @@ import { motion, useMotionValueEvent, useScroll, useTransform } from 'motion/rea
 import { useRef, useState } from 'react';
 import { CONSTRUCTION_STAGES } from '@/lib/content';
 import { SectionLabel } from '../Reveal';
+import { RevealHeading } from '../RevealHeading';
+import { HouseScene, SceneSlot } from '../three/Scenes';
 
 const TOTAL = 48_00_000_00; // ₹48 lakh sample project, in paise
 
-/** A house that builds itself as the visitor scrolls through the 10 construction stages. */
+/** Flat drawing of the house, used where WebGL is unavailable. */
 function House({ stage }: { stage: number }) {
   const show = (n: number) => ({ opacity: stage >= n ? 1 : 0, y: stage >= n ? 0 : 16 });
   const t = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
@@ -123,9 +125,11 @@ export function BuildTracker() {
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <SectionLabel>House construction tracker</SectionLabel>
-            <h2 className="text-balance text-[clamp(2.2rem,4.5vw,3.6rem)] leading-[1.02]">
-              Watch your house rise, <em>stage by stage.</em>
-            </h2>
+            <RevealHeading
+              className="text-balance text-[clamp(2.2rem,4.5vw,3.6rem)] leading-[1.02]"
+              text="Watch your house rise,"
+              accent="stage by stage."
+            />
             <p className="mt-4 max-w-md text-text-muted">
               Ten stages, each with an engineer inspection, photo visit report and a stage payment
               you approve. Nothing is paid for work you haven't seen.
@@ -154,8 +158,19 @@ export function BuildTracker() {
           </div>
 
           <div className="relative">
-            <div className="relative aspect-[10/9] w-full rounded-[32px] border border-border bg-gradient-to-b from-sand-50 to-sand-200 p-6 pt-16 sm:pb-20">
-              <House stage={stage} />
+            <div className="relative aspect-[10/9] w-full overflow-hidden rounded-[32px] border border-border bg-gradient-to-b from-sand-50 to-sand-200">
+              <SceneSlot
+                className="absolute inset-0"
+                fallback={
+                  <div className="h-full p-6 pt-16 sm:pb-20">
+                    <House stage={stage} />
+                  </div>
+                }
+              >
+                {(active) => (
+                  <HouseScene stage={stage} progress={scrollYProgress} active={active} />
+                )}
+              </SceneSlot>
               <div className="absolute top-5 left-5 rounded-2xl bg-surface/90 px-4 py-3 shadow-sm backdrop-blur">
                 <p className="text-[11px] tracking-wider text-text-muted uppercase">
                   Stage {stage + 1} of 10

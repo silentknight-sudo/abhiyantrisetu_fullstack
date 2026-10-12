@@ -5,6 +5,7 @@ import { FinalCta } from '@/components/home/FinalCta';
 import { Flows } from '@/components/home/Flows';
 import { Hero } from '@/components/home/Hero';
 import { HowItWorks } from '@/components/home/HowItWorks';
+import { Manifesto } from '@/components/home/Manifesto';
 import { Marquee } from '@/components/home/Marquee';
 import { Partners } from '@/components/home/Partners';
 import { SetuAi } from '@/components/home/SetuAi';
@@ -41,6 +42,7 @@ export default function Home() {
       />
       <Hero />
       <Marquee />
+      <Manifesto />
       <Flows />
       <Stats />
       <HowItWorks />

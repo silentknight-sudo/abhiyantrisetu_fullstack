@@ -2,6 +2,7 @@
 
 import { Building2, CalendarClock, PhoneCall } from 'lucide-react';
 import { motion } from 'motion/react';
+import { RevealHeading } from '../RevealHeading';
 import { Reveal, SectionLabel } from '../Reveal';
 
 const TOWERS = [
@@ -51,9 +52,11 @@ export function Societies() {
         <div className="order-1 lg:order-2">
           <SectionLabel>Societies, RWAs & builders</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
-              One contact for <em>every tower.</em>
-            </h2>
+            <RevealHeading
+              className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700"
+              text="One contact for"
+              accent="every tower."
+            />
           </Reveal>
           <div className="mt-8 space-y-5">
             {[

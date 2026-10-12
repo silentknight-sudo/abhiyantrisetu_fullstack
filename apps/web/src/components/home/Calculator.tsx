@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { BUILD_RATES } from '@/lib/content';
+import { RevealHeading } from '../RevealHeading';
 import { Reveal, SectionLabel } from '../Reveal';
 
 type Tab = 'build' | 'paint';
@@ -83,9 +84,11 @@ export function Calculator() {
           <div>
             <SectionLabel>Cost calculator</SectionLabel>
             <Reveal>
-              <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
-                Know the ballpark <em>before you call anyone.</em>
-              </h2>
+              <RevealHeading
+                className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700"
+                text="Know the ballpark"
+                accent="before you call anyone."
+              />
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-5 text-lg text-text-muted">

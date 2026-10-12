@@ -3,6 +3,8 @@
 import { t as strings } from '@setu/domain';
 import { Camera, Mic, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
+import { RevealHeading } from '../RevealHeading';
+import { Tilt } from '../Tilt';
 import { Reveal, SectionLabel } from '../Reveal';
 
 const CHAT = [
@@ -29,9 +31,11 @@ export function SetuAi() {
         <div>
           <SectionLabel>Setu AI</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
-              Ask in Hinglish. <em>Get a plan.</em>
-            </h2>
+            <RevealHeading
+              className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700"
+              text="Ask in Hinglish."
+              accent="Get a plan."
+            />
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-text-muted">
@@ -64,7 +68,10 @@ export function SetuAi() {
         </div>
 
         <div className="relative">
-          <div className="rounded-[32px] border border-border bg-surface p-5 shadow-[0_30px_80px_-30px_rgba(26,58,82,0.35)]">
+          <Tilt
+            max={7}
+            className="rounded-[32px] border border-border bg-surface p-5 shadow-[0_30px_80px_-30px_rgba(26,58,82,0.35)]"
+          >
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-white">
                 <Sparkles size={18} />
@@ -108,7 +115,7 @@ export function SetuAi() {
                 <Mic size={16} />
               </span>
             </div>
-          </div>
+          </Tilt>
         </div>
       </div>
     </section>

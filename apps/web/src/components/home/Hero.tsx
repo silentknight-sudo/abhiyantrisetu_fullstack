@@ -1,27 +1,56 @@
 'use client';
 
 import { ArrowDown } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef } from 'react';
 import { FLOWS } from '@/lib/content';
+import { HeroScene, SceneSlot } from '../three/Scenes';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-/** Rolling sand-coloured land with a small skyline, echoing the bridge-and-city logo. */
+/** Rolling sand-coloured land under the 3D scene. */
 function Hills() {
   return (
     <svg viewBox="0 0 1440 220" preserveAspectRatio="none" className="h-full w-full" aria-hidden>
       <path d="M0 150 C 240 90, 420 110, 640 140 S 1080 80, 1440 120 V220 H0 Z" fill="#EADBC3" />
-      <g fill="#C9AE85">
-        <rect x="1010" y="70" width="18" height="52" />
-        <rect x="1032" y="50" width="22" height="72" />
-        <polygon points="1043,30 1037,50 1049,50" />
-        <rect x="1058" y="84" width="16" height="38" />
-      </g>
       <path d="M0 180 C 300 140, 520 150, 760 175 S 1200 150, 1440 165 V220 H0 Z" fill="#DCC6A3" />
     </svg>
+  );
+}
+
+/** Static logo emblem, shown instead of the 3D scene on devices without WebGL. */
+function Emblem({ rotate }: { rotate: MotionValue<number> }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1, ease }}
+      className="relative mx-auto aspect-square w-full max-w-[440px]"
+    >
+      <motion.div
+        style={{ rotate }}
+        className="absolute inset-0 rounded-full border-[3px] border-navy-600/80"
+      />
+      <div className="absolute inset-[14px] rounded-full border border-navy-600/40" />
+      <div className="absolute inset-0 grid place-items-center">
+        <div className="text-center">
+          <Image
+            src="/logo.png"
+            alt="Abhiyantri Setu"
+            width={334}
+            height={190}
+            priority
+            className="mx-auto w-[64%]"
+          />
+          <p className="mt-4 font-display text-[clamp(1.6rem,3vw,2.2rem)] leading-none font-semibold tracking-[0.08em] text-navy-700 uppercase">
+            Abhiyantri <span className="font-medium">Setu</span>
+          </p>
+          <p className="mt-2 text-sm tracking-[0.3em] text-sand-600">अभियंत्री सेतु</p>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -41,38 +70,8 @@ export function Hero() {
 
       <motion.div
         style={{ y: contentY }}
-        className="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-12 pb-48 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:pt-20 lg:pb-56"
+        className="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-12 pb-48 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:pt-16 lg:pb-52"
       >
-        {/* Emblem */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease }}
-          className="relative mx-auto aspect-square w-full max-w-[440px]"
-        >
-          <motion.div
-            style={{ rotate: emblemRotate }}
-            className="absolute inset-0 rounded-full border-[3px] border-navy-600/80"
-          />
-          <div className="absolute inset-[14px] rounded-full border border-navy-600/40" />
-          <div className="absolute inset-0 grid place-items-center">
-            <div className="text-center">
-              <Image
-                src="/logo.png"
-                alt="Abhiyantri Setu"
-                width={334}
-                height={190}
-                priority
-                className="mx-auto w-[64%]"
-              />
-              <p className="mt-4 font-display text-[clamp(1.6rem,3vw,2.2rem)] leading-none font-semibold tracking-[0.08em] text-navy-700 uppercase">
-                Abhiyantri <span className="font-medium">Setu</span>
-              </p>
-              <p className="mt-2 text-sm tracking-[0.3em] text-sand-600">अभियंत्री सेतु</p>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Copy */}
         <div>
           <motion.p
@@ -138,6 +137,22 @@ export function Hero() {
             ))}
           </motion.div>
         </div>
+
+        {/* 3D bridge and city; the camera orbits as the visitor scrolls */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease }}
+          className="relative -mx-4 h-[380px] sm:h-[480px] lg:mx-0 lg:h-[600px]"
+        >
+          <SceneSlot
+            // Soft edges so the 3D ground melts into the page instead of ending in a box.
+            className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_45%,transparent_75%)]"
+            fallback={<Emblem rotate={emblemRotate} />}
+          >
+            {(active) => <HeroScene progress={scrollYProgress} active={active} />}
+          </SceneSlot>
+        </motion.div>
       </motion.div>
 
       <motion.div

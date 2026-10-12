@@ -5,6 +5,7 @@ import { BadgeCheck, IndianRupee, MessageCircle, Smartphone } from 'lucide-react
 import { motion, useScroll, useTransform } from 'motion/react';
 import Image from 'next/image';
 import { useRef } from 'react';
+import { RevealHeading } from '../RevealHeading';
 import { Reveal, SectionLabel } from '../Reveal';
 
 const WEEK = [42, 65, 38, 80, 72, 95, 60];
@@ -33,9 +34,11 @@ export function Partners() {
         <div>
           <SectionLabel dark>For plumbers, masons, contractors & suppliers</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02]">
-              More work. <em className="text-orange-300">Paid on time.</em>
-            </h2>
+            <RevealHeading
+              className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02]"
+              text="More work."
+              accent="Paid on time."
+            />
           </Reveal>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[

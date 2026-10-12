@@ -2,10 +2,18 @@
 
 import { formatINR, quoteTotals } from '@setu/domain';
 import { BadgeCheck, Camera, Mic, ShieldCheck, Star } from 'lucide-react';
-import { AnimatePresence, motion, useInView, useScroll, useSpring } from 'motion/react';
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { STEPS } from '@/lib/content';
 import { SectionLabel } from '../Reveal';
+import { RevealHeading } from '../RevealHeading';
 
 type Screen = (typeof STEPS)[number]['screen'];
 
@@ -268,14 +276,22 @@ export function HowItWorks() {
     offset: ['start center', 'end center'],
   });
   const draw = useSpring(scrollYProgress, { stiffness: 80, damping: 20 });
+  // The phone turns slowly through the section, like it is being shown around.
+  const phoneRotateY = useSpring(useTransform(scrollYProgress, [0, 1], [-22, 22]), {
+    stiffness: 60,
+    damping: 18,
+  });
+  const phoneRotateX = useTransform(scrollYProgress, [0, 0.5, 1], [10, 2, 10]);
 
   return (
     <section id="how" ref={section} className="relative bg-surface">
       <div className="mx-auto max-w-7xl px-4 pt-24 sm:px-6">
         <SectionLabel>How it works</SectionLabel>
-        <h2 className="max-w-3xl text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
-          From “I need help” to a job well done, <em>in five steps.</em>
-        </h2>
+        <RevealHeading
+          className="max-w-3xl text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700"
+          text="From “I need help” to a job well done,"
+          accent="in five steps."
+        />
       </div>
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_auto_1fr]">
@@ -315,7 +331,10 @@ export function HowItWorks() {
 
         <div className="hidden lg:block">
           <div className="sticky top-[calc(50vh-300px)] flex h-[600px] items-center justify-center">
-            <div className="relative h-[600px] w-[300px] rounded-[44px] border-[10px] border-navy-800 bg-surface shadow-[0_40px_80px_-20px_rgba(10,24,35,0.45)]">
+            <motion.div
+              style={{ rotateY: phoneRotateY, rotateX: phoneRotateX, transformPerspective: 1200 }}
+              className="relative h-[600px] w-[300px] rounded-[44px] border-[10px] border-navy-800 bg-surface shadow-[0_40px_80px_-20px_rgba(10,24,35,0.45)]"
+            >
               <div className="absolute top-2 left-1/2 h-5 w-24 -translate-x-1/2 rounded-full bg-navy-800" />
               <div className="flex h-full flex-col overflow-hidden rounded-[34px] px-4 pt-10 pb-4">
                 <div className="mb-4 flex items-center justify-between">
@@ -336,7 +355,7 @@ export function HowItWorks() {
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -11,6 +11,8 @@ import { Partners } from '@/components/home/Partners';
 import { SetuAi } from '@/components/home/SetuAi';
 import { Societies } from '@/components/home/Societies';
 import { Stats } from '@/components/home/Stats';
+import { TrustStack } from '@/components/home/TrustStack';
+import { SectionDots } from '@/components/SectionDots';
 import { FAQS, SITE } from '@/lib/content';
 
 const jsonLd = [
@@ -46,6 +48,7 @@ export default function Home() {
       <Flows />
       <Stats />
       <HowItWorks />
+      <TrustStack />
       <BuildTracker />
       <SetuAi />
       <Calculator />
@@ -53,6 +56,7 @@ export default function Home() {
       <Partners />
       <Faq />
       <FinalCta />
+      <SectionDots />
     </>
   );
 }

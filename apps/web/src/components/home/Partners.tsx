@@ -2,7 +2,7 @@
 
 import { formatINR } from '@setu/domain';
 import { BadgeCheck, IndianRupee, MessageCircle, Smartphone } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useMotionTemplate, useScroll, useTransform } from 'motion/react';
 import Image from 'next/image';
 import { useRef } from 'react';
 import { RevealHeading } from '../RevealHeading';
@@ -16,11 +16,21 @@ export function Partners() {
   const cardY = useTransform(scrollYProgress, [0, 1], [80, -80]);
   const chatY = useTransform(scrollYProgress, [0, 1], [140, -40]);
   const logoRotate = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+  // Opens like a curtain: a rounded window that widens to full bleed as it scrolls in.
+  const { scrollYProgress: enter } = useScroll({
+    target: ref,
+    offset: ['start end', 'start 0.15'],
+  });
+  const insetX = useTransform(enter, [0, 1], [7, 0]);
+  const insetY = useTransform(enter, [0, 1], [9, 0]);
+  const round = useTransform(enter, [0, 1], [56, 0]);
+  const clipPath = useMotionTemplate`inset(${insetY}% ${insetX}% ${insetY}% ${insetX}% round ${round}px)`;
 
   return (
-    <section
+    <motion.section
       id="partners"
       ref={ref}
+      style={{ clipPath }}
       className="relative overflow-hidden bg-navy-900 py-28 text-white"
     >
       <motion.div
@@ -143,6 +153,6 @@ export function Partners() {
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

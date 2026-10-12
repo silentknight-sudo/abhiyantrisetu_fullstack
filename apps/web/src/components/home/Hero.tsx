@@ -60,6 +60,9 @@ export function Hero() {
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const hillsY = useTransform(scrollYProgress, [0, 1], [0, 60]);
   const emblemRotate = useTransform(scrollYProgress, [0, 1], [0, 18]);
+  const lineOneX = useTransform(scrollYProgress, [0, 0.6], [0, -140]);
+  const lineTwoX = useTransform(scrollYProgress, [0, 0.6], [0, 140]);
+  const linesOpacity = useTransform(scrollYProgress, [0.1, 0.55], [1, 0]);
 
   return (
     <section ref={ref} className="relative isolate overflow-hidden bg-background pt-[72px]">
@@ -88,9 +91,13 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.1, ease }}
             className="mt-5 text-[clamp(2.5rem,5.2vw,4.7rem)] leading-[1.02] text-navy-700"
           >
-            Build, Renovate,
-            <br />
-            <em>Repair &amp; Maintain.</em>
+            {/* The two lines part ways as the visitor scrolls on. */}
+            <motion.span style={{ x: lineOneX, opacity: linesOpacity }} className="block">
+              Build, Renovate,
+            </motion.span>
+            <motion.em style={{ x: lineTwoX, opacity: linesOpacity }} className="block">
+              Repair &amp; Maintain.
+            </motion.em>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}

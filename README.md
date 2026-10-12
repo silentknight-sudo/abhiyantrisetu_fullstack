@@ -79,6 +79,12 @@ curl -XPOST localhost:4000/v1/auth/otp/verify -H 'content-type: application/json
 - **Brand**: logo in `apps/web/public/` (`logo.png`, plus `logo-on-dark.png` with the navy recoloured white for dark backgrounds); colours come from `@setu/ui-tokens`.
 - Prices on the site (visit charges, calculator rates) are **placeholders** to confirm before launch: `apps/web/src/lib/content.ts`.
 
+### Deploying the website on Vercel
+
+1. Import the GitHub repo in Vercel and set **Root Directory** to `apps/web`. `apps/web/vercel.json` already builds the shared packages first via Turborepo.
+2. Environment variables: `NEXT_PUBLIC_SITE_URL` (e.g. `https://abhiyantrisetu.com`) and `NEXT_PUBLIC_API_URL` (the deployed API). Without a reachable API, the `/post` form shows a connection error at the phone step; the rest of the site is static.
+3. Add the site's domain to the API's `CORS_ORIGINS`.
+
 ## API (v1)
 
 ```

@@ -33,7 +33,7 @@ export const fileKeySchema = z.string().min(1).max(512);
 
 export const addressInputSchema = z.object({
   label: z.string().trim().max(40).optional(),
-  line1: z.string().trim().min(3).max(200),
+  line1: z.string().trim().min(3, 'Add your flat/house number and society').max(200),
   line2: z.string().trim().max(200).optional(),
   sector: z.string().trim().max(80).optional(),
   tower: z.string().trim().max(40).optional(),

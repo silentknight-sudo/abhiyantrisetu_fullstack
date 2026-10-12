@@ -22,6 +22,7 @@ One TypeScript monorepo for all five surfaces: customer app, partner app, websit
 
 ```
 apps/
+  web/            Next.js website (abhiyantrisetu.com)
   api/            NestJS modular monolith (+ BullMQ worker entrypoint: src/worker.ts)
     drizzle/      versioned SQL migrations (generated from src/db/schema.ts)
 packages/
@@ -46,6 +47,13 @@ pnpm db:migrate && pnpm db:seed      # schema + catalog categories
 pnpm --filter @setu/api dev          # http://localhost:4000, Swagger at /docs
 ```
 
+Then the website:
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+pnpm --filter @setu/web dev          # http://localhost:3000 (API must allow it in CORS_ORIGINS)
+```
+
 With `SMS_PROVIDER=console`, OTP codes are printed in the API log. Production refuses to boot with console SMS.
 
 ```bash
@@ -62,6 +70,14 @@ curl -XPOST localhost:4000/v1/auth/otp/verify -H 'content-type: application/json
 | `pnpm db:generate`                | Creates a migration after editing `apps/api/src/db/schema.ts` (CI fails if you forget)                                           |
 | `pnpm --filter @setu/api openapi` | Writes `apps/api/openapi.json` (input for the generated API client)                                                              |
 | `pnpm format`                     | Prettier                                                                                                                         |
+
+## Website
+
+- **Motion**: Lenis inertial scrolling and Motion (`motion/react`) scroll-linked animation: parallax skyline hero, a pinned horizontal service carousel, a pinned phone whose screen follows the "How it works" steps, a house that builds itself through the 10 construction stages, and in-view reveals. All of it is disabled under `prefers-reduced-motion`.
+- **Live flow**: `/post` runs the real API: shared Zod validation, phone OTP, then `POST /v1/requirements` with a geo point.
+- **SEO**: `/services/[trade]/[sector]` is statically generated with `Service`/`LocalBusiness` JSON-LD, plus `sitemap.xml`, `robots.txt` and FAQ structured data.
+- **Brand**: logo in `apps/web/public/` (`logo.png`, plus `logo-on-dark.png` with the navy recoloured white for dark backgrounds); colours come from `@setu/ui-tokens`.
+- Prices on the site (visit charges, calculator rates) are **placeholders** to confirm before launch: `apps/web/src/lib/content.ts`.
 
 ## API (v1)
 

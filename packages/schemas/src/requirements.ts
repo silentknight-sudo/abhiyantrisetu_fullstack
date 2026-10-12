@@ -13,7 +13,7 @@ export const serviceDetailsSchema = z.object({
 
 export const renovationDetailsSchema = z.object({
   propertyType: z.enum(['apartment', 'independent_house', 'villa', 'commercial', 'plot']),
-  scope: z.array(z.string().trim().min(2).max(60)).min(1).max(20),
+  scope: z.array(z.string().trim().min(2).max(60)).min(1, 'Pick at least one area of work').max(20),
   areaSqft: z.number().int().positive().max(1_000_000).optional(),
   description,
   wantsSiteVisit: z.boolean().default(true),
@@ -25,8 +25,10 @@ export const materialRfqDetailsSchema = z
     items: z
       .array(
         z.object({
-          name: z.string().trim().min(2).max(120),
-          quantity: z.number().positive(),
+          name: z.string().trim().min(2, 'Item names need at least 2 characters').max(120),
+          quantity: z
+            .number({ error: 'Enter a quantity for each item' })
+            .positive('Enter a quantity for each item'),
           unit: z.enum([
             'bag',
             'kg',
@@ -56,11 +58,15 @@ export const materialRfqDetailsSchema = z
   });
 
 export const equipmentDetailsSchema = z.object({
-  equipmentType: z.string().trim().min(2).max(80),
+  equipmentType: z.string().trim().min(2, 'Tell us which equipment you need').max(80),
   quantity: z.number().int().positive().max(50).default(1),
-  durationDays: z.number().int().positive().max(365),
+  durationDays: z
+    .number({ error: 'Enter the number of days' })
+    .int()
+    .positive('Enter the number of days')
+    .max(365),
   withOperator: z.boolean().default(true),
-  startDate: z.iso.date(),
+  startDate: z.iso.date({ error: 'Pick a start date' }),
   spec: z.string().trim().max(500).optional(),
 });
 
@@ -79,7 +85,7 @@ export const requirementDetailsSchemas = {
 } as const;
 
 const base = {
-  title: z.string().trim().min(3).max(120),
+  title: z.string().trim().min(3, 'Add a short title (at least 3 characters)').max(120),
   categoryId: z.string().uuid().optional(),
   /** Either an existing saved address or a new one. */
   addressId: z.string().uuid().optional(),

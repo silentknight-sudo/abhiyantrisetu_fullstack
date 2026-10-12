@@ -14,18 +14,18 @@ export function FinalCta() {
     <section ref={ref} className="bg-surface px-4 pb-24 sm:px-6">
       <motion.div
         style={{ scale, borderRadius: radius }}
-        className="relative mx-auto max-w-7xl overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500 px-6 py-20 text-center text-navy-800 sm:px-12"
+        className="relative mx-auto max-w-7xl overflow-hidden bg-gradient-to-br from-sand-200 to-sand-300 px-6 py-20 text-center text-navy-700 sm:px-12"
       >
         <span className="mx-auto grid w-fit place-items-center rounded-[28px] bg-white px-6 py-4 shadow-[0_20px_50px_-20px_rgba(10,24,35,0.5)]">
           <Image src="/logo.png" alt="" width={334} height={190} className="w-36" />
         </span>
-        <h2 className="mx-auto mt-8 max-w-3xl text-balance text-[clamp(2rem,5vw,3.8rem)] leading-[1.03] font-extrabold tracking-[-0.02em]">
-          Tell us what you need. We'll bring you verified pros by tomorrow.
+        <h2 className="mx-auto mt-8 max-w-3xl text-balance text-[clamp(2rem,5vw,3.8rem)] leading-[1.03]">
+          Tell us what you need. <em>We'll bring verified pros by tomorrow.</em>
         </h2>
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="/post"
-            className="rounded-full bg-navy-700 px-8 py-4 font-bold text-white transition hover:-translate-y-0.5 hover:bg-navy-800"
+            className="rounded-full bg-navy-700 px-8 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-navy-800"
           >
             Post a requirement, free
           </Link>

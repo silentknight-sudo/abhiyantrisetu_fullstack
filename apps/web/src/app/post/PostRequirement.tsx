@@ -303,7 +303,7 @@ export function PostRequirement() {
               className="h-full bg-orange-400"
             />
           </div>
-          <h1 className="mt-6 text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tight text-navy-600">
+          <h1 className="mt-6 text-[clamp(1.8rem,4vw,2.6rem)] text-navy-600">
             {STEP_TITLES[step]}
           </h1>
         </div>
@@ -720,9 +720,7 @@ export function PostRequirement() {
               >
                 <CheckCircle2 size={72} className="mx-auto text-success" />
               </motion.div>
-              <h1 className="mt-6 text-3xl font-extrabold text-navy-600">
-                Your requirement is live
-              </h1>
+              <h1 className="mt-6 text-3xl text-navy-600">Your requirement is live</h1>
               <p className="mt-2 text-text-muted">
                 “{posted.title}” · Ref {posted.id.slice(0, 8).toUpperCase()}
               </p>
@@ -788,7 +786,7 @@ export function PostRequirement() {
                   type="button"
                   disabled={busy}
                   onClick={sendOtp}
-                  className="inline-flex items-center gap-2 rounded-full bg-orange-400 px-6 py-3 font-bold text-navy-800 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-navy-700 px-6 py-3 font-semibold text-white disabled:opacity-60"
                 >
                   {busy && <Loader2 size={16} className="animate-spin" />} Send code
                 </button>
@@ -798,7 +796,7 @@ export function PostRequirement() {
                   type="button"
                   disabled={busy || code.length !== 6}
                   onClick={verifyAndPost}
-                  className="inline-flex items-center gap-2 rounded-full bg-orange-400 px-6 py-3 font-bold text-navy-800 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-navy-700 px-6 py-3 font-semibold text-white disabled:opacity-60"
                 >
                   {busy && <Loader2 size={16} className="animate-spin" />} Verify & post
                 </button>

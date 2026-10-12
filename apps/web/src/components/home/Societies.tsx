@@ -51,8 +51,8 @@ export function Societies() {
         <div className="order-1 lg:order-2">
           <SectionLabel>Societies, RWAs & builders</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
-              One contact for <span className="text-orange-500">every tower.</span>
+            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
+              One contact for <em>every tower.</em>
             </h2>
           </Reveal>
           <div className="mt-8 space-y-5">

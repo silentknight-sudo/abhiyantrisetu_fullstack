@@ -29,31 +29,24 @@ export function Header() {
     setHidden(y > 400 && y > prev && !open);
   });
 
-  // Home has a dark hero; other pages start on a light surface.
-  const overDark = pathname === '/' && !scrolled;
+  const solid = scrolled || pathname !== '/';
 
   return (
     <motion.header
       animate={{ y: hidden ? -96 : 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled || pathname !== '/'
-          ? 'border-b border-border/70 bg-surface/85 backdrop-blur-xl'
-          : 'bg-transparent'
+        solid ? 'border-b border-border/70 bg-background/85 backdrop-blur-xl' : 'bg-transparent'
       }`}
     >
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Logo onDark={overDark} />
+        <Logo />
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className={`rounded-full px-3 py-2 text-sm font-medium transition-colors ${
-                overDark
-                  ? 'text-navy-100 hover:bg-white/10 hover:text-white'
-                  : 'text-text-muted hover:bg-surface-muted hover:text-text'
-              }`}
+              className="rounded-full px-3 py-2 text-[15px] text-navy-700 transition-colors hover:text-orange-600"
             >
               {n.label}
             </Link>
@@ -61,8 +54,14 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <Link
+            href="/#ai"
+            className="hidden items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-10px_rgba(242,134,31,0.8)] transition hover:-translate-y-0.5 md:inline-flex"
+          >
+            ✦ Setu AI
+          </Link>
+          <Link
             href="/post"
-            className="hidden rounded-full bg-orange-400 px-5 py-2.5 text-sm font-bold text-navy-800 shadow-[0_8px_24px_-8px_rgba(255,159,67,0.7)] transition hover:-translate-y-0.5 hover:bg-orange-300 sm:inline-flex"
+            className="hidden rounded-full bg-navy-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(16,36,52,0.6)] transition hover:-translate-y-0.5 hover:bg-navy-800 sm:inline-flex"
           >
             Post a requirement
           </Link>
@@ -71,7 +70,7 @@ export function Header() {
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
-            className={`grid h-11 w-11 place-items-center rounded-full lg:hidden ${overDark ? 'text-white' : 'text-text'}`}
+            className="grid h-11 w-11 place-items-center rounded-full text-navy-700 lg:hidden"
           >
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -83,7 +82,7 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-border bg-surface lg:hidden"
+            className="overflow-hidden border-t border-border bg-background lg:hidden"
           >
             <div className="flex flex-col px-4 py-3">
               {NAV.map((n) => (
@@ -99,7 +98,7 @@ export function Header() {
               <Link
                 href="/post"
                 onClick={() => setOpen(false)}
-                className="mt-2 rounded-full bg-orange-400 px-5 py-3 text-center font-bold text-navy-800"
+                className="mt-2 rounded-full bg-navy-700 px-5 py-3 text-center font-semibold text-white"
               >
                 Post a requirement
               </Link>

@@ -69,26 +69,26 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <section className="bg-navy-800 text-white">
+      <section className="bg-surface-muted text-navy-700">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-          <nav className="text-sm text-navy-200">
-            <Link href="/services" className="hover:text-white">
+          <nav className="text-sm text-text-muted">
+            <Link href="/services" className="hover:text-navy-700">
               Services
             </Link>{' '}
             / {t.name} / {s.name}
           </nav>
           <Reveal>
-            <h1 className="mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.03] font-extrabold tracking-tight">
-              {t.name} in <span className="text-orange-400">{s.name}</span>, Greater Noida
+            <h1 className="mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.03]">
+              {t.name} in <em>{s.name}</em>, Greater Noida
             </h1>
           </Reveal>
-          <p className="mt-4 text-lg text-navy-100">
+          <p className="mt-4 text-lg text-text-muted">
             {t.hindi} · from ₹{t.from}
             {priceUnit(t.slug)}
           </p>
           <Link
             href="/post?type=service"
-            className="mt-8 inline-block rounded-full bg-orange-400 px-7 py-4 font-bold text-navy-800 transition hover:bg-orange-300"
+            className="mt-8 inline-block rounded-full bg-navy-700 px-7 py-4 font-semibold text-white transition hover:bg-navy-800"
           >
             Book a {t.name.toLowerCase()} in {s.name}
           </Link>
@@ -120,14 +120,14 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
             className="rounded-3xl border border-border bg-surface p-6"
           >
             <Icon className="text-orange-500" size={22} />
-            <h2 className="mt-4 font-bold text-navy-600">{title}</h2>
+            <h2 className="mt-4 font-display text-2xl font-semibold text-navy-700">{title}</h2>
             <p className="mt-1 text-sm text-text-muted">{body}</p>
           </Reveal>
         ))}
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-        <h2 className="text-xl font-bold text-navy-600">{t.plural} in nearby sectors</h2>
+        <h2 className="text-3xl text-navy-700">{t.plural} in nearby sectors</h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {nearby.map((n) => (
             <Link
@@ -139,7 +139,7 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
             </Link>
           ))}
         </div>
-        <h2 className="mt-10 text-xl font-bold text-navy-600">Other services in {s.name}</h2>
+        <h2 className="mt-10 text-3xl text-navy-700">Other services in {s.name}</h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {TRADES.filter((x) => x.slug !== t.slug).map((x) => (
             <Link

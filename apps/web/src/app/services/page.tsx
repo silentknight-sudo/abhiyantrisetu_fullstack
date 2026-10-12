@@ -12,7 +12,7 @@ export default function ServicesIndex() {
   return (
     <div className="bg-background pt-[72px]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <h1 className="text-[clamp(2rem,5vw,3.4rem)] font-extrabold tracking-tight text-navy-600">
+        <h1 className="text-[clamp(2rem,5vw,3.4rem)] text-navy-600">
           Services across Greater Noida
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-text-muted">
@@ -22,7 +22,7 @@ export default function ServicesIndex() {
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {TRADES.map((t) => (
             <section key={t.slug} className="rounded-3xl border border-border bg-surface p-6">
-              <h2 className="text-xl font-bold text-navy-600">
+              <h2 className="font-display text-2xl font-semibold text-navy-700">
                 {t.plural} <span className="text-sm font-medium text-orange-600">· {t.hindi}</span>
               </h2>
               <ul className="mt-4 flex flex-wrap gap-2">

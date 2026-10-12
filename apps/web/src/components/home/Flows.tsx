@@ -34,7 +34,7 @@ function FlowCard({ flow, index }: { flow: Flow; index: number }) {
       >
         <Icon size={26} />
       </span>
-      <h3 className="mt-8 text-3xl font-extrabold tracking-tight">{flow.title}</h3>
+      <h3 className="mt-8 font-display text-4xl font-semibold">{flow.title}</h3>
       <p className={`mt-1 text-sm ${dark ? 'text-orange-300' : 'text-orange-600'}`}>{flow.hindi}</p>
       <p className={`mt-4 leading-relaxed ${dark ? 'text-navy-100' : 'text-text-muted'}`}>
         {flow.pitch}
@@ -98,8 +98,8 @@ export function Flows() {
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
           <SectionLabel>Five ways to use Setu</SectionLabel>
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="max-w-2xl text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
-              Everything your home needs, <span className="text-orange-500">on one bridge.</span>
+            <h2 className="max-w-2xl text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
+              Everything your home needs, <em>on one bridge.</em>
             </h2>
             <div className="hidden w-48 md:block">
               <div className="h-1 overflow-hidden rounded-full bg-border">

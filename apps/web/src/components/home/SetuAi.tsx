@@ -29,8 +29,8 @@ export function SetuAi() {
         <div>
           <SectionLabel>Setu AI</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
-              Ask in Hinglish. <span className="text-orange-500">Get a plan.</span>
+            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
+              Ask in Hinglish. <em>Get a plan.</em>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>

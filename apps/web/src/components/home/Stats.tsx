@@ -40,7 +40,7 @@ export function Stats() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 sm:px-6 lg:grid-cols-4">
         {STATS.map((s, i) => (
           <Reveal key={s.label} delay={i * 0.08} className="border-l-2 border-orange-400 pl-5">
-            <p className="text-[clamp(2.2rem,5vw,3.6rem)] leading-none font-extrabold tracking-tight text-navy-600">
+            <p className="text-[clamp(2.2rem,5vw,3.6rem)] leading-none font-display font-semibold text-navy-700">
               <Counter to={s.to} suffix={s.suffix} />
             </p>
             <p className="mt-2 text-sm text-text-muted">{s.label}</p>

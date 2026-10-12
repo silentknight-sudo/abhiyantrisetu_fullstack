@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <div className="grid min-h-[70vh] place-items-center bg-background px-4 pt-[72px] text-center">
       <div>
-        <p className="text-6xl font-extrabold text-orange-400">404</p>
+        <p className="font-display text-7xl font-semibold text-orange-500">404</p>
         <h1 className="mt-4 text-2xl font-bold text-navy-600">
           This bridge doesn't go anywhere yet.
         </h1>

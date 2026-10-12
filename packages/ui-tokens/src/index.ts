@@ -42,6 +42,16 @@ export const palette = {
     800: '#252A31',
     900: '#14171B',
   },
+  /** Warm paper neutrals for the calm, editorial surfaces (website, marketing). */
+  sand: {
+    50: '#FBF7F0',
+    100: '#F6EFE3',
+    200: '#EFE4D2',
+    300: '#E4D4BB',
+    400: '#D2BC98',
+    500: '#B79C72',
+    600: '#7A6E62',
+  },
   green: { 500: '#1F9D55', 600: '#17804A', 50: '#E9F7EF' },
   red: { 500: '#D93B3B', 600: '#B92E2E', 50: '#FDECEC' },
   amber: { 500: '#E6A100', 50: '#FFF7E0' },
@@ -57,12 +67,12 @@ export const colors = {
     accent: palette.orange[400],
     accentHover: palette.orange[500],
     onAccent: palette.navy[800],
-    background: palette.neutral[50],
-    surface: palette.neutral[0],
-    surfaceMuted: palette.neutral[100],
-    border: palette.neutral[200],
+    background: palette.sand[100],
+    surface: palette.sand[50],
+    surfaceMuted: palette.sand[200],
+    border: palette.sand[300],
     text: palette.navy[800],
-    textMuted: palette.neutral[500],
+    textMuted: palette.sand[600],
     success: palette.green[600],
     successBg: palette.green[50],
     danger: palette.red[600],
@@ -126,11 +136,13 @@ export const radius = {
 } as const;
 
 /**
- * Type scale. Noto Sans covers Latin and Devanagari with matching metrics,
- * so Hindi and English text sit on the same baseline.
+ * Type scale. Inter for running text, Cormorant Garamond for headings, and Noto Sans
+ * Devanagari for Hindi.
  */
 export const fontFamily = {
-  sans: 'Noto Sans',
+  /** Headings: an elegant serif, used with an italic accent word. */
+  display: 'Cormorant Garamond',
+  sans: 'Inter',
   sansDevanagari: 'Noto Sans Devanagari',
   mono: 'JetBrains Mono',
 } as const;
@@ -196,6 +208,7 @@ export const tailwindPreset = {
       ),
       fontFamily: {
         sans: [fontFamily.sans, fontFamily.sansDevanagari, 'system-ui', 'sans-serif'],
+        display: [fontFamily.display, fontFamily.sansDevanagari, 'Georgia', 'serif'],
         mono: [fontFamily.mono, 'monospace'],
       },
       fontSize: Object.fromEntries(

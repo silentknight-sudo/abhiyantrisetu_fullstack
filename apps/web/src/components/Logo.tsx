@@ -15,12 +15,12 @@ export function Logo({ onDark = false, compact = false }: { onDark?: boolean; co
       {!compact && (
         <span className="leading-none">
           <span
-            className={`block text-[17px] font-extrabold tracking-tight ${onDark ? 'text-white' : 'text-navy-600'}`}
+            className={`block font-display text-[22px] font-semibold tracking-wide ${onDark ? 'text-white' : 'text-navy-700'}`}
           >
-            Abhiyantri <span className="text-orange-400">Setu</span>
+            Abhiyantri Setu
           </span>
           <span
-            className={`block text-[10px] font-medium tracking-[0.2em] uppercase ${onDark ? 'text-navy-200' : 'text-text-muted'}`}
+            className={`mt-0.5 block text-[10px] tracking-[0.25em] ${onDark ? 'text-navy-200' : 'text-text-muted'}`}
           >
             अभियंत्री सेतु
           </span>

@@ -173,7 +173,7 @@ function PhoneScreen({ screen }: { screen: Screen }) {
                 initial={{ rotateX: 90, opacity: 0 }}
                 animate={{ rotateX: 0, opacity: 1 }}
                 transition={{ delay: 0.2 + i * 0.12 }}
-                className="grid h-14 w-12 place-items-center rounded-xl bg-navy-600 text-2xl font-extrabold text-white"
+                className="grid h-14 w-12 place-items-center rounded-xl bg-navy-600 text-2xl font-bold text-white"
               >
                 {d}
               </motion.span>
@@ -247,7 +247,7 @@ function Step({
         <span className="text-sm font-bold tracking-[0.2em] text-orange-500">
           STEP 0{index + 1}
         </span>
-        <h3 className="mt-3 text-[clamp(1.6rem,3.2vw,2.6rem)] leading-tight font-extrabold tracking-tight text-navy-600">
+        <h3 className="mt-3 text-[clamp(1.6rem,3.2vw,2.6rem)] leading-tight font-display font-semibold text-navy-700">
           {title}
         </h3>
         <p className="mt-4 max-w-md text-lg leading-relaxed text-text-muted">{body}</p>
@@ -273,9 +273,8 @@ export function HowItWorks() {
     <section id="how" ref={section} className="relative bg-surface">
       <div className="mx-auto max-w-7xl px-4 pt-24 sm:px-6">
         <SectionLabel>How it works</SectionLabel>
-        <h2 className="max-w-3xl text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
-          From “I need help” to a job well done,{' '}
-          <span className="text-orange-500">in five steps.</span>
+        <h2 className="max-w-3xl text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
+          From “I need help” to a job well done, <em>in five steps.</em>
         </h2>
       </div>
 
@@ -320,7 +319,7 @@ export function HowItWorks() {
               <div className="absolute top-2 left-1/2 h-5 w-24 -translate-x-1/2 rounded-full bg-navy-800" />
               <div className="flex h-full flex-col overflow-hidden rounded-[34px] px-4 pt-10 pb-4">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="text-sm font-extrabold text-navy-600">
+                  <span className="font-display text-base font-semibold text-navy-700">
                     Abhiyantri <span className="text-orange-400">Setu</span>
                   </span>
                   <span className="text-[10px] font-semibold text-text-muted">{active + 1}/5</span>

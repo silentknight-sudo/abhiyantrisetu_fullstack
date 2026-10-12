@@ -83,8 +83,8 @@ export function Calculator() {
           <div>
             <SectionLabel>Cost calculator</SectionLabel>
             <Reveal>
-              <h2 className="text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
-                Know the ballpark <span className="text-orange-500">before you call anyone.</span>
+              <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
+                Know the ballpark <em>before you call anyone.</em>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
@@ -188,7 +188,7 @@ export function Calculator() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-2 text-[clamp(1.5rem,3vw,2.1rem)] leading-tight font-extrabold"
+                    className="mt-2 text-[clamp(1.5rem,3vw,2.1rem)] leading-tight font-display font-semibold"
                   >
                     {formatINR(low, { decimals: false })} – {formatINR(high, { decimals: false })}
                   </motion.p>

@@ -35,7 +35,16 @@
   --color-orange-500: #f2861f;
   --color-orange-600: #d06b0b;
 
-  --font-sans: var(--font-noto), var(--font-noto-deva), system-ui, sans-serif;
+  --color-sand-50: #fbf7f0;
+  --color-sand-100: #f6efe3;
+  --color-sand-200: #efe4d2;
+  --color-sand-300: #e4d4bb;
+  --color-sand-400: #d2bc98;
+  --color-sand-500: #b79c72;
+  --color-sand-600: #7a6e62;
+
+  --font-sans: var(--font-inter), var(--font-noto-deva), system-ui, sans-serif;
+  --font-display: var(--font-cormorant), var(--font-noto-deva), Georgia, serif;
 }
 
 html {
@@ -68,6 +77,23 @@ html.lenis body {
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee {
     animation: none;
+  }
+}
+
+/* Headings use the serif display face; an <em> inside one is the italic orange accent.
+   In the base layer so utility classes on a heading still win. */
+@layer base {
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h1 em,
+  h2 em {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-orange-500);
   }
 }
 

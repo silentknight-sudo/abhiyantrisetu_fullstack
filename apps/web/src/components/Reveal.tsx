@@ -5,7 +5,7 @@ import { motion, type HTMLMotionProps } from 'motion/react';
 /** Fades and lifts children into place the first time they scroll into view. */
 export function Reveal({
   delay = 0,
-  y = 28,
+  y = 24,
   className,
   children,
   ...rest
@@ -24,14 +24,12 @@ export function Reveal({
   );
 }
 
+/** Letter-spaced eyebrow above a section heading. */
 export function SectionLabel({ children, dark }: { children: React.ReactNode; dark?: boolean }) {
   return (
     <p
-      className={`mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold tracking-[0.18em] uppercase ${
-        dark ? 'bg-white/10 text-orange-300' : 'bg-orange-50 text-orange-600'
-      }`}
+      className={`mb-4 text-sm font-semibold tracking-[0.28em] uppercase ${dark ? 'text-orange-300' : 'text-orange-600'}`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
       {children}
     </p>
   );

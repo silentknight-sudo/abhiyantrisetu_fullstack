@@ -118,15 +118,15 @@ export function BuildTracker() {
   const released = Math.round((TOTAL * (stage + 1)) / 10);
 
   return (
-    <section id="build" ref={ref} className="relative h-[420vh] bg-navy-800 text-white">
+    <section id="build" ref={ref} className="relative h-[420vh] bg-surface-muted text-navy-700">
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <SectionLabel dark>House construction tracker</SectionLabel>
-            <h2 className="text-balance text-[clamp(1.9rem,4vw,3.2rem)] leading-[1.05] font-extrabold tracking-[-0.02em]">
-              Watch your house rise, <span className="text-orange-400">stage by stage.</span>
+            <SectionLabel>House construction tracker</SectionLabel>
+            <h2 className="text-balance text-[clamp(2.2rem,4.5vw,3.6rem)] leading-[1.02]">
+              Watch your house rise, <em>stage by stage.</em>
             </h2>
-            <p className="mt-4 max-w-md text-navy-100">
+            <p className="mt-4 max-w-md text-text-muted">
               Ten stages, each with an engineer inspection, photo visit report and a stage payment
               you approve. Nothing is paid for work you haven't seen.
             </p>
@@ -134,15 +134,15 @@ export function BuildTracker() {
               {CONSTRUCTION_STAGES.map((s, i) => (
                 <li
                   key={s}
-                  className={`flex items-center gap-2 transition-colors duration-300 ${i <= stage ? 'text-white' : 'text-navy-400'}`}
+                  className={`flex items-center gap-2 transition-colors duration-300 ${i <= stage ? 'text-navy-700' : 'text-sand-500'}`}
                 >
                   <span
                     className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-bold transition-colors duration-300 ${
                       i < stage
                         ? 'bg-success text-white'
                         : i === stage
-                          ? 'bg-orange-400 text-navy-800'
-                          : 'bg-white/10'
+                          ? 'bg-orange-400 text-white'
+                          : 'bg-sand-300 text-navy-700'
                     }`}
                   >
                     {i < stage ? '✓' : i + 1}
@@ -154,28 +154,27 @@ export function BuildTracker() {
           </div>
 
           <div className="relative">
-            <div className="relative aspect-[10/9] w-full rounded-[32px] border border-white/10 bg-gradient-to-b from-navy-700 to-navy-800 p-6 pt-16 sm:pb-20">
+            <div className="relative aspect-[10/9] w-full rounded-[32px] border border-border bg-gradient-to-b from-sand-50 to-sand-200 p-6 pt-16 sm:pb-20">
               <House stage={stage} />
-              <div className="absolute top-5 left-5 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
-                <p className="text-[11px] tracking-wider text-navy-200 uppercase">
+              <div className="absolute top-5 left-5 rounded-2xl bg-surface/90 px-4 py-3 shadow-sm backdrop-blur">
+                <p className="text-[11px] tracking-wider text-text-muted uppercase">
                   Stage {stage + 1} of 10
                 </p>
                 <p className="text-lg font-bold">{CONSTRUCTION_STAGES[stage]}</p>
               </div>
               <div className="absolute right-5 bottom-5 left-5 hidden gap-3 sm:grid sm:grid-cols-3">
-                <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2.5 text-sm backdrop-blur">
+                <div className="flex items-center gap-2 rounded-2xl bg-surface/90 px-3 py-2.5 text-sm shadow-sm backdrop-blur">
                   <ClipboardCheck size={16} className="text-orange-400" /> Inspection passed
                 </div>
-                <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2.5 text-sm backdrop-blur">
+                <div className="flex items-center gap-2 rounded-2xl bg-surface/90 px-3 py-2.5 text-sm shadow-sm backdrop-blur">
                   <Camera size={16} className="text-orange-400" /> {6 + stage * 3} site photos
                 </div>
-                <div className="flex items-center gap-2 rounded-2xl bg-success/20 px-3 py-2.5 text-sm backdrop-blur">
-                  <CheckCircle2 size={16} className="text-green-300" /> {formatINR(released)}{' '}
-                  released
+                <div className="flex items-center gap-2 rounded-2xl bg-surface/90 px-3 py-2.5 text-sm font-semibold text-success shadow-sm backdrop-blur">
+                  <CheckCircle2 size={16} className="text-success" /> {formatINR(released)} released
                 </div>
               </div>
             </div>
-            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-sand-300">
               <motion.div
                 style={{ width: fill }}
                 className="h-full bg-gradient-to-r from-orange-500 to-orange-300"

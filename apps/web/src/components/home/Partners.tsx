@@ -33,8 +33,8 @@ export function Partners() {
         <div>
           <SectionLabel dark>For plumbers, masons, contractors & suppliers</SectionLabel>
           <Reveal>
-            <h2 className="text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em]">
-              More work. <span className="text-orange-400">Paid on time.</span>
+            <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02]">
+              More work. <em className="text-orange-300">Paid on time.</em>
             </h2>
           </Reveal>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -93,7 +93,7 @@ export function Partners() {
             className="absolute top-0 right-0 w-[min(100%,360px)] rounded-[28px] bg-surface p-6 text-text shadow-2xl"
           >
             <p className="text-xs tracking-wider text-text-muted uppercase">This week</p>
-            <p className="mt-1 text-3xl font-extrabold text-navy-600">
+            <p className="mt-1 font-display text-4xl font-semibold text-navy-700">
               {formatINR(1_842_000, { decimals: false })}
             </p>
             <p className="text-sm text-success">

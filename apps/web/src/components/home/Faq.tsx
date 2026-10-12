@@ -13,7 +13,7 @@ export function Faq() {
       <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div>
           <SectionLabel>Questions</SectionLabel>
-          <h2 className="text-balance text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-navy-600">
+          <h2 className="text-balance text-[clamp(2.4rem,5vw,4rem)] leading-[1.02] text-navy-700">
             Good to know.
           </h2>
         </div>

@@ -86,11 +86,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="mt-5 text-[clamp(2.8rem,6vw,5.4rem)] leading-[0.98] text-navy-700"
+            className="mt-5 text-[clamp(2.5rem,5.2vw,4.7rem)] leading-[1.02] text-navy-700"
           >
-            Build your home,
+            Build, Renovate,
             <br />
-            <em>with trust.</em>
+            <em>Repair &amp; Maintain.</em>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}

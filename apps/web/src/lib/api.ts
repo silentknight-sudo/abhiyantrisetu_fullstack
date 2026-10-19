@@ -1,4 +1,4 @@
-import type { AuthTokens, CreateRequirementInput } from '@setu/schemas';
+import type { AuthTokens, CreateRequirementInput, WaitlistSignupInput } from '@setu/schemas';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
@@ -64,4 +64,6 @@ export const api = {
       token,
       body: JSON.stringify(input),
     }),
+  joinWaitlist: (input: WaitlistSignupInput) =>
+    call<{ ok: true; id: string }>('/waitlist', { method: 'POST', body: JSON.stringify(input) }),
 };

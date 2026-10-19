@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { WaitlistForm } from '@/components/WaitlistForm';
 import { FLOWS, SITE } from '@/lib/content';
 
 /** Shown at /post until launch. */
@@ -27,24 +28,24 @@ export function ComingSoonPage() {
           </li>
         ))}
       </ul>
-      <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <div className="mx-auto mt-10 max-w-xl rounded-[28px] border border-border bg-surface p-6 text-left shadow-[0_30px_60px_-30px_rgba(16,36,52,0.35)] sm:p-8">
+        <p className="mb-4 font-display text-2xl font-semibold text-navy-700">Get early access</p>
+        <WaitlistForm source="post-page" />
+      </div>
+      <p className="mt-6 text-sm text-text-muted">
+        Prefer WhatsApp?{' '}
         <a
+          className="font-medium text-navy-700 underline"
           href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent('Hi Abhiyantri Setu, please notify me when you launch.')}`}
           target="_blank"
           rel="noreferrer"
-          className="rounded-full bg-navy-700 px-8 py-4 font-semibold text-white transition hover:bg-navy-800"
         >
-          Notify me on WhatsApp
-        </a>
-        <Link
-          href="/"
-          className="rounded-full border-2 border-navy-700/70 px-8 py-4 font-semibold text-navy-700 transition hover:bg-navy-700 hover:text-white"
-        >
+          Message us
+        </a>{' '}
+        ·{' '}
+        <Link href="/" className="font-medium text-navy-700 underline">
           Back to home
         </Link>
-      </div>
-      <p className="mt-6 text-sm text-text-muted">
-        Or write to <span className="font-medium text-navy-700 select-all">{SITE.email}</span>
       </p>
     </section>
   );

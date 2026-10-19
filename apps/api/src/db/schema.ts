@@ -121,6 +121,12 @@ export const quoteStatusEnum = pgEnum('quote_status', [
 ]);
 export const jobStateEnum = pgEnum('job_state', tuple(JOB_STATES));
 export const actorTypeEnum = pgEnum('actor_type', ['customer', 'partner', 'ops', 'system']);
+export const waitlistRoleEnum = pgEnum('waitlist_role', [
+  'customer',
+  'provider',
+  'supplier',
+  'society',
+]);
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -576,4 +582,34 @@ export const events = pgTable(
     occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index('events_name_time_idx').on(t.name, t.occurredAt)],
+);
+
+// ---------- pre-launch ----------
+
+/** Early-access sign-ups from the website. One row per phone and role; repeats update it. */
+export const waitlistSignups = pgTable(
+  'waitlist_signups',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    phone: text('phone').notNull(),
+    role: waitlistRoleEnum('role').notNull(),
+    sector: text('sector'),
+    interests: requirementTypeEnum('interests')
+      .array()
+      .notNull()
+      .default(sql`'{}'::requirement_type[]`),
+    trade: text('trade'),
+    source: text('source'),
+    /** DPDP consent: when the person agreed to be contacted. */
+    consentedAt: timestamp('consented_at', { withTimezone: true }).notNull(),
+    ip: text('ip'),
+    /** Set when the person is invited or converted at launch. */
+    contactedAt: timestamp('contacted_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex('waitlist_phone_role_uq').on(t.phone, t.role),
+    index('waitlist_created_idx').on(t.createdAt),
+  ],
 );

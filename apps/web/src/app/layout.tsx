@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter, Noto_Sans_Devanagari } from 'next/font/google';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { Analytics } from '@/components/Analytics';
 import { ComingSoonProvider } from '@/components/ComingSoon';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { SmoothScroll } from '@/components/SmoothScroll';
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <ComingSoonProvider />
+          <Analytics />
         </SmoothScroll>
       </body>
     </html>

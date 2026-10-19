@@ -5,8 +5,9 @@ import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { SITE } from '@/lib/content';
+import { track } from '@/lib/analytics';
 import { LAUNCHED } from '@/lib/launch';
+import { WaitlistForm } from './WaitlistForm';
 
 /**
  * Before launch, intercepts every link to /post and every element marked
@@ -26,7 +27,9 @@ export function ComingSoonProvider() {
       const isPost = href === '/post' || href.startsWith('/post?');
       if (!marked && !isPost) return;
       e.preventDefault();
-      setFeature(marked ?? 'Posting a requirement');
+      const name = marked ?? 'Posting a requirement';
+      track('coming_soon_opened', { feature: name });
+      setFeature(name);
     };
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);
@@ -62,7 +65,7 @@ export function ComingSoonProvider() {
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformPerspective: 1000 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md rounded-[32px] border border-border bg-surface p-8 text-center shadow-[0_40px_80px_-30px_rgba(10,24,35,0.6)]"
+            className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-[32px] border border-border bg-surface p-6 text-center shadow-[0_40px_80px_-30px_rgba(10,24,35,0.6)] sm:p-8"
           >
             <button
               type="button"
@@ -79,25 +82,21 @@ export function ComingSoonProvider() {
             <h2 id="coming-soon-title" className="mt-2 text-4xl leading-tight text-navy-700">
               {feature} <em>is almost here.</em>
             </h2>
-            <p className="mt-4 leading-relaxed text-text-muted">
-              Abhiyantri Setu is launching in Greater Noida soon, on the web and as apps for Android
-              and iPhone. Message us on WhatsApp and we&apos;ll tell you the day it goes live.
+            <p className="mt-3 leading-relaxed text-text-muted">
+              Abhiyantri Setu launches in Greater Noida soon, on the web and as Android and iPhone
+              apps. Join the early-access list and we&apos;ll message you the day it goes live.
             </p>
-            <div className="mt-7 flex flex-col gap-3">
-              <a
-                href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(
-                  `Hi Abhiyantri Setu, please notify me when ${feature.toLowerCase()} is live.`,
-                )}`}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-navy-700 px-6 py-3.5 font-semibold text-white transition hover:bg-navy-800"
-              >
-                Notify me on WhatsApp
-              </a>
-              <p className="text-sm text-text-muted">
-                Or write to{' '}
-                <span className="font-medium text-navy-700 select-all">{SITE.email}</span>
-              </p>
+            <div className="mt-6">
+              <WaitlistForm
+                source={`dialog:${feature}`}
+                defaultRole={
+                  /partner/i.test(feature)
+                    ? 'provider'
+                    : /supplier|rental/i.test(feature)
+                      ? 'supplier'
+                      : 'customer'
+                }
+              />
             </div>
           </motion.div>
         </motion.div>

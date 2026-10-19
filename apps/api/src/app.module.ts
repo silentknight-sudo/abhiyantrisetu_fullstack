@@ -12,6 +12,7 @@ import { HealthController } from './modules/health/health.controller';
 import { IdentityModule } from './modules/identity/identity.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { RequirementsModule } from './modules/requirements/requirements.module';
+import { WaitlistModule } from './modules/waitlist/waitlist.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RequirementsModule } from './modules/requirements/requirements.module';
     IdentityModule,
     RequirementsModule,
     JobsModule,
+    WaitlistModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

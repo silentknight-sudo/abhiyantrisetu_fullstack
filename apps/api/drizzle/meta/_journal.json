@@ -15,6 +15,13 @@
       "when": 1791797131681,
       "tag": "0001_core_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792412652033,
+      "tag": "0002_waitlist",
+      "breakpoints": true
     }
   ]
 }

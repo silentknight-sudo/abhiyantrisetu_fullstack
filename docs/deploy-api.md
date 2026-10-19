@@ -1,0 +1,57 @@
+# Deploying the API (AWS Mumbai)
+
+The API and the background worker ship as one Docker image (`apps/api/Dockerfile`), and everything runs in **ap-south-1 (Mumbai)**, which keeps personal data in India for the DPDP Act. CI builds the image on every push.
+
+## What you need
+
+| Piece              | Service                     | Notes                                                                                                                                                |
+| ------------------ | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Container registry | Amazon ECR                  | Repository `setu-api`                                                                                                                                |
+| API and worker     | ECS on Fargate              | One service for the API (2 tasks in different availability zones), one for the worker (1 task)                                                       |
+| Database           | RDS PostgreSQL 16, Multi-AZ | Enable the `postgis` and `pgcrypto` extensions (the first migration does this; the DB user needs `rds_superuser`). Supabase Pro in Mumbai also works |
+| Redis              | ElastiCache (Redis 7)       | Used by the worker (BullMQ)                                                                                                                          |
+| Secrets            | AWS Secrets Manager         | Injected into the tasks as environment variables                                                                                                     |
+| Load balancer      | Application Load Balancer   | HTTPS on `api.abhiyantrisetu.com`; health check `GET /v1/health`                                                                                     |
+| DNS and protection | Cloudflare                  | Proxy the API hostname                                                                                                                               |
+
+## Environment variables
+
+| Variable                                  | Pre-launch value                                            | At launch                               |
+| ----------------------------------------- | ----------------------------------------------------------- | --------------------------------------- |
+| `NODE_ENV`                                | `production`                                                | `production`                            |
+| `DATABASE_URL`                            | RDS connection string                                       | —                                       |
+| `REDIS_URL`                               | ElastiCache endpoint                                        | —                                       |
+| `JWT_ACCESS_SECRET`, `OTP_HASH_SECRET`    | 48+ random characters each (`openssl rand -base64 48`)      | —                                       |
+| `SMS_PROVIDER`                            | `disabled` (login closed; sign-ups still work)              | `msg91` once DLT templates are approved |
+| `MSG91_AUTH_KEY`, `MSG91_OTP_TEMPLATE_ID` | empty                                                       | from MSG91                              |
+| `CORS_ORIGINS`                            | `https://abhiyantrisetu.com,https://www.abhiyantrisetu.com` | add the admin and vendor portals        |
+
+The API refuses to start with missing or unsafe settings and prints `Invalid environment` with the reason.
+
+## Release steps
+
+1. Build and push the image:
+   ```bash
+   docker build -f apps/api/Dockerfile -t setu-api .
+   aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.ap-south-1.amazonaws.com
+   docker tag setu-api <account>.dkr.ecr.ap-south-1.amazonaws.com/setu-api:<git-sha>
+   docker push <account>.dkr.ecr.ap-south-1.amazonaws.com/setu-api:<git-sha>
+   ```
+2. Run migrations as a one-off ECS task with the new image and the command `node dist/db/migrate.js`.
+3. Update the API service (command `node dist/main.js`) and the worker service (command `node dist/worker.js`) to the new image tag.
+4. Check `https://api.abhiyantrisetu.com/v1/health` returns `{"status":"ok","db":"up"}`.
+5. In Vercel, set `NEXT_PUBLIC_API_URL=https://api.abhiyantrisetu.com` and redeploy the website so the early-access form posts to it.
+
+## Reading the early-access list
+
+Staff accounts (role `ops`, `support` or `super_admin`) can call:
+
+- `GET /v1/admin/waitlist?role=provider&sector=Sector%20Pi` for a filtered list
+- `GET /v1/admin/waitlist/summary` for counts by role and sector
+- `GET /v1/admin/waitlist/export.csv` for a spreadsheet
+
+Admin portal v1 (Phase 1) will put these behind buttons. Until then, give a staff role to your own account in the database (`update users set roles = '{customer,super_admin}' where phone = '+91…'`) and call the endpoints with your login token.
+
+## Before scaling beyond one API task
+
+Request rate limits are kept in each task's memory. Move them to Redis before running more than one task for real traffic (planned in Phase 1).

@@ -12,7 +12,8 @@ const envSchema = z
     OTP_HASH_SECRET: secret,
     ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
     REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
-    SMS_PROVIDER: z.enum(['console', 'msg91']).default('console'),
+    // disabled: login is switched off (pre-launch, before DLT approval); OTP requests get a 503.
+    SMS_PROVIDER: z.enum(['console', 'msg91', 'disabled']).default('console'),
     MSG91_AUTH_KEY: z.string().optional(),
     MSG91_OTP_TEMPLATE_ID: z.string().optional(),
     CORS_ORIGINS: z

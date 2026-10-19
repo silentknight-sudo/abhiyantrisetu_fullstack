@@ -6,6 +6,7 @@ import { ENV, type Env } from '../../config/env';
 import type { Db } from '../../db/client';
 import { DB } from '../../db/db.module';
 import { otpChallenges } from '../../db/schema';
+import { DisabledSmsProvider } from './sms/disabled.provider';
 import { SMS_PROVIDER, type SmsProvider } from './sms/sms.provider';
 
 export const OTP_POLICY = {
@@ -37,6 +38,8 @@ export class OtpService {
   }
 
   async send(phone: string, ip: string | undefined, locale: Locale = 'en') {
+    // Pre-launch: refuse before touching the database.
+    if (this.sms instanceof DisabledSmsProvider) await this.sms.sendOtp();
     const hourAgo = new Date(Date.now() - 60 * 60_000);
 
     const [latest] = await this.db

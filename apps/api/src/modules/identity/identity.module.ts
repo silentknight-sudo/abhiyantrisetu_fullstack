@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { MeController } from './me.controller';
 import { OtpService } from './otp.service';
 import { ConsoleSmsProvider } from './sms/console.provider';
+import { DisabledSmsProvider } from './sms/disabled.provider';
 import { Msg91SmsProvider } from './sms/msg91.provider';
 import { SMS_PROVIDER } from './sms/sms.provider';
 import { TokensService } from './tokens.service';
@@ -21,7 +22,9 @@ import { TokensService } from './tokens.service';
       useFactory: (env: Env) =>
         env.SMS_PROVIDER === 'msg91'
           ? new Msg91SmsProvider(env.MSG91_AUTH_KEY!, env.MSG91_OTP_TEMPLATE_ID!)
-          : new ConsoleSmsProvider(),
+          : env.SMS_PROVIDER === 'disabled'
+            ? new DisabledSmsProvider()
+            : new ConsoleSmsProvider(),
     },
   ],
   exports: [TokensService],

@@ -12,7 +12,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node -r @swc-node/register src/db/migrate.ts",
     "db:seed": "node -r @swc-node/register src/db/seed.ts",
-    "openapi": "node -r @swc-node/register src/openapi.ts"
+    "openapi": "node -r @swc-node/register src/openapi.ts",
+    "db:migrate:prod": "node dist/db/migrate.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",

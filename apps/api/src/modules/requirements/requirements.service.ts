@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { isStaff, requirementMachine, type RequirementEvent } from '@setu/domain';
 import type { CreateRequirementInput } from '@setu/schemas';
 import { and, desc, eq } from 'drizzle-orm';
@@ -8,12 +9,18 @@ import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
 import { addresses, categories, events, requirementEvents, requirements } from '../../db/schema';
 
+/** Emitted after a requirement is committed. Payload: { requirementId }. */
+export const REQUIREMENT_CREATED = 'requirement.created';
+
 @Injectable()
 export class RequirementsService {
-  constructor(@Inject(DB) private readonly db: Db) {}
+  constructor(
+    @Inject(DB) private readonly db: Db,
+    @Inject(EventEmitter2) private readonly bus: EventEmitter2,
+  ) {}
 
   async create(user: AuthUser, input: CreateRequirementInput) {
-    return this.db.transaction(async (tx) => {
+    const created = await this.db.transaction(async (tx) => {
       let addressId = input.addressId;
       if (addressId) {
         const [owned] = await tx
@@ -69,6 +76,15 @@ export class RequirementsService {
       });
       return req!;
     });
+    // Matching and notifications react to this; their failures never undo the post.
+    await this.bus
+      .emitAsync(REQUIREMENT_CREATED, { requirementId: created.id })
+      .catch(() => undefined);
+    const [fresh] = await this.db
+      .select()
+      .from(requirements)
+      .where(eq(requirements.id, created.id));
+    return fresh ?? created;
   }
 
   listMine(user: AuthUser) {

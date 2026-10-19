@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
@@ -13,11 +14,15 @@ import { IdentityModule } from './modules/identity/identity.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { RequirementsModule } from './modules/requirements/requirements.module';
 import { WaitlistModule } from './modules/waitlist/waitlist.module';
+import { MatchingModule } from './modules/matching/matching.module';
+import { PartnersModule } from './modules/partners/partners.module';
+import { QuotesModule } from './modules/quotes/quotes.module';
 
 @Module({
   imports: [
     ConfigModule,
     DbModule,
+    EventEmitterModule.forRoot(),
     JwtModule.registerAsync({
       global: true,
       inject: [ENV],
@@ -33,6 +38,9 @@ import { WaitlistModule } from './modules/waitlist/waitlist.module';
     RequirementsModule,
     JobsModule,
     WaitlistModule,
+    PartnersModule,
+    MatchingModule,
+    QuotesModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

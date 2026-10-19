@@ -6,3 +6,5 @@ export * from './gst';
 export * from './machine';
 export * from './jobs';
 export * from './i18n';
+export * from './trades';
+export * from './matching';

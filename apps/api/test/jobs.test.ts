@@ -87,7 +87,15 @@ async function hiredJob() {
   const requirements = ctx.app.get(RequirementsService);
   const jobsService = ctx.app.get(JobsService);
   return ctx.db.transaction(async (tx) => {
-    await requirements.transition(tx, req.id, { type: 'match', leadCount: 1 }, { type: 'system' });
+    // Posting auto-matches the nearby verified plumber, so the requirement is already matched.
+    if (req.status === 'requested') {
+      await requirements.transition(
+        tx,
+        req.id,
+        { type: 'match', leadCount: 1 },
+        { type: 'system' },
+      );
+    }
     await requirements.transition(tx, req.id, { type: 'receive_quote' }, { type: 'system' });
     return jobsService.hire(tx, {
       requirementId: req.id,
@@ -103,7 +111,7 @@ const tomorrow = () => new Date(Date.now() + 86_400_000).toISOString();
 describe('requirements', () => {
   it('stores a geo-located requirement and its creation event', async () => {
     const req = await postRequirement();
-    expect(req.status).toBe('requested');
+    expect(req.status).toBe('matched'); // the verified plumber nearby got a lead
     const got = await ctx
       .http()
       .get(`/v1/requirements/${req.id}`)

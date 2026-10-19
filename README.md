@@ -97,6 +97,11 @@ POST /v1/requirements           GET /v1/requirements[/:id]     POST /v1/requirem
 GET  /v1/jobs[/:id]             GET /v1/jobs/:id/events
 POST /v1/jobs/:id/{schedule|reschedule|start|complete|confirm|cancel|dispute|resolve|start-code}
 GET  /v1/health
+POST /v1/waitlist                GET /v1/admin/waitlist[/summary|/export.csv]
+POST|GET|PATCH /v1/partners/me   GET /v1/admin/partners   POST /v1/admin/partners/:id/verification
+GET  /v1/partner/leads           POST /v1/partner/leads/:id/{seen|decline|quote}
+GET  /v1/quotes/:id              POST /v1/quotes/:id/{revise|withdraw|negotiate|accept}
+GET  /v1/requirements/:id/quotes
 ```
 
 ## Rules this codebase holds to

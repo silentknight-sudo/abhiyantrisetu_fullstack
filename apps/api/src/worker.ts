@@ -5,6 +5,7 @@
 import 'reflect-metadata';
 import { Logger, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { Queue, Worker } from 'bullmq';
 import IORedis from 'ioredis';
@@ -16,7 +17,15 @@ import { JobsService } from './modules/jobs/jobs.service';
 
 export const QUEUES = { maintenance: 'maintenance' } as const;
 
-@Module({ imports: [ConfigModule, DbModule, JwtModule.register({}), JobsModule] })
+@Module({
+  imports: [
+    ConfigModule,
+    DbModule,
+    EventEmitterModule.forRoot(),
+    JwtModule.register({}),
+    JobsModule,
+  ],
+})
 class WorkerModule {}
 
 async function main() {

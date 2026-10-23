@@ -38,6 +38,7 @@ const publicColumns = {
   locale: users.locale,
   roles: users.roles,
   consentVersion: users.consentVersion,
+  whatsappOptInAt: users.whatsappOptInAt,
   createdAt: users.createdAt,
 };
 

@@ -10,3 +10,4 @@ coverage/
 apps/api/openapi.json
 .next/
 next-env.d.ts
+apps/web/tsconfig.tsbuildinfo

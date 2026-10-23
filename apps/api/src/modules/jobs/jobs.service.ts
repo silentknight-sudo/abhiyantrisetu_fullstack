@@ -25,7 +25,7 @@ import { assertTransition } from '../../common/transition-error';
 import { ENV, type Env } from '../../config/env';
 import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
-import { jobEvents, jobs, partners } from '../../db/schema';
+import { addresses, jobEvents, jobs, partners, requirements, users } from '../../db/schema';
 import { RequirementsService } from '../requirements/requirements.service';
 
 type JobRow = typeof jobs.$inferSelect;
@@ -48,6 +48,21 @@ type EventBuilder = (job: JobRow, tx: Tx) => Promise<JobEvent>;
  * The only place a job changes state. Every transition locks the row, runs the guarded
  * transition table from @setu/domain and appends a job_events row in the same transaction.
  */
+export interface JobContact {
+  name: string | null;
+  phone: string;
+  address: {
+    line1: string;
+    line2: string | null;
+    tower: string | null;
+    flat: string | null;
+    sector: string | null;
+    city: string;
+    pincode: string;
+    location: { lat: number; lng: number };
+  } | null;
+}
+
 @Injectable()
 export class JobsService {
   constructor(
@@ -128,19 +143,63 @@ export class JobsService {
     throw new NotFoundException();
   }
 
-  private present(job: JobRow, actor: Actor) {
+  private present(job: JobRow, actor: Actor, extra: { title: string; contact: JobContact | null }) {
     const { startCodeHash: _hash, startCodeAttempts: _attempts, ...rest } = job;
     return {
       ...rest,
+      ...extra,
       viewerRole: actor,
       availableActions: jobMachine.availableEvents(job.state, actor),
     };
   }
 
+  /**
+   * The job's title, and who to call once hired: the partner (and staff) get the customer
+   * and the site address, the customer gets the partner. Hidden on cancelled jobs.
+   */
+  private async details(db: Db | Tx, job: JobRow, actor: Actor) {
+    const [site] = await db
+      .select({
+        title: requirements.title,
+        customerName: users.name,
+        customerPhone: users.phone,
+        address: {
+          line1: addresses.line1,
+          line2: addresses.line2,
+          tower: addresses.tower,
+          flat: addresses.flat,
+          sector: addresses.sector,
+          city: addresses.city,
+          pincode: addresses.pincode,
+          location: addresses.location,
+        },
+      })
+      .from(requirements)
+      .innerJoin(users, eq(users.id, requirements.customerId))
+      .innerJoin(addresses, eq(addresses.id, requirements.addressId))
+      .where(eq(requirements.id, job.requirementId));
+    if (!site) throw new NotFoundException();
+    let contact: JobContact | null = null;
+    if (job.state !== 'cancelled') {
+      if (actor === 'customer') {
+        const [p] = await db
+          .select({ name: partners.displayName, phone: users.phone })
+          .from(partners)
+          .innerJoin(users, eq(users.id, partners.userId))
+          .where(eq(partners.id, job.partnerId));
+        contact = p ? { ...p, address: null } : null;
+      } else {
+        contact = { name: site.customerName, phone: site.customerPhone, address: site.address };
+      }
+    }
+    return { title: site.title, contact };
+  }
+
   async get(user: AuthUser, id: string) {
     const [job] = await this.db.select().from(jobs).where(eq(jobs.id, id));
     if (!job) throw new NotFoundException();
-    return this.present(job, await this.actorFor(this.db, user, job));
+    const actor = await this.actorFor(this.db, user, job);
+    return this.present(job, actor, await this.details(this.db, job, actor));
   }
 
   async listMine(user: AuthUser) {
@@ -149,8 +208,9 @@ export class JobsService {
       .from(partners)
       .where(eq(partners.userId, user.id));
     const rows = await this.db
-      .select()
+      .select({ job: jobs, title: requirements.title })
       .from(jobs)
+      .innerJoin(requirements, eq(requirements.id, jobs.requirementId))
       .where(
         p
           ? or(eq(jobs.customerId, user.id), eq(jobs.partnerId, p.id))
@@ -158,7 +218,12 @@ export class JobsService {
       )
       .orderBy(desc(jobs.createdAt))
       .limit(100);
-    return rows.map((j) => this.present(j, p && j.partnerId === p.id ? 'partner' : 'customer'));
+    return rows.map(({ job, title }) =>
+      this.present(job, p && job.partnerId === p.id ? 'partner' : 'customer', {
+        title,
+        contact: null,
+      }),
+    );
   }
 
   async history(user: AuthUser, id: string) {
@@ -200,7 +265,7 @@ export class JobsService {
         actorId: user === 'system' ? null : user.id,
         payload: event,
       });
-      return { res, job: this.present(updated!, actor), row: updated!, event: eventType } as const;
+      return { res, actor, row: updated!, event: eventType } as const;
     });
     assertTransition(outcome.res);
     const row = outcome.row!;
@@ -214,7 +279,7 @@ export class JobsService {
       actorUserId: user === 'system' ? null : user.id,
     };
     await this.bus.emitAsync(DomainEvents.JobTransitioned, event).catch(() => undefined);
-    return outcome.job!;
+    return this.present(row, outcome.actor!, await this.details(this.db, row, outcome.actor!));
   }
 
   schedule(user: AuthUser, id: string, slotStart: Date) {

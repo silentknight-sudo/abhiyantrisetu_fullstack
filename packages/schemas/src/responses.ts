@@ -24,11 +24,17 @@ export const timestamp = z.codec(z.iso.datetime(), z.date(), {
   encode: (d) => d.toISOString(),
 });
 /** Postgres numeric: a number on the wire, a string from the driver. */
-const decimal = z.codec(z.number(), z.string(), {
+const decimal = z.codec(z.number().meta({ format: 'double' }), z.string(), {
   decode: (n) => String(n),
   encode: (s) => Number(s),
 });
 const uuid = z.uuid();
+/**
+ * Free text. The length bound also keeps `text.nullable()` documented as a nullable
+ * string: zod writes a bare nullable string as `type: [string, null]`, which the Swagger
+ * layer misreads as an array.
+ */
+const text = z.string().max(10_000);
 const paise = z.number().int();
 const json = z.unknown();
 
@@ -45,11 +51,12 @@ export const authSessionResponse = authTokensSchema;
 export const meResponse = z.object({
   id: uuid,
   phone: z.string(),
-  name: z.string().nullable(),
-  email: z.string().nullable(),
+  name: text.nullable(),
+  email: text.nullable(),
   locale: z.enum(LOCALES),
   roles: z.array(z.enum(ROLES)),
-  consentVersion: z.string().nullable(),
+  consentVersion: text.nullable(),
+  whatsappOptInAt: timestamp.nullable(),
   createdAt: timestamp,
 });
 
@@ -62,7 +69,7 @@ export const categoryResponse = z.object({
   requirementType: z.enum(REQUIREMENT_TYPES),
   nameEn: z.string(),
   nameHi: z.string(),
-  icon: z.string().nullable(),
+  icon: text.nullable(),
 });
 
 // ---------- requirements & jobs ----------
@@ -80,7 +87,7 @@ export const requirementResponse = z.object({
   budgetMinPaise: paise.nullable(),
   budgetMaxPaise: paise.nullable(),
   status: z.enum(REQUIREMENT_STATUSES),
-  cancelReason: z.string().nullable(),
+  cancelReason: text.nullable(),
   matchedAt: timestamp.nullable(),
   firstQuoteAt: timestamp.nullable(),
   hiredAt: timestamp.nullable(),
@@ -106,8 +113,30 @@ export const jobResponse = z.object({
   updatedAt: timestamp,
 });
 
+/** Who to call once hired. `address` (the site) is for the partner and staff only. */
+export const jobContactResponse = z.object({
+  name: text.nullable(),
+  phone: z.string(),
+  address: z
+    .object({
+      line1: z.string(),
+      line2: text.nullable(),
+      tower: text.nullable(),
+      flat: text.nullable(),
+      sector: text.nullable(),
+      city: z.string(),
+      pincode: z.string(),
+      location: geoPointSchema,
+    })
+    .nullable(),
+});
+
 /** A job as one participant sees it, with the actions open to them now. */
 export const jobViewResponse = jobResponse.extend({
+  /** The requirement's title. */
+  title: z.string(),
+  /** Only on GET /jobs/{id}; null in lists and on cancelled jobs. */
+  contact: jobContactResponse.nullable(),
   viewerRole: z.enum(['customer', 'partner', 'ops', 'system']),
   availableActions: z.array(z.enum(JOB_EVENT_TYPES)),
 });
@@ -139,9 +168,9 @@ export const partnerResponse = z.object({
   id: uuid,
   userId: uuid,
   displayName: z.string(),
-  businessName: z.string().nullable(),
+  businessName: text.nullable(),
   trades: z.array(z.string()),
-  gstin: z.string().nullable(),
+  gstin: text.nullable(),
   baseLocation: geoPointSchema.nullable(),
   serviceRadiusKm: z.number().int(),
   ratingAvg: decimal.nullable(),
@@ -186,7 +215,7 @@ export const leadInboxItemResponse = z.object({
     budgetMaxPaise: true,
     createdAt: true,
   }),
-  area: z.object({ sector: z.string().nullable(), city: z.string(), pincode: z.string() }),
+  area: z.object({ sector: text.nullable(), city: z.string(), pincode: z.string() }),
   distanceKm: z.number(),
   quoteId: uuid.nullable(),
 });
@@ -206,7 +235,7 @@ export const quoteRowResponse = z.object({
   gstPaise: paise,
   totalPaise: paise,
   milestones: json,
-  notes: z.string().nullable(),
+  notes: text.nullable(),
   validUntil: timestamp.nullable(),
   sentAt: timestamp.nullable(),
   createdAt: timestamp,
@@ -218,7 +247,7 @@ export const quoteLineResponse = z.object({
   quoteId: uuid,
   description: z.string(),
   quantity: z.number(),
-  unit: z.string().nullable(),
+  unit: text.nullable(),
   unitPricePaise: paise,
   amountPaise: paise,
   sortOrder: z.number().int(),
@@ -229,7 +258,7 @@ export const quoteResponse = quoteRowResponse.extend({ items: z.array(quoteLineR
 export const quoteMessageResponse = z.object({
   quoteId: uuid,
   version: z.number().int(),
-  message: z.string().nullable(),
+  message: text.nullable(),
   authorId: uuid.nullable(),
   createdAt: timestamp,
 });
@@ -238,7 +267,7 @@ export const quoteMessageResponse = z.object({
 export const partnerCardResponse = z.object({
   id: uuid,
   displayName: z.string(),
-  businessName: z.string().nullable(),
+  businessName: text.nullable(),
   trades: z.array(z.string()),
   tier: partnerTier,
   verificationStatus,
@@ -283,7 +312,7 @@ export const jobPaymentsResponse = z.object({
       id: uuid,
       amountPaise: paise,
       status: paymentStatus,
-      method: z.string().nullable(),
+      method: text.nullable(),
       capturedAt: timestamp.nullable(),
       createdAt: timestamp,
     }),
@@ -322,10 +351,10 @@ export const waitlistSignupResponse = z.object({
   name: z.string(),
   phone: z.string(),
   role: z.enum(WAITLIST_ROLES),
-  sector: z.string().nullable(),
+  sector: text.nullable(),
   interests: z.array(z.enum(REQUIREMENT_TYPES)),
-  trade: z.string().nullable(),
-  source: z.string().nullable(),
+  trade: text.nullable(),
+  source: text.nullable(),
   consentedAt: timestamp,
   contactedAt: timestamp.nullable(),
   createdAt: timestamp,
@@ -338,7 +367,7 @@ export const waitlistPageResponse = z.object({
 
 export const waitlistSummaryResponse = z.object({
   byRole: z.array(z.object({ role: z.enum(WAITLIST_ROLES), n: z.number().int() })),
-  bySector: z.array(z.object({ sector: z.string().nullable(), n: z.number().int() })),
+  bySector: z.array(z.object({ sector: text.nullable(), n: z.number().int() })),
 });
 
 /** Wire (JSON) type of a response schema. */

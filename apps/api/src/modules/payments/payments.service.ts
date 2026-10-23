@@ -172,6 +172,20 @@ export class PaymentsService {
   }
 
   /**
+   * Development checkout for the fake gateway: completes the order as if the customer
+   * paid. Not routable unless PAYMENTS_PROVIDER=fake, which production refuses.
+   */
+  async completeFakeCheckout(user: AuthUser, razorpayOrderId: string) {
+    if (this.env.PAYMENTS_PROVIDER !== 'fake') throw new NotFoundException();
+    const razorpayPaymentId = `pay_fake_${randomUUID().replace(/-/g, '').slice(0, 14)}`;
+    return this.verifyCheckout(user, {
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature: hmac(this.keySecret, `${razorpayOrderId}|${razorpayPaymentId}`),
+    });
+  }
+
+  /**
    * Marks a payment captured and moves the money into the job's held account. Idempotent:
    * the app callback and the webhook both call this, and only the first one posts.
    */

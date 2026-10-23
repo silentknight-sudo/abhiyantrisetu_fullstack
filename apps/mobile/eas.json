@@ -1,0 +1,46 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_VARIANT": "customer",
+        "EXPO_PUBLIC_API_URL": "https://api.abhiyantrisetu.com"
+      }
+    },
+    "preview-partner": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_VARIANT": "partner",
+        "EXPO_PUBLIC_API_URL": "https://api.abhiyantrisetu.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "APP_VARIANT": "customer",
+        "EXPO_PUBLIC_API_URL": "https://api.abhiyantrisetu.com"
+      }
+    },
+    "production-partner": {
+      "autoIncrement": true,
+      "env": {
+        "APP_VARIANT": "partner",
+        "EXPO_PUBLIC_API_URL": "https://api.abhiyantrisetu.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {},
+    "production-partner": {}
+  }
+}

@@ -10,7 +10,7 @@ import {
   type RawBodyRequest,
   Req,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { ZodResponse, createZodDto } from 'nestjs-zod';
@@ -33,6 +33,10 @@ class VerifyDto extends createZodDto(
   }),
 ) {}
 
+class FakeCheckoutDto extends createZodDto(
+  z.object({ razorpayOrderId: z.string().min(1).max(64) }),
+) {}
+
 @ApiTags('payments')
 @Controller()
 export class PaymentsController {
@@ -51,6 +55,16 @@ export class PaymentsController {
   @HttpCode(200)
   async verify(@CurrentUser() user: AuthUser, @Body() body: VerifyDto) {
     const p = await this.payments.verifyCheckout(user, body);
+    return { paymentId: p.id, status: p.status, amountPaise: p.amountPaise };
+  }
+
+  /** Development only (fake gateway): pays the order without Razorpay. */
+  @ZodResponse({ status: 200, type: PaymentVerifiedDto })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Development only: completes a fake-gateway order (404 otherwise)' })
+  @Post('payments/fake-checkout')
+  async fakeCheckout(@CurrentUser() user: AuthUser, @Body() body: FakeCheckoutDto) {
+    const p = await this.payments.completeFakeCheckout(user, body.razorpayOrderId);
     return { paymentId: p.id, status: p.status, amountPaise: p.amountPaise };
   }
 

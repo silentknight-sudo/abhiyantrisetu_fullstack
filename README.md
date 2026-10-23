@@ -21,13 +21,15 @@ One TypeScript monorepo for all five surfaces: customer app, partner app, websit
 | Razorpay payments with an append-only double-entry ledger                                                                                 | ✅                                             |
 | `packages/api-client`: typed client and TanStack Query hooks generated from OpenAPI                                                       | ✅                                             |
 | `apps/web` website (pre-launch mode, waitlist)                                                                                            | ✅                                             |
-| `apps/mobile`, `apps/vendor`, `apps/admin`, `packages/ui-web`, `packages/ui-native`                                                       | ⏳ Phase 1                                     |
+| `apps/mobile`: Expo customer and partner apps on the typed client                                                                         | ✅                                             |
+| `apps/vendor`, `apps/admin`, `packages/ui-web`, `packages/ui-native`                                                                      | ⏳ Phase 1                                     |
 
 ## Layout
 
 ```
 apps/
   web/            Next.js website (abhiyantrisetu.com)
+  mobile/         Expo app: customer and partner variants (see apps/mobile/README.md)
   api/            NestJS modular monolith (+ BullMQ worker entrypoint: src/worker.ts)
     drizzle/      versioned SQL migrations (generated from src/db/schema.ts)
 packages/
@@ -132,6 +134,6 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-2. Catalog, Matching (PostGIS radius plus rule-based ranking), Leads & credits, Quotes & negotiation (`POST /quotes/:id/accept` calls `JobsService.hire`).
-3. `apps/mobile` (Expo, customer + partner variants), `apps/web` (Next.js), `apps/admin` v1.
-4. Move throttling to a Redis store before running more than one API task.
+1. `apps/admin` v1: partner verification, disputes, payouts, waitlist, ledger.
+2. Move throttling to a Redis store before running more than one API task.
+3. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.

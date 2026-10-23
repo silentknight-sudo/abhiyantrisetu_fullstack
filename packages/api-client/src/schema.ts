@@ -708,6 +708,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/payments/fake-checkout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Development only: completes a fake-gateway order (404 otherwise) */
+    post: operations['PaymentsController_fakeCheckout_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/jobs/{id}/payments': {
     parameters: {
       query?: never;
@@ -760,7 +777,7 @@ export interface components {
       requirementType: 'service' | 'renovation' | 'material_rfq' | 'equipment' | 'consult';
       nameEn: string;
       nameHi: string;
-      icon: string[];
+      icon: string | null;
     };
     OtpSendDto: {
       phone: string;
@@ -809,8 +826,8 @@ export interface components {
       /** Format: uuid */
       id: string;
       phone: string;
-      name: string[];
-      email: string[];
+      name: string | null;
+      email: string | null;
       /** @enum {string} */
       locale: 'en' | 'hi' | 'hinglish';
       roles: (
@@ -824,7 +841,9 @@ export interface components {
         | 'finance'
         | 'super_admin'
       )[];
-      consentVersion: string[];
+      consentVersion: string | null;
+      /** Format: date-time */
+      whatsappOptInAt: string | null;
       /** Format: date-time */
       createdAt: string;
     };
@@ -857,7 +876,7 @@ export interface components {
       budgetMaxPaise: number | null;
       /** @enum {string} */
       status: 'requested' | 'matched' | 'quoted' | 'hired' | 'cancelled' | 'expired';
-      cancelReason: string[];
+      cancelReason: string | null;
       /** Format: date-time */
       matchedAt: string | null;
       /** Format: date-time */
@@ -903,6 +922,24 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      title: string;
+      contact: {
+        name: string | null;
+        phone: string;
+        address: {
+          line1: string;
+          line2: string | null;
+          tower: string | null;
+          flat: string | null;
+          sector: string | null;
+          city: string;
+          pincode: string;
+          location: {
+            lat: number;
+            lng: number;
+          };
+        } | null;
+      } | null;
       /** @enum {string} */
       viewerRole: 'customer' | 'partner' | 'ops' | 'system';
       availableActions: (
@@ -1046,18 +1083,20 @@ export interface components {
       /** Format: uuid */
       userId: string;
       displayName: string;
-      businessName: string[];
+      businessName: string | null;
       trades: string[];
-      gstin: string[];
+      gstin: string | null;
       baseLocation: {
         lat: number;
         lng: number;
       } | null;
       serviceRadiusKm: number;
-      ratingAvg: number[];
+      /** Format: double */
+      ratingAvg: number | null;
       ratingCount: number;
       avgResponseMinutes: number | null;
-      acceptanceRate: number[];
+      /** Format: double */
+      acceptanceRate: number | null;
       /** @enum {string} */
       tier: 'basic' | 'verified' | 'pro';
       /** @enum {string} */
@@ -1141,7 +1180,8 @@ export interface components {
       /** @enum {string} */
       status: 'sent' | 'seen' | 'quoted' | 'declined' | 'expired';
       creditsSpent: number;
-      matchScore: number[];
+      /** Format: double */
+      matchScore: number | null;
       /** Format: date-time */
       sentAt: string;
       /** Format: date-time */
@@ -1167,7 +1207,7 @@ export interface components {
       gstPaise: number;
       totalPaise: number;
       milestones: unknown;
-      notes: string[];
+      notes: string | null;
       /** Format: date-time */
       validUntil: string | null;
       /** Format: date-time */
@@ -1207,7 +1247,7 @@ export interface components {
       gstPaise: number;
       totalPaise: number;
       milestones: unknown;
-      notes: string[];
+      notes: string | null;
       /** Format: date-time */
       validUntil: string | null;
       /** Format: date-time */
@@ -1235,7 +1275,7 @@ export interface components {
       gstPaise: number;
       totalPaise: number;
       milestones: unknown;
-      notes: string[];
+      notes: string | null;
       /** Format: date-time */
       validUntil: string | null;
       /** Format: date-time */
@@ -1276,6 +1316,7 @@ export interface components {
         tier: 'basic' | 'verified' | 'pro';
         /** @enum {string} */
         verificationStatus: 'pending' | 'in_review' | 'verified' | 'rejected' | 'suspended';
+        /** Format: double */
         ratingAvg: number | null;
         ratingCount: number;
         avgResponseMinutes: number | null;
@@ -1290,7 +1331,7 @@ export interface components {
       /** Format: uuid */
       quoteId: string;
       version: number;
-      message: string[];
+      message: string | null;
       /** Format: uuid */
       authorId: string | null;
       /** Format: date-time */
@@ -1382,6 +1423,9 @@ export interface components {
       status: 'created' | 'captured' | 'failed' | 'refunded';
       amountPaise: number;
     };
+    FakeCheckoutDto: {
+      razorpayOrderId: string;
+    };
     JobPaymentsDto: {
       agreedTotalPaise: number;
       paidPaise: number;
@@ -1407,6 +1451,16 @@ export interface components {
         balancePaise: number;
       }[];
       trialBalancePaise: number;
+    };
+    ApiError: {
+      statusCode?: number;
+      message: string | string[];
+      /** @description Machine-readable reason, e.g. ALREADY_PAID */
+      code?: string;
+      /** @description Validation issues */
+      errors?: {
+        message?: string;
+      }[];
     };
   };
   responses: never;
@@ -1434,6 +1488,15 @@ export interface operations {
           'application/json': components['schemas']['HealthDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   CatalogController_categories_v1: {
@@ -1451,6 +1514,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['CategoryDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1476,6 +1548,15 @@ export interface operations {
           'application/json': components['schemas']['OtpSentDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   AuthController_verify_v1: {
@@ -1497,6 +1578,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AuthSessionDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1522,6 +1612,15 @@ export interface operations {
           'application/json': components['schemas']['TokenPairDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   AuthController_logout_v1: {
@@ -1543,6 +1642,15 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   MeController_get_v1: {
@@ -1562,6 +1670,15 @@ export interface operations {
           'application/json': components['schemas']['MeDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   MeController_remove_v1: {
@@ -1578,6 +1695,15 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
       };
     };
   };
@@ -1602,6 +1728,15 @@ export interface operations {
           'application/json': components['schemas']['MeDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   RequirementsController_list_v1: {
@@ -1619,6 +1754,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['RequirementDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1850,6 +1994,15 @@ export interface operations {
           'application/json': components['schemas']['RequirementDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   RequirementsController_get_v1: {
@@ -1869,6 +2022,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['RequirementDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1896,6 +2058,15 @@ export interface operations {
           'application/json': components['schemas']['RequirementDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_list_v1: {
@@ -1913,6 +2084,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1936,6 +2116,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_events_v1: {
@@ -1955,6 +2144,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobEventDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -1982,6 +2180,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_reschedule_v1: {
@@ -2005,6 +2212,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2032,6 +2248,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_complete_v1: {
@@ -2053,6 +2278,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_confirm_v1: {
@@ -2072,6 +2306,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2099,6 +2342,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_dispute_v1: {
@@ -2122,6 +2374,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2149,6 +2410,15 @@ export interface operations {
           'application/json': components['schemas']['JobViewDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   JobsController_regenerateStartCode_v1: {
@@ -2168,6 +2438,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['StartCodeDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2191,6 +2470,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['WaitlistJoinedDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2217,6 +2505,15 @@ export interface operations {
           'application/json': components['schemas']['WaitlistPageDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   WaitlistController_summary_v1: {
@@ -2234,6 +2531,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['WaitlistSummaryDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2258,6 +2564,15 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PartnersController_me_v1: {
@@ -2275,6 +2590,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PartnerDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2300,6 +2624,15 @@ export interface operations {
           'application/json': components['schemas']['PartnerDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PartnersController_update_v1: {
@@ -2323,6 +2656,15 @@ export interface operations {
           'application/json': components['schemas']['PartnerDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PartnersController_list_v1: {
@@ -2342,6 +2684,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PartnerDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2375,6 +2726,15 @@ export interface operations {
           'application/json': components['schemas']['PartnerDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   QuotesController_leads_v1: {
@@ -2392,6 +2752,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['LeadInboxItemDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2415,6 +2784,15 @@ export interface operations {
           'application/json': components['schemas']['LeadDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   QuotesController_decline_v1: {
@@ -2434,6 +2812,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['LeadDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2478,6 +2865,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['QuoteDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2525,6 +2921,15 @@ export interface operations {
           'application/json': components['schemas']['QuoteDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   QuotesController_withdraw_v1: {
@@ -2544,6 +2949,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['QuoteRowDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2567,6 +2981,15 @@ export interface operations {
           'application/json': components['schemas']['QuoteDetailDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   QuotesController_forRequirement_v1: {
@@ -2586,6 +3009,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['QuoteDetailDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2613,6 +3045,15 @@ export interface operations {
           'application/json': components['schemas']['QuoteRevisionDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   QuotesController_accept_v1: {
@@ -2632,6 +3073,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['HireDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2655,6 +3105,15 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   NotificationsController_removeToken_v1: {
@@ -2675,6 +3134,15 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
       };
     };
   };
@@ -2697,6 +3165,15 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   NotificationsController_inbox_v1: {
@@ -2714,6 +3191,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['NotificationDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };
@@ -2739,6 +3225,15 @@ export interface operations {
           'application/json': components['schemas']['PaymentOrderDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PaymentsController_verify_v1: {
@@ -2762,6 +3257,47 @@ export interface operations {
           'application/json': components['schemas']['PaymentVerifiedDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_fakeCheckout_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FakeCheckoutDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PaymentVerifiedDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PaymentsController_forJob_v1: {
@@ -2783,6 +3319,15 @@ export interface operations {
           'application/json': components['schemas']['JobPaymentsDto'];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
     };
   };
   PaymentsController_balances_v1: {
@@ -2800,6 +3345,15 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['LedgerBalancesDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
         };
       };
     };

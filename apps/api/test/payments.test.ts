@@ -248,6 +248,26 @@ describe('payments', () => {
     expect(hooks.every((h) => h.error === null && h.processedAt)).toBe(true);
   });
 
+  it('completes fake-gateway checkouts in development, for the order owner only', async () => {
+    const { job } = await hiredJob();
+    const created = await order(job.id);
+    const orderId = created.body.razorpayOrderId as string;
+    await ctx
+      .http()
+      .post('/v1/payments/fake-checkout')
+      .set(bearer(stranger.accessToken))
+      .send({ razorpayOrderId: orderId })
+      .expect(404);
+    const paid = await ctx
+      .http()
+      .post('/v1/payments/fake-checkout')
+      .set(bearer(customer.accessToken))
+      .send({ razorpayOrderId: orderId })
+      .expect(200);
+    expect(paid.body).toMatchObject({ status: 'captured', amountPaise: AGREED });
+    expect(await balance(`held:job:${job.id}`)).toBe(AGREED);
+  });
+
   it('marks failed payments without touching the ledger', async () => {
     const { job } = await hiredJob();
     const created = await order(job.id);

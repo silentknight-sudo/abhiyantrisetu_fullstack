@@ -1,0 +1,115 @@
+import { normalizeIndianMobile } from '@setu/domain';
+import { Image } from 'react-native';
+import { useState } from 'react';
+import { Body, Button, Field, Heading, Notice, Screen, Small } from '@/components/ui';
+import { client } from '@/lib/api';
+import { IS_PARTNER } from '@/lib/config';
+import { errorMessage } from '@/lib/errors';
+import { useSession } from '@/lib/session';
+
+export default function Login() {
+  const { signIn } = useSession();
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<'phone' | 'code'>('phone');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+
+  async function sendCode() {
+    setError(null);
+    if (!normalizeIndianMobile(phone)) return setError('Enter a 10-digit Indian mobile number');
+    setBusy(true);
+    try {
+      const res = await client.api.POST('/v1/auth/otp/send', { body: { phone } });
+      if (!res.response.ok) throw res.error;
+      setStep('code');
+      setInfo(
+        `We sent a 6-digit code by SMS. You can ask for a new one in ${res.data!.resendAfterSeconds}s.`,
+      );
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verify() {
+    setError(null);
+    if (!/^\d{6}$/.test(code)) return setError('Enter the 6-digit code');
+    setBusy(true);
+    try {
+      await signIn(phone, code);
+      // The root layout swaps to the signed-in routes.
+    } catch (err) {
+      setError(errorMessage(err));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Screen edges={['top', 'bottom']}>
+      <Image
+        source={require('../../assets/icon.png')}
+        style={{ width: 96, height: 96, borderRadius: 20, marginTop: 24 }}
+        accessibilityLabel="Abhiyantri Setu"
+      />
+      <Heading size="4xl">
+        {IS_PARTNER ? 'Grow your work' : 'Build, Renovate, Repair & Maintain'}
+      </Heading>
+      <Body muted>
+        {IS_PARTNER
+          ? 'Get verified leads near you in Greater Noida. Quote, get hired and get paid on time.'
+          : 'Verified professionals in Greater Noida. Post once, compare quotes, pay safely.'}
+      </Body>
+
+      {step === 'phone' ? (
+        <>
+          <Field
+            label="Mobile number"
+            testID="phone"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            autoComplete="tel"
+            placeholder="98765 43210"
+            maxLength={14}
+            onSubmitEditing={sendCode}
+          />
+          {error ? <Notice>{error}</Notice> : null}
+          <Button title="Send code" testID="send-code" onPress={sendCode} loading={busy} />
+        </>
+      ) : (
+        <>
+          {info ? <Notice tone="info">{info}</Notice> : null}
+          <Field
+            label="6-digit code"
+            testID="code"
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
+            autoComplete="one-time-code"
+            textContentType="oneTimeCode"
+            maxLength={6}
+            onSubmitEditing={verify}
+          />
+          {error ? <Notice>{error}</Notice> : null}
+          <Button title="Verify and continue" testID="verify" onPress={verify} loading={busy} />
+          <Button
+            title="Change number"
+            kind="outline"
+            onPress={() => {
+              setStep('phone');
+              setCode('');
+              setError(null);
+            }}
+          />
+        </>
+      )}
+      <Small>
+        By continuing you agree to our Terms and Privacy Policy. Your number is never shown to
+        anyone before you hire.
+      </Small>
+    </Screen>
+  );
+}

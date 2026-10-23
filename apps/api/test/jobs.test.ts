@@ -174,6 +174,20 @@ describe('job state machine over HTTP', () => {
     const view = await ctx.http().get(`/v1/jobs/${job.id}`).set(asPartner).expect(200);
     expect(view.body).toMatchObject({ state: 'hired', viewerRole: 'partner' });
     expect(view.body.startCodeHash).toBeUndefined();
+    // After hire the partner gets the customer and the site; the customer gets the partner.
+    expect(view.body.title).toBe('Kitchen tap leaking');
+    expect(view.body.contact).toMatchObject({
+      phone: '+919900000001',
+      address: { line1: address.line1, pincode: '201310', location: address.location },
+    });
+    const customerView = await ctx.http().get(`/v1/jobs/${job.id}`).set(asCustomer).expect(200);
+    expect(customerView.body.contact).toEqual({
+      name: 'Ramesh Plumber',
+      phone: '+919900000002',
+      address: null,
+    });
+    const list = await ctx.http().get('/v1/jobs').set(asCustomer).expect(200);
+    expect(list.body[0]).toMatchObject({ title: 'Kitchen tap leaking', contact: null });
 
     await ctx
       .http()

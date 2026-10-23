@@ -1,8 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { MAX_LEADS_PER_REQUIREMENT, rankScore, tradesFor } from '@setu/domain';
 import { eq, sql } from 'drizzle-orm';
 import type { Db } from '../../db/client';
+import { DomainEvents, type LeadsCreatedEvent } from '../../common/events';
 import { DB } from '../../db/db.module';
 import { categories, events, leads, requirements } from '../../db/schema';
 import { REQUIREMENT_CREATED, RequirementsService } from '../requirements/requirements.service';
@@ -29,6 +30,7 @@ export class MatchingService {
   constructor(
     @Inject(DB) private readonly db: Db,
     @Inject(RequirementsService) private readonly requirements: RequirementsService,
+    @Inject(EventEmitter2) private readonly bus: EventEmitter2,
   ) {}
 
   @OnEvent(REQUIREMENT_CREATED, { promisify: true })
@@ -103,20 +105,24 @@ export class MatchingService {
       return { leadCount: 0 };
     }
 
-    await this.db.transaction(async (tx) => {
-      await tx
+    const leadIds = await this.db.transaction(async (tx) => {
+      const inserted = await tx
         .insert(leads)
         .values(
           ranked.map((r) => ({ requirementId, partnerId: r.id, matchScore: String(r.score) })),
         )
-        .onConflictDoNothing();
+        .onConflictDoNothing()
+        .returning({ id: leads.id });
       await this.requirements.transition(
         tx,
         requirementId,
         { type: 'match', leadCount: ranked.length },
         { type: 'system' },
       );
+      return inserted.map((l) => l.id);
     });
+    const event: LeadsCreatedEvent = { requirementId, leadIds };
+    await this.bus.emitAsync(DomainEvents.LeadsCreated, event);
     return { leadCount: ranked.length };
   }
 }

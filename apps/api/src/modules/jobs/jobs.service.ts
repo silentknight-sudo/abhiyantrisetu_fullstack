@@ -15,9 +15,11 @@ import {
   type JobState,
   type TransitionResult,
 } from '@setu/domain';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { and, desc, eq, lte, or } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '../../common/auth';
+import { DomainEvents, type JobTransitionedEvent } from '../../common/events';
 import { hmac, numericCode, safeEqualHex } from '../../common/crypto';
 import { assertTransition } from '../../common/transition-error';
 import { ENV, type Env } from '../../config/env';
@@ -52,6 +54,7 @@ export class JobsService {
     @Inject(DB) private readonly db: Db,
     @Inject(ENV) private readonly env: Env,
     @Inject(RequirementsService) private readonly requirements: RequirementsService,
+    @Inject(EventEmitter2) private readonly bus: EventEmitter2,
   ) {}
 
   private hashStartCode(jobId: string, code: string) {
@@ -180,6 +183,7 @@ export class JobsService {
       const event = await build(job, tx);
       const res: TransitionResult<JobState> = jobMachine.transition(job.state, event, actor);
       if (!res.ok) return { res } as const;
+      const eventType = event.type;
 
       const stamp = STATE_TIMESTAMP[res.to];
       const set: Partial<JobRow> = { state: res.to };
@@ -196,9 +200,20 @@ export class JobsService {
         actorId: user === 'system' ? null : user.id,
         payload: event,
       });
-      return { res, job: this.present(updated!, actor) } as const;
+      return { res, job: this.present(updated!, actor), row: updated!, event: eventType } as const;
     });
     assertTransition(outcome.res);
+    const row = outcome.row!;
+    const event: JobTransitionedEvent = {
+      jobId: id,
+      event: outcome.event!,
+      from: outcome.res.from,
+      to: outcome.res.to,
+      customerId: row.customerId,
+      partnerId: row.partnerId,
+      actorUserId: user === 'system' ? null : user.id,
+    };
+    await this.bus.emitAsync(DomainEvents.JobTransitioned, event).catch(() => undefined);
     return outcome.job!;
   }
 

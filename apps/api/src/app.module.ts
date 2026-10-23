@@ -16,6 +16,7 @@ import { RequirementsModule } from './modules/requirements/requirements.module';
 import { WaitlistModule } from './modules/waitlist/waitlist.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { PartnersModule } from './modules/partners/partners.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { QuotesModule } from './modules/quotes/quotes.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { QuotesModule } from './modules/quotes/quotes.module';
     PartnersModule,
     MatchingModule,
     QuotesModule,
+    NotificationsModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

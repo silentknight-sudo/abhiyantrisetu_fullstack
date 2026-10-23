@@ -22,6 +22,8 @@ Object.assign(process.env, {
   JWT_ACCESS_SECRET: 'test-access-secret-0123456789abcdef0123',
   OTP_HASH_SECRET: 'test-otp-secret-0123456789abcdef01234567',
   SMS_PROVIDER: 'console',
+  WHATSAPP_APP_SECRET: 'test-whatsapp-app-secret',
+  WHATSAPP_VERIFY_TOKEN: 'test-verify-token',
 });
 
 export interface TestContext {
@@ -52,7 +54,7 @@ export async function createTestApp(): Promise<TestContext> {
     .overrideProvider(SMS_PROVIDER)
     .useValue(sms)
     .compile();
-  const app = configureApp(moduleRef.createNestApplication({ logger: false }), {
+  const app = configureApp(moduleRef.createNestApplication({ logger: false, rawBody: true }), {
     CORS_ORIGINS: [],
   });
   await app.init();

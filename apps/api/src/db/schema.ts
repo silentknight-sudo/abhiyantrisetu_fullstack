@@ -121,6 +121,13 @@ export const quoteStatusEnum = pgEnum('quote_status', [
 ]);
 export const jobStateEnum = pgEnum('job_state', tuple(JOB_STATES));
 export const actorTypeEnum = pgEnum('actor_type', ['customer', 'partner', 'ops', 'system']);
+export const notificationChannelEnum = pgEnum('notification_channel', ['whatsapp', 'push', 'sms']);
+export const notificationStatusEnum = pgEnum('notification_status', [
+  'queued',
+  'sent',
+  'failed',
+  'skipped',
+]);
 export const waitlistRoleEnum = pgEnum('waitlist_role', [
   'customer',
   'provider',
@@ -158,6 +165,8 @@ export const users = pgTable('users', {
   consentVersion: text('consent_version'),
   consentedAt: timestamp('consented_at', { withTimezone: true }),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+  /** WhatsApp Business rules: messages only after an explicit opt-in. */
+  whatsappOptInAt: timestamp('whatsapp_opt_in_at', { withTimezone: true }),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
   ...timestamps,
 });
@@ -612,4 +621,61 @@ export const waitlistSignups = pgTable(
     uniqueIndex('waitlist_phone_role_uq').on(t.phone, t.role),
     index('waitlist_created_idx').on(t.createdAt),
   ],
+);
+
+// ---------- notifications ----------
+
+/** Expo push tokens, one row per device install. */
+export const pushTokens = pgTable(
+  'push_tokens',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    token: text('token').notNull().unique(),
+    platform: text('platform').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('push_tokens_user_idx').on(t.userId)],
+);
+
+/** Every outbound message, one row per channel, with its delivery outcome. */
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    channel: notificationChannelEnum('channel').notNull(),
+    template: text('template').notNull(),
+    params: jsonb('params').notNull(),
+    status: notificationStatusEnum('status').notNull().default('queued'),
+    attempts: smallint('attempts').notNull().default(0),
+    providerRef: text('provider_ref'),
+    error: text('error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+  },
+  (t) => [
+    index('notifications_user_idx').on(t.userId, t.createdAt),
+    index('notifications_status_idx').on(t.status),
+  ],
+);
+
+/** Inbound webhook deliveries (WhatsApp, Razorpay). The unique key makes handling idempotent. */
+export const inboundWebhooks = pgTable(
+  'inbound_webhooks',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    provider: text('provider').notNull(),
+    externalId: text('external_id').notNull(),
+    payload: jsonb('payload').notNull(),
+    processedAt: timestamp('processed_at', { withTimezone: true }),
+    error: text('error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('inbound_webhooks_provider_external_uq').on(t.provider, t.externalId)],
 );

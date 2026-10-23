@@ -5,10 +5,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { isStaff, quoteTotals, roundPaise } from '@setu/domain';
 import type { CreateQuoteInput, ReviseQuoteInput } from '@setu/schemas';
 import { and, asc, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import type { AuthUser } from '../../common/auth';
+import { DomainEvents, type JobHiredEvent, type QuoteSentEvent } from '../../common/events';
 import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
 import {
@@ -61,7 +63,13 @@ export class QuotesService {
     @Inject(PartnersService) private readonly partners: PartnersService,
     @Inject(RequirementsService) private readonly requirements: RequirementsService,
     @Inject(JobsService) private readonly jobs: JobsService,
+    @Inject(EventEmitter2) private readonly bus: EventEmitter2,
   ) {}
+
+  /** Fires after commit; listener failures never undo the action. */
+  private emit(name: string, payload: unknown) {
+    return this.bus.emitAsync(name, payload).catch(() => undefined);
+  }
 
   // ---------- partner: leads ----------
 
@@ -140,7 +148,7 @@ export class QuotesService {
   // ---------- partner: quotes ----------
 
   async createQuote(user: AuthUser, leadId: string, input: CreateQuoteInput) {
-    return this.db.transaction(async (tx) => {
+    const created = await this.db.transaction(async (tx) => {
       const { me, lead } = await this.lockMyLead(tx, user, leadId);
       if (lead.status === 'declined' || lead.status === 'expired') {
         throw new ConflictException('This lead is closed');
@@ -215,6 +223,14 @@ export class QuotesService {
       });
       return { ...quote!, items };
     });
+    const event: QuoteSentEvent = {
+      quoteId: created.id,
+      requirementId: created.requirementId,
+      partnerId: created.partnerId,
+      totalPaise: created.totalPaise,
+    };
+    await this.emit(DomainEvents.QuoteSent, event);
+    return created;
   }
 
   private async lockQuote(tx: Tx, quoteId: string) {
@@ -231,7 +247,7 @@ export class QuotesService {
   }
 
   async revise(user: AuthUser, quoteId: string, input: ReviseQuoteInput) {
-    return this.db.transaction(async (tx) => {
+    const revised = await this.db.transaction(async (tx) => {
       const q = await this.lockMyQuote(tx, user, quoteId);
       if (q.status !== 'sent') throw new ConflictException(`A ${q.status} quote cannot be revised`);
       const { items, totals } = price(input);
@@ -270,6 +286,15 @@ export class QuotesService {
       });
       return { ...updated!, items };
     });
+    // The customer hears about a revised price the same way as a new quote.
+    const event: QuoteSentEvent = {
+      quoteId: revised.id,
+      requirementId: revised.requirementId,
+      partnerId: revised.partnerId,
+      totalPaise: revised.totalPaise,
+    };
+    await this.emit(DomainEvents.QuoteRevised, event);
+    return revised;
   }
 
   async withdraw(user: AuthUser, quoteId: string) {
@@ -409,7 +434,7 @@ export class QuotesService {
    * the job and the customer's one-time start code.
    */
   async accept(user: AuthUser, quoteId: string) {
-    return this.db.transaction(async (tx) => {
+    const hired = await this.db.transaction(async (tx) => {
       const q = await this.lockCustomerQuote(tx, user, quoteId);
       if (q.status !== 'sent')
         throw new ConflictException(`A ${q.status} quote cannot be accepted`);
@@ -444,5 +469,13 @@ export class QuotesService {
       });
       return hired;
     });
+    const event: JobHiredEvent = {
+      jobId: hired.job.id,
+      requirementId: hired.job.requirementId,
+      customerId: hired.job.customerId,
+      partnerId: hired.job.partnerId,
+    };
+    await this.emit(DomainEvents.JobHired, event);
+    return hired;
   }
 }

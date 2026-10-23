@@ -1,6 +1,7 @@
 /**
  * BullMQ worker process. Same codebase and modules as the API, separate deployable
- * (ECS service scaled on queue depth). Phase 1 adds lead fan-out, WhatsApp and payouts.
+ * (ECS service scaled on queue depth). Runs scheduled maintenance and delivers queued
+ * notifications (WhatsApp, push) with retries.
  */
 import 'reflect-metadata';
 import { Logger, Module } from '@nestjs/common';
@@ -14,6 +15,11 @@ import { ENV, type Env } from './config/env';
 import { DbModule } from './db/db.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { JobsService } from './modules/jobs/jobs.service';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import {
+  NOTIFICATIONS_QUEUE,
+  NotificationsService,
+} from './modules/notifications/notifications.service';
 
 export const QUEUES = { maintenance: 'maintenance' } as const;
 
@@ -24,6 +30,7 @@ export const QUEUES = { maintenance: 'maintenance' } as const;
     EventEmitterModule.forRoot(),
     JwtModule.register({}),
     JobsModule,
+    NotificationsModule,
   ],
 })
 class WorkerModule {}
@@ -57,8 +64,22 @@ async function main() {
   );
   worker.on('failed', (job, err) => logger.error(`${job?.name} failed: ${err.message}`));
 
+  const notificationsService = app.get(NotificationsService);
+  const notifier = new Worker(
+    NOTIFICATIONS_QUEUE,
+    // Throwing marks the attempt failed; BullMQ retries with the backoff set when queued.
+    async (job) => notificationsService.deliver(job.data.notificationId as string),
+    { connection, concurrency: 10 },
+  );
+  notifier.on('failed', (job, err) =>
+    logger.warn(
+      `notification ${job?.data?.notificationId} attempt ${job?.attemptsMade}: ${err.message}`,
+    ),
+  );
+
   const shutdown = async () => {
     await worker.close();
+    await notifier.close();
     await queue.close();
     await connection.quit();
     await app.close();

@@ -1,3 +1,4 @@
+import { ROLES } from '@setu/domain';
 import { z } from 'zod';
 import { phoneSchema } from './common';
 
@@ -27,7 +28,7 @@ export const authTokensSchema = z.object({
     id: z.string().uuid(),
     phone: z.string(),
     name: z.string().nullable(),
-    roles: z.array(z.string()),
+    roles: z.array(z.enum(ROLES)),
     isNew: z.boolean(),
   }),
 });

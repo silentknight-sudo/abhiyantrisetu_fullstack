@@ -31,6 +31,9 @@ type QuoteRow = typeof quotes.$inferSelect;
 
 const DAY_MS = 86_400_000;
 
+/** Quantities are numeric(12,3) in Postgres, so the driver returns strings. */
+const lineOut = (i: typeof quoteItems.$inferSelect) => ({ ...i, quantity: Number(i.quantity) });
+
 /** Line items and totals for a quote body, computed with the shared GST rules. */
 function price(input: CreateQuoteInput | ReviseQuoteInput) {
   const items = input.items.map((i, idx) => ({
@@ -188,9 +191,10 @@ export class QuotesService {
           sentAt: now,
         })
         .returning();
-      await tx
+      const lines = await tx
         .insert(quoteItems)
-        .values(items.map((i) => ({ ...i, quoteId: quote!.id, quantity: String(i.quantity) })));
+        .values(items.map((i) => ({ ...i, quoteId: quote!.id, quantity: String(i.quantity) })))
+        .returning();
       await tx.insert(quoteRevisions).values({
         quoteId: quote!.id,
         version: 1,
@@ -221,7 +225,7 @@ export class QuotesService {
           totalPaise: totals.total,
         },
       });
-      return { ...quote!, items };
+      return { ...quote!, items: lines.map(lineOut) };
     });
     const event: QuoteSentEvent = {
       quoteId: created.id,
@@ -269,9 +273,10 @@ export class QuotesService {
         .where(eq(quotes.id, quoteId))
         .returning();
       await tx.delete(quoteItems).where(eq(quoteItems.quoteId, quoteId));
-      await tx
+      const lines = await tx
         .insert(quoteItems)
-        .values(items.map((i) => ({ ...i, quoteId, quantity: String(i.quantity) })));
+        .values(items.map((i) => ({ ...i, quoteId, quantity: String(i.quantity) })))
+        .returning();
       await tx.insert(quoteRevisions).values({
         quoteId,
         version,
@@ -284,7 +289,7 @@ export class QuotesService {
         authorId: user.id,
         message: input.message,
       });
-      return { ...updated!, items };
+      return { ...updated!, items: lines.map(lineOut) };
     });
     // The customer hears about a revised price the same way as a new quote.
     const event: QuoteSentEvent = {
@@ -371,9 +376,7 @@ export class QuotesService {
     ]);
     return rows.map((q) => ({
       ...q,
-      items: items
-        .filter((i) => i.quoteId === q.id)
-        .map((i) => ({ ...i, quantity: Number(i.quantity) })),
+      items: items.filter((i) => i.quoteId === q.id).map(lineOut),
       thread: revisions.filter((r) => r.quoteId === q.id),
       partner: cards.find((c) => c.id === q.partnerId) ?? null,
     }));

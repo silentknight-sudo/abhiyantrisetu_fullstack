@@ -2,9 +2,10 @@ import { Body, Controller, Get, Header, HttpCode, Inject, Ip, Post, Query } from
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { WAITLIST_ROLES, waitlistSignupSchema } from '@setu/schemas';
-import { createZodDto } from 'nestjs-zod';
+import { ZodResponse, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { Public, Roles } from '../../common/auth';
+import { WaitlistJoinedDto, WaitlistPageDto, WaitlistSummaryDto } from '../../common/responses';
 import { WaitlistService } from './waitlist.service';
 
 class WaitlistSignupDto extends createZodDto(waitlistSignupSchema) {}
@@ -22,6 +23,7 @@ class WaitlistQueryDto extends createZodDto(
 export class WaitlistController {
   constructor(@Inject(WaitlistService) private readonly waitlist: WaitlistService) {}
 
+  @ZodResponse({ status: 200, type: WaitlistJoinedDto })
   @Public()
   @Post('waitlist')
   @HttpCode(200)
@@ -30,6 +32,7 @@ export class WaitlistController {
     return this.waitlist.signUp(body, ip);
   }
 
+  @ZodResponse({ status: 200, type: WaitlistPageDto })
   @ApiBearerAuth()
   @Roles('ops', 'support', 'super_admin')
   @Get('admin/waitlist')
@@ -37,6 +40,7 @@ export class WaitlistController {
     return this.waitlist.list(q, q.limit, q.offset);
   }
 
+  @ZodResponse({ status: 200, type: WaitlistSummaryDto })
   @ApiBearerAuth()
   @Roles('ops', 'support', 'super_admin')
   @Get('admin/waitlist/summary')

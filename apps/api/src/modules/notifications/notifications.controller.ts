@@ -15,10 +15,11 @@ import {
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request } from 'express';
-import { createZodDto } from 'nestjs-zod';
+import { ZodResponse, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Public } from '../../common/auth';
 import { hmac, safeEqualHex } from '../../common/crypto';
+import { NotificationDto } from '../../common/responses';
 import { ENV, type Env } from '../../config/env';
 import { NotificationsService } from './notifications.service';
 import { WhatsAppInboundService } from './whatsapp-inbound.service';
@@ -62,6 +63,7 @@ export class NotificationsController {
     await this.notifications.setWhatsAppOptIn(user.id, body.optIn);
   }
 
+  @ZodResponse({ status: 200, type: [NotificationDto] })
   @ApiBearerAuth()
   @Get('me/notifications')
   inbox(@CurrentUser() user: AuthUser) {

@@ -16,9 +16,18 @@ import {
   type ReviseQuoteInput,
   reviseQuoteSchema,
 } from '@setu/schemas';
-import { createZodDto, ZodValidationPipe } from 'nestjs-zod';
+import { ZodResponse, ZodValidationPipe, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser } from '../../common/auth';
+import {
+  HireDto,
+  LeadDto,
+  LeadInboxItemDto,
+  QuoteDetailDto,
+  QuoteDto,
+  QuoteRevisionDto,
+  QuoteRowDto,
+} from '../../common/responses';
 import { QuotesService } from './quotes.service';
 
 class NegotiateDto extends createZodDto(negotiateQuoteSchema) {}
@@ -31,17 +40,20 @@ export class QuotesController {
 
   // Partner side
 
+  @ZodResponse({ status: 200, type: [LeadInboxItemDto] })
   @Get('partner/leads')
   leads(@CurrentUser() user: AuthUser) {
     return this.quotes.myLeads(user);
   }
 
+  @ZodResponse({ status: 200, type: LeadDto })
   @Post('partner/leads/:id/seen')
   @HttpCode(200)
   seen(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.quotes.markSeen(user, id);
   }
 
+  @ZodResponse({ status: 200, type: LeadDto })
   @Post('partner/leads/:id/decline')
   @HttpCode(200)
   decline(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
@@ -50,6 +62,7 @@ export class QuotesController {
 
   @Post('partner/leads/:id/quote')
   // Refined schemas cannot be DTO classes, so validate and document them explicitly.
+  @ZodResponse({ status: 201, type: QuoteDto })
   @ApiBody({ schema: z.toJSONSchema(createQuoteSchema, { io: 'input' }) as object })
   quote(
     @CurrentUser() user: AuthUser,
@@ -59,6 +72,7 @@ export class QuotesController {
     return this.quotes.createQuote(user, id, body);
   }
 
+  @ZodResponse({ status: 200, type: QuoteDto })
   @Post('quotes/:id/revise')
   @HttpCode(200)
   @ApiBody({ schema: z.toJSONSchema(reviseQuoteSchema, { io: 'input' }) as object })
@@ -70,6 +84,7 @@ export class QuotesController {
     return this.quotes.revise(user, id, body);
   }
 
+  @ZodResponse({ status: 200, type: QuoteRowDto })
   @Post('quotes/:id/withdraw')
   @HttpCode(200)
   withdraw(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
@@ -78,6 +93,7 @@ export class QuotesController {
 
   // Either side
 
+  @ZodResponse({ status: 200, type: QuoteDetailDto })
   @Get('quotes/:id')
   get(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.quotes.getQuote(user, id);
@@ -85,11 +101,13 @@ export class QuotesController {
 
   // Customer side
 
+  @ZodResponse({ status: 200, type: [QuoteDetailDto] })
   @Get('requirements/:id/quotes')
   forRequirement(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.quotes.forRequirement(user, id);
   }
 
+  @ZodResponse({ status: 201, type: QuoteRevisionDto })
   @Post('quotes/:id/negotiate')
   negotiate(
     @CurrentUser() user: AuthUser,
@@ -99,6 +117,7 @@ export class QuotesController {
     return this.quotes.negotiate(user, id, body);
   }
 
+  @ZodResponse({ status: 200, type: HireDto })
   @Post('quotes/:id/accept')
   @HttpCode(200)
   accept(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {

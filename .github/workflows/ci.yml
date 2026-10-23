@@ -49,6 +49,15 @@ jobs:
             git status --porcelain drizzle
             exit 1
           fi
+      - name: API client matches the API
+        run: |
+          pnpm --filter @setu/api openapi
+          pnpm --filter @setu/api-client generate
+          if [ -n "$(git status --porcelain packages/api-client/src/schema.ts)" ]; then
+            echo "::error::The API changed but packages/api-client is stale. Run 'pnpm api-client:generate' and commit the result."
+            git diff --stat packages/api-client/src/schema.ts
+            exit 1
+          fi
 
   docker:
     runs-on: ubuntu-latest

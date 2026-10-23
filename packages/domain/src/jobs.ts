@@ -36,6 +36,24 @@ export type JobEvent =
 
 export type JobEventType = JobEvent['type'];
 
+export const JOB_EVENT_TYPES = [
+  'schedule',
+  'reschedule',
+  'start',
+  'complete',
+  'confirm',
+  'auto_confirm',
+  'cancel',
+  'dispute',
+  'resolve_release',
+  'resolve_refund',
+] as const satisfies readonly JobEventType[];
+// Fails to compile if a JobEvent type is missing from the list.
+const _allJobEvents: Exclude<JobEventType, (typeof JOB_EVENT_TYPES)[number]> extends never
+  ? true
+  : never = true;
+void _allJobEvents;
+
 const futureSlot = (e: { slotStart: Date; now: Date }) =>
   e.slotStart.getTime() > e.now.getTime() ? null : 'Slot must be in the future';
 

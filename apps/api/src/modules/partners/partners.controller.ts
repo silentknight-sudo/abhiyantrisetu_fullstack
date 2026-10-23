@@ -16,9 +16,10 @@ import {
   partnerProfileUpdateSchema,
   verifyPartnerSchema,
 } from '@setu/schemas';
-import { createZodDto, ZodValidationPipe } from 'nestjs-zod';
+import { ZodResponse, ZodValidationPipe, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Roles } from '../../common/auth';
+import { PartnerDto } from '../../common/responses';
 import { PartnersService } from './partners.service';
 
 class PartnerProfileDto extends createZodDto(partnerProfileSchema) {}
@@ -35,21 +36,25 @@ class PartnerListQueryDto extends createZodDto(
 export class PartnersController {
   constructor(@Inject(PartnersService) private readonly partners: PartnersService) {}
 
+  @ZodResponse({ status: 201, type: PartnerDto })
   @Post('partners/me')
   create(@CurrentUser() user: AuthUser, @Body() body: PartnerProfileDto) {
     return this.partners.create(user, body);
   }
 
+  @ZodResponse({ status: 200, type: PartnerDto })
   @Get('partners/me')
   me(@CurrentUser() user: AuthUser) {
     return this.partners.requireMine(user);
   }
 
+  @ZodResponse({ status: 200, type: PartnerDto })
   @Patch('partners/me')
   update(@CurrentUser() user: AuthUser, @Body() body: PartnerProfileUpdateDto) {
     return this.partners.updateMine(user, body);
   }
 
+  @ZodResponse({ status: 200, type: [PartnerDto] })
   @Get('admin/partners')
   @Roles('verification', 'ops', 'super_admin')
   list(@Query() q: PartnerListQueryDto) {
@@ -59,6 +64,7 @@ export class PartnersController {
   @Post('admin/partners/:id/verification')
   @Roles('verification', 'ops', 'super_admin')
   // A refined object cannot be a DTO class, so validate explicitly.
+  @ZodResponse({ status: 201, type: PartnerDto })
   @ApiBody({ schema: z.toJSONSchema(verifyPartnerSchema, { io: 'input' }) as object })
   verify(
     @CurrentUser() staff: AuthUser,

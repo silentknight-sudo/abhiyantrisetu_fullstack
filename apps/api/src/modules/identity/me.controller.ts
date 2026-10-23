@@ -11,9 +11,10 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { localeSchema } from '@setu/schemas';
 import { eq } from 'drizzle-orm';
-import { createZodDto } from 'nestjs-zod';
+import { ZodResponse, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser } from '../../common/auth';
+import { MeDto } from '../../common/responses';
 import type { Db } from '../../db/client';
 import { DB } from '../../db/db.module';
 import { users } from '../../db/schema';
@@ -49,6 +50,7 @@ export class MeController {
     @Inject(TokensService) private readonly tokens: TokensService,
   ) {}
 
+  @ZodResponse({ status: 200, type: MeDto })
   @Get()
   async get(@CurrentUser() me: AuthUser) {
     const [user] = await this.db.select(publicColumns).from(users).where(eq(users.id, me.id));
@@ -56,6 +58,7 @@ export class MeController {
     return user;
   }
 
+  @ZodResponse({ status: 200, type: MeDto })
   @Patch()
   async update(@CurrentUser() me: AuthUser, @Body() body: UpdateMeDto) {
     const { consentVersion, ...rest } = body;
@@ -64,7 +67,7 @@ export class MeController {
       .set({ ...rest, ...(consentVersion ? { consentVersion, consentedAt: new Date() } : {}) })
       .where(eq(users.id, me.id))
       .returning(publicColumns);
-    return user;
+    return user!;
   }
 
   /**

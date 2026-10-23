@@ -10,10 +10,11 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { type CreateRequirementInput, createRequirementSchema } from '@setu/schemas';
-import { ZodValidationPipe } from 'nestjs-zod';
+import { ZodResponse, ZodValidationPipe } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser } from '../../common/auth';
 import { CancelRequirementDto } from '../../common/dto';
+import { RequirementDto } from '../../common/responses';
 import { RequirementsService } from './requirements.service';
 
 @ApiTags('requirements')
@@ -24,6 +25,7 @@ export class RequirementsController {
 
   @Post()
   // A discriminated union cannot be a DTO class, so validate and document it explicitly.
+  @ZodResponse({ status: 201, type: RequirementDto })
   @ApiBody({ schema: z.toJSONSchema(createRequirementSchema, { io: 'input' }) as object })
   create(
     @CurrentUser() user: AuthUser,
@@ -32,16 +34,19 @@ export class RequirementsController {
     return this.requirements.create(user, body);
   }
 
+  @ZodResponse({ status: 200, type: [RequirementDto] })
   @Get()
   list(@CurrentUser() user: AuthUser) {
     return this.requirements.listMine(user);
   }
 
+  @ZodResponse({ status: 200, type: RequirementDto })
   @Get(':id')
   get(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
     return this.requirements.get(user, id);
   }
 
+  @ZodResponse({ status: 200, type: RequirementDto })
   @Post(':id/cancel')
   @HttpCode(200)
   cancel(

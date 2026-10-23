@@ -16,7 +16,8 @@
     "db:up": "docker compose up -d postgres redis",
     "db:migrate": "pnpm --filter @setu/api db:migrate",
     "db:generate": "pnpm --filter @setu/api db:generate",
-    "db:seed": "pnpm --filter @setu/api db:seed"
+    "db:seed": "pnpm --filter @setu/api db:seed",
+    "api-client:generate": "pnpm --filter @setu/api openapi && pnpm --filter @setu/api-client generate"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

@@ -32,6 +32,14 @@ export const Public = () => SetMetadata(IS_PUBLIC, true);
 /** Require at least one of the given roles (in addition to being authenticated). */
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
+/** The caller's User-Agent, kept out of the API spec (it is not a client-supplied parameter). */
+export const UserAgent = createParamDecorator(
+  (_: unknown, ctx: ExecutionContext): string | undefined =>
+    ctx.switchToHttp().getRequest<{ headers: Record<string, string | undefined> }>().headers[
+      'user-agent'
+    ],
+);
+
 export const CurrentUser = createParamDecorator(
   (_: unknown, ctx: ExecutionContext): AuthUser =>
     ctx.switchToHttp().getRequest<Request & { user: AuthUser }>().user,

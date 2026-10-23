@@ -2,7 +2,9 @@ import { Controller, Get, Inject, ServiceUnavailableException } from '@nestjs/co
 import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Sql } from 'postgres';
+import { ZodResponse } from 'nestjs-zod';
 import { Public } from '../../common/auth';
+import { HealthDto } from '../../common/responses';
 import { SQL } from '../../db/db.module';
 
 @ApiTags('health')
@@ -12,6 +14,7 @@ import { SQL } from '../../db/db.module';
 export class HealthController {
   constructor(@Inject(SQL) private readonly sql: Sql) {}
 
+  @ZodResponse({ status: 200, type: HealthDto })
   @Get()
   async check() {
     try {
@@ -19,6 +22,6 @@ export class HealthController {
     } catch {
       throw new ServiceUnavailableException({ status: 'error', db: 'down' });
     }
-    return { status: 'ok', db: 'up' };
+    return { status: 'ok', db: 'up' } as const;
   }
 }

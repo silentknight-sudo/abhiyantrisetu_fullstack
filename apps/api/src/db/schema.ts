@@ -387,7 +387,7 @@ export const requirements = pgTable(
     categoryId: uuid('category_id').references(() => categories.id),
     title: text('title').notNull(),
     /** Validated per `type` by @setu/schemas requirementDetailsSchemas. */
-    details: jsonb('details').notNull(),
+    details: jsonb('details').$type<Record<string, unknown>>().notNull(),
     addressId: uuid('address_id')
       .notNull()
       .references(() => addresses.id),

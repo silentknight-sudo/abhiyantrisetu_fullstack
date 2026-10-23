@@ -141,7 +141,7 @@ export class PaymentsService {
         paymentId: payment.id,
         razorpayOrderId: payment.razorpayOrderId,
         amountPaise: payment.amountPaise,
-        currency: 'INR',
+        currency: 'INR' as const,
         keyId: this.gateway.keyId,
       };
     });

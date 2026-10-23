@@ -2,7 +2,7 @@
 
 One TypeScript monorepo for all five surfaces: customer app, partner app, website, vendor portal and admin portal. They share a single NestJS backend on Postgres + PostGIS. The architecture reference is the _Abhiyantri Setu — System Architecture & Tech Stack_ document. This repo builds it phase by phase.
 
-## Status: Phase 0 (Foundation)
+## Status: Phase 1 (core loop) in progress
 
 | Area                                                                                                                                      | State                                          |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
@@ -16,7 +16,12 @@ One TypeScript monorepo for all five surfaces: customer app, partner app, websit
 | Jobs module: the hire event and guarded state machine, with an event row per transition, start codes and 48h auto-confirm worker          | ✅                                             |
 | CI: format, build, typecheck, tests against PostGIS, schema-drift check                                                                   | ✅                                             |
 | Data migration from the Lovable/Supabase project                                                                                          | ⏳ needs access to the current Supabase schema |
-| `apps/mobile`, `apps/web`, `apps/vendor`, `apps/admin`, `packages/ui-web`, `packages/ui-native`, `packages/api-client`                    | ⏳ Phase 1                                     |
+| Marketplace core loop: PostGIS matching, leads, quotes and negotiation, hire                                                              | ✅                                             |
+| WhatsApp and push notifications (worker-delivered, signed inbound webhooks)                                                               | ✅                                             |
+| Razorpay payments with an append-only double-entry ledger                                                                                 | ✅                                             |
+| `packages/api-client`: typed client and TanStack Query hooks generated from OpenAPI                                                       | ✅                                             |
+| `apps/web` website (pre-launch mode, waitlist)                                                                                            | ✅                                             |
+| `apps/mobile`, `apps/vendor`, `apps/admin`, `packages/ui-web`, `packages/ui-native`                                                       | ⏳ Phase 1                                     |
 
 ## Layout
 
@@ -28,7 +33,8 @@ apps/
 packages/
   ui-tokens/      design tokens
   domain/         business rules shared by every surface
-  schemas/        Zod schemas shared by forms and API
+  schemas/        Zod schemas shared by forms and API, including every response shape
+  api-client/     typed client generated from the API's OpenAPI spec (+ TanStack Query hooks)
 ```
 
 `apps/workers` from the architecture doc lives as `apps/api/src/worker.ts`. It is a separate process and deployable, but it reuses the API's modules directly.
@@ -63,13 +69,13 @@ curl -XPOST localhost:4000/v1/auth/otp/verify -H 'content-type: application/json
 
 ### Common tasks
 
-| Command                           | What it does                                                                                                                     |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm test`                       | All unit and integration tests. API tests need `TEST_DATABASE_URL` (defaults to `postgres://setu:setu@localhost:5432/setu_test`) |
-| `pnpm typecheck`                  | Type-checks every package, including tests                                                                                       |
-| `pnpm db:generate`                | Creates a migration after editing `apps/api/src/db/schema.ts` (CI fails if you forget)                                           |
-| `pnpm --filter @setu/api openapi` | Writes `apps/api/openapi.json` (input for the generated API client)                                                              |
-| `pnpm format`                     | Prettier                                                                                                                         |
+| Command                    | What it does                                                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm test`                | All unit and integration tests. API tests need `TEST_DATABASE_URL` (defaults to `postgres://setu:setu@localhost:5432/setu_test`) |
+| `pnpm typecheck`           | Type-checks every package, including tests                                                                                       |
+| `pnpm db:generate`         | Creates a migration after editing `apps/api/src/db/schema.ts` (CI fails if you forget)                                           |
+| `pnpm api-client:generate` | Regenerates `packages/api-client` from the API (CI fails if it is stale)                                                         |
+| `pnpm format`              | Prettier                                                                                                                         |
 
 ## Website
 
@@ -114,11 +120,18 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 - **No secrets at rest in plaintext**: OTPs, start codes and refresh tokens are stored only as hashes. Aadhaar is masked only.
 - **Every vendor sits behind an adapter** (e.g. `SmsProvider`). Swapping a vendor touches one file.
 - **Clients never talk to the database.** Everything goes through `/v1`.
+- **Every response has a schema.** Controllers declare `@ZodResponse` with a schema from `@setu/schemas`; the API encodes through it (fields not listed are never sent), type-checks the controller against it, and documents it, so `@setu/api-client` is fully typed:
+
+  ```ts
+  const client = createSetuClient({ baseUrl, tokens, onSessionExpired });
+  const job = unwrap(await client.api.GET('/v1/jobs/{id}', { params: { path: { id } } }));
+  // React: const $api = createSetuQueries(client); $api.useQuery('get', '/v1/jobs');
+  ```
+
 - **Data stays in India**: deploy to AWS `ap-south-1` / Supabase Mumbai.
 
 ## Next (Phase 1: core loop)
 
-1. `packages/api-client`: generate TanStack Query hooks from `openapi.json`.
 2. Catalog, Matching (PostGIS radius plus rule-based ranking), Leads & credits, Quotes & negotiation (`POST /quotes/:id/accept` calls `JobsService.hire`).
 3. `apps/mobile` (Expo, customer + partner variants), `apps/web` (Next.js), `apps/admin` v1.
 4. Move throttling to a Redis store before running more than one API task.

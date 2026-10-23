@@ -13,9 +13,15 @@ import {
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request } from 'express';
-import { createZodDto } from 'nestjs-zod';
+import { ZodResponse, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Public, Roles } from '../../common/auth';
+import {
+  JobPaymentsDto,
+  LedgerBalancesDto,
+  PaymentOrderDto,
+  PaymentVerifiedDto,
+} from '../../common/responses';
 import { PaymentsService } from './payments.service';
 
 class CreateOrderDto extends createZodDto(z.object({ jobId: z.uuid() })) {}
@@ -32,12 +38,14 @@ class VerifyDto extends createZodDto(
 export class PaymentsController {
   constructor(@Inject(PaymentsService) private readonly payments: PaymentsService) {}
 
+  @ZodResponse({ status: 201, type: PaymentOrderDto })
   @ApiBearerAuth()
   @Post('payments/orders')
   createOrder(@CurrentUser() user: AuthUser, @Body() body: CreateOrderDto) {
     return this.payments.createOrder(user, body.jobId);
   }
 
+  @ZodResponse({ status: 200, type: PaymentVerifiedDto })
   @ApiBearerAuth()
   @Post('payments/verify')
   @HttpCode(200)
@@ -46,6 +54,7 @@ export class PaymentsController {
     return { paymentId: p.id, status: p.status, amountPaise: p.amountPaise };
   }
 
+  @ZodResponse({ status: 200, type: JobPaymentsDto })
   @ApiBearerAuth()
   @Get('jobs/:id/payments')
   forJob(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
@@ -67,6 +76,7 @@ export class PaymentsController {
     );
   }
 
+  @ZodResponse({ status: 200, type: LedgerBalancesDto })
   @ApiBearerAuth()
   @Roles('ops', 'finance', 'super_admin')
   @Get('admin/ledger/balances')

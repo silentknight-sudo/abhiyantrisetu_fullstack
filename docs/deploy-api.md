@@ -16,15 +16,19 @@ The API and the background worker ship as one Docker image (`apps/api/Dockerfile
 
 ## Environment variables
 
-| Variable                                  | Pre-launch value                                            | At launch                               |
-| ----------------------------------------- | ----------------------------------------------------------- | --------------------------------------- |
-| `NODE_ENV`                                | `production`                                                | `production`                            |
-| `DATABASE_URL`                            | RDS connection string                                       | —                                       |
-| `REDIS_URL`                               | ElastiCache endpoint                                        | —                                       |
-| `JWT_ACCESS_SECRET`, `OTP_HASH_SECRET`    | 48+ random characters each (`openssl rand -base64 48`)      | —                                       |
-| `SMS_PROVIDER`                            | `disabled` (login closed; sign-ups still work)              | `msg91` once DLT templates are approved |
-| `MSG91_AUTH_KEY`, `MSG91_OTP_TEMPLATE_ID` | empty                                                       | from MSG91                              |
-| `CORS_ORIGINS`                            | `https://abhiyantrisetu.com,https://www.abhiyantrisetu.com` | add the admin and vendor portals        |
+| Variable                                                                                     | Pre-launch value                                            | At launch                                                                                            |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`                                                                                   | `production`                                                | `production`                                                                                         |
+| `DATABASE_URL`                                                                               | RDS connection string                                       | —                                                                                                    |
+| `REDIS_URL`                                                                                  | ElastiCache endpoint                                        | —                                                                                                    |
+| `JWT_ACCESS_SECRET`, `OTP_HASH_SECRET`                                                       | 48+ random characters each (`openssl rand -base64 48`)      | —                                                                                                    |
+| `SMS_PROVIDER`                                                                               | `disabled` (login closed; sign-ups still work)              | `msg91` once DLT templates are approved                                                              |
+| `MSG91_AUTH_KEY`, `MSG91_OTP_TEMPLATE_ID`                                                    | empty                                                       | from MSG91                                                                                           |
+| `WHATSAPP_PROVIDER`                                                                          | `disabled`                                                  | `meta` once templates are approved (see `docs/whatsapp-templates.md`)                                |
+| `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | empty                                                       | from WhatsApp Manager or your BSP; webhook URL `https://api.abhiyantrisetu.com/v1/webhooks/whatsapp` |
+| `PUSH_PROVIDER`                                                                              | `disabled`                                                  | `expo` when the apps ship (`EXPO_ACCESS_TOKEN` optional)                                             |
+| `NOTIFICATIONS_DELIVERY`                                                                     | `queue`                                                     | `queue` (the worker sends and retries)                                                               |
+| `CORS_ORIGINS`                                                                               | `https://abhiyantrisetu.com,https://www.abhiyantrisetu.com` | add the admin and vendor portals                                                                     |
 
 The API refuses to start with missing or unsafe settings and prints `Invalid environment` with the reason.
 

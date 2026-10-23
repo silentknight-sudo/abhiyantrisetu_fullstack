@@ -16,6 +16,7 @@ import { DbModule } from './db/db.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { JobsService } from './modules/jobs/jobs.service';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import {
   NOTIFICATIONS_QUEUE,
   NotificationsService,
@@ -31,6 +32,7 @@ export const QUEUES = { maintenance: 'maintenance' } as const;
     JwtModule.register({}),
     JobsModule,
     NotificationsModule,
+    PaymentsModule,
   ],
 })
 class WorkerModule {}

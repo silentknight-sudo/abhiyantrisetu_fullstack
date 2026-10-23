@@ -25,6 +25,13 @@ const envSchema = z
     // Push notifications through Expo (FCM + APNs).
     PUSH_PROVIDER: z.enum(['console', 'expo', 'disabled']).default('console'),
     EXPO_ACCESS_TOKEN: z.string().optional(),
+    // Payments. fake: local order ids, same signature checks (dev/test only).
+    PAYMENTS_PROVIDER: z.enum(['fake', 'razorpay', 'disabled']).default('fake'),
+    RAZORPAY_KEY_ID: z.string().optional(),
+    RAZORPAY_KEY_SECRET: z.string().optional(),
+    RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
+    /** Platform fee taken when a job's held money is released, in basis points (100 = 1%). */
+    PLATFORM_FEE_BPS: z.coerce.number().int().min(0).max(10_000).default(0),
     // inline: send during the request (dev/test). queue: hand to the BullMQ worker (production).
     NOTIFICATIONS_DELIVERY: z.enum(['inline', 'queue']).default('inline'),
     CORS_ORIGINS: z
@@ -43,6 +50,24 @@ const envSchema = z
         code: 'custom',
         path: ['SMS_PROVIDER'],
         message: 'console SMS is not allowed in production',
+      });
+    }
+    if (env.NODE_ENV === 'production' && env.PAYMENTS_PROVIDER === 'fake') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['PAYMENTS_PROVIDER'],
+        message: 'fake payments are not allowed in production',
+      });
+    }
+    if (
+      env.PAYMENTS_PROVIDER === 'razorpay' &&
+      (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET || !env.RAZORPAY_WEBHOOK_SECRET)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['RAZORPAY_KEY_ID'],
+        message:
+          'RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET are required when PAYMENTS_PROVIDER=razorpay',
       });
     }
     for (const key of ['WHATSAPP_PROVIDER', 'PUSH_PROVIDER'] as const) {

@@ -102,12 +102,15 @@ POST|GET|PATCH /v1/partners/me   GET /v1/admin/partners   POST /v1/admin/partner
 GET  /v1/partner/leads           POST /v1/partner/leads/:id/{seen|decline|quote}
 GET  /v1/quotes/:id              POST /v1/quotes/:id/{revise|withdraw|negotiate|accept}
 GET  /v1/requirements/:id/quotes
+POST /v1/payments/orders         POST /v1/payments/verify        GET /v1/jobs/:id/payments
+POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 ```
 
 ## Rules this codebase holds to
 
 - **Only the Jobs module changes job state.** It locks the row, runs the guarded transition table from `@setu/domain`, and writes a `job_events` row in the same transaction. Requirements follow the same pattern with `requirement_events`.
 - **Money is integer paise** (`bigint` in Postgres). GST is computed in `@setu/domain` so the quote screen, invoice and API agree.
+- **The ledger is append-only and double-entry.** Every rupee is a balanced transaction in `ledger_entries`; a database trigger rejects UPDATE and DELETE. Customer payments are held per job and released to the partner (less `PLATFORM_FEE_BPS`) only when the job closes, so disputed money stays held.
 - **No secrets at rest in plaintext**: OTPs, start codes and refresh tokens are stored only as hashes. Aadhaar is masked only.
 - **Every vendor sits behind an adapter** (e.g. `SmsProvider`). Swapping a vendor touches one file.
 - **Clients never talk to the database.** Everything goes through `/v1`.
@@ -117,6 +120,5 @@ GET  /v1/requirements/:id/quotes
 
 1. `packages/api-client`: generate TanStack Query hooks from `openapi.json`.
 2. Catalog, Matching (PostGIS radius plus rule-based ranking), Leads & credits, Quotes & negotiation (`POST /quotes/:id/accept` calls `JobsService.hire`).
-3. Payments (Razorpay orders and webhook, append-only ledger), WhatsApp lead notifications via BSP.
-4. `apps/mobile` (Expo, customer + partner variants), `apps/web` (Next.js), `apps/admin` v1.
-5. Move throttling to a Redis store before running more than one API task.
+3. `apps/mobile` (Expo, customer + partner variants), `apps/web` (Next.js), `apps/admin` v1.
+4. Move throttling to a Redis store before running more than one API task.

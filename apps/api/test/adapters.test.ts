@@ -4,6 +4,7 @@ import { DisabledSmsProvider } from '../src/modules/identity/sms/disabled.provid
 import { Msg91SmsProvider } from '../src/modules/identity/sms/msg91.provider';
 import { ExpoPushProvider } from '../src/modules/notifications/providers/push.provider';
 import { MetaWhatsAppProvider } from '../src/modules/notifications/providers/whatsapp.provider';
+import { RazorpayGateway } from '../src/modules/payments/razorpay.provider';
 
 const base = {
   DATABASE_URL: 'postgres://u:p@localhost:5432/db',
@@ -23,6 +24,7 @@ describe('env validation', () => {
         SMS_PROVIDER: 'disabled',
         WHATSAPP_PROVIDER: 'disabled',
         PUSH_PROVIDER: 'disabled',
+        PAYMENTS_PROVIDER: 'disabled',
       }).SMS_PROVIDER,
     ).toBe('disabled');
   });
@@ -43,6 +45,19 @@ describe('env validation', () => {
   });
   it('requires MSG91 credentials when selected', () => {
     expect(() => loadEnv({ ...base, SMS_PROVIDER: 'msg91' })).toThrow(/MSG91_AUTH_KEY/);
+  });
+  it('forbids fake payments in production and needs every Razorpay key', () => {
+    const prod = {
+      ...base,
+      NODE_ENV: 'production',
+      SMS_PROVIDER: 'disabled',
+      WHATSAPP_PROVIDER: 'disabled',
+      PUSH_PROVIDER: 'disabled',
+    };
+    expect(() => loadEnv(prod)).toThrow(/fake payments/);
+    expect(() =>
+      loadEnv({ ...prod, PAYMENTS_PROVIDER: 'razorpay', RAZORPAY_KEY_ID: 'rzp_live_x' }),
+    ).toThrow(/RAZORPAY_KEY_SECRET/);
   });
   it('rejects short secrets', () => {
     expect(() => loadEnv({ ...base, JWT_ACCESS_SECRET: 'short' })).toThrow(/JWT_ACCESS_SECRET/);
@@ -113,13 +128,11 @@ describe('MetaWhatsAppProvider', () => {
   });
 
   it('throws with Meta’s error message', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(JSON.stringify({ error: { message: 'Template not approved' } }), {
-          status: 400,
-        }),
-      );
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ error: { message: 'Template not approved' } }), {
+        status: 400,
+      }),
+    );
     await expect(
       new MetaWhatsAppProvider('t', '1', fetchMock).send({
         to: '+91',
@@ -133,19 +146,14 @@ describe('MetaWhatsAppProvider', () => {
 
 describe('ExpoPushProvider', () => {
   it('reports dead device tokens for cleanup', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            data: [
-              { status: 'ok' },
-              { status: 'error', details: { error: 'DeviceNotRegistered' } },
-            ],
-          }),
-          { status: 200 },
-        ),
-      );
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [{ status: 'ok' }, { status: 'error', details: { error: 'DeviceNotRegistered' } }],
+        }),
+        { status: 200 },
+      ),
+    );
     const res = await new ExpoPushProvider(undefined, fetchMock).send(
       ['ExponentPushToken[a]', 'ExponentPushToken[b]'],
       {
@@ -155,5 +163,41 @@ describe('ExpoPushProvider', () => {
       },
     );
     expect(res).toEqual({ ok: true, deadTokens: ['ExponentPushToken[b]'], error: undefined });
+  });
+});
+
+describe('RazorpayGateway', () => {
+  it('creates an INR order with basic auth', async () => {
+    const fetchImpl = vi.fn(
+      async () => new Response(JSON.stringify({ id: 'order_123' }), { status: 200 }),
+    );
+    const gw = new RazorpayGateway('rzp_test_key', 'secret', fetchImpl as unknown as typeof fetch);
+    await expect(
+      gw.createOrder({ amountPaise: 89_900, receipt: 'r1', notes: { jobId: 'j' } }),
+    ).resolves.toEqual({
+      id: 'order_123',
+    });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://api.razorpay.com/v1/orders');
+    expect((init.headers as Record<string, string>).authorization).toBe(
+      `Basic ${Buffer.from('rzp_test_key:secret').toString('base64')}`,
+    );
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      amount: 89_900,
+      currency: 'INR',
+      receipt: 'r1',
+    });
+  });
+  it('throws with Razorpay’s error description', async () => {
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ error: { description: 'Authentication failed' } }), {
+          status: 401,
+        }),
+    );
+    const gw = new RazorpayGateway('k', 's', fetchImpl as unknown as typeof fetch);
+    await expect(gw.createOrder({ amountPaise: 100, receipt: 'r', notes: {} })).rejects.toThrow(
+      /401: Authentication failed/,
+    );
   });
 });

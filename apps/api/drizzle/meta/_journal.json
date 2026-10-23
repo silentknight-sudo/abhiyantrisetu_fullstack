@@ -29,6 +29,20 @@
       "when": 1792770978009,
       "tag": "0003_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792771424909,
+      "tag": "0004_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792771426164,
+      "tag": "0005_ledger_append_only",
+      "breakpoints": true
     }
   ]
 }

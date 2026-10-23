@@ -128,6 +128,12 @@ export const notificationStatusEnum = pgEnum('notification_status', [
   'failed',
   'skipped',
 ]);
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'created',
+  'captured',
+  'failed',
+  'refunded',
+]);
 export const waitlistRoleEnum = pgEnum('waitlist_role', [
   'customer',
   'provider',
@@ -678,4 +684,58 @@ export const inboundWebhooks = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('inbound_webhooks_provider_external_uq').on(t.provider, t.externalId)],
+);
+
+// ---------- payments ----------
+
+/** One Razorpay order per payment attempt against a job. */
+export const payments = pgTable(
+  'payments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    jobId: uuid('job_id')
+      .notNull()
+      .references(() => jobs.id),
+    customerId: uuid('customer_id')
+      .notNull()
+      .references(() => users.id),
+    amountPaise: money('amount_paise').notNull(),
+    status: paymentStatusEnum('status').notNull().default('created'),
+    razorpayOrderId: text('razorpay_order_id').notNull().unique(),
+    razorpayPaymentId: text('razorpay_payment_id').unique(),
+    method: text('method'),
+    failureReason: text('failure_reason'),
+    capturedAt: timestamp('captured_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('payments_job_idx').on(t.jobId)],
+);
+
+/**
+ * Double-entry ledger. Append-only (a database trigger rejects UPDATE and DELETE); each
+ * transaction's lines share a txn_id and balance. Balances are sums per account.
+ */
+export const ledgerEntries = pgTable(
+  'ledger_entries',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    txnId: uuid('txn_id').notNull(),
+    kind: text('kind').notNull(),
+    account: text('account').notNull(),
+    debitPaise: money('debit_paise').notNull().default(0),
+    creditPaise: money('credit_paise').notNull().default(0),
+    jobId: uuid('job_id').references(() => jobs.id),
+    paymentId: uuid('payment_id').references(() => payments.id),
+    memo: text('memo'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('ledger_account_idx').on(t.account),
+    index('ledger_job_idx').on(t.jobId),
+    index('ledger_txn_idx').on(t.txnId),
+    check(
+      'ledger_one_sided',
+      sql`(${t.debitPaise} > 0 AND ${t.creditPaise} = 0) OR (${t.creditPaise} > 0 AND ${t.debitPaise} = 0)`,
+    ),
+  ],
 );

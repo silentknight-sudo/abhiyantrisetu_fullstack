@@ -18,6 +18,7 @@ import { MatchingModule } from './modules/matching/matching.module';
 import { PartnersModule } from './modules/partners/partners.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { QuotesModule } from './modules/quotes/quotes.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { QuotesModule } from './modules/quotes/quotes.module';
     MatchingModule,
     QuotesModule,
     NotificationsModule,
+    PaymentsModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

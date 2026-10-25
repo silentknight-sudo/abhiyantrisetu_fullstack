@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Inject,
+  Ip,
   Param,
   ParseUUIDPipe,
   Post,
@@ -14,6 +15,7 @@ import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestj
 import { SkipThrottle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { ZodResponse, createZodDto } from 'nestjs-zod';
+import { recordPayoutSchema } from '@setu/schemas';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Public, Roles } from '../../common/auth';
 import {
@@ -21,9 +23,12 @@ import {
   LedgerBalancesDto,
   PaymentOrderDto,
   PaymentVerifiedDto,
+  PayoutDueDto,
+  PayoutRecordedDto,
 } from '../../common/responses';
 import { PaymentsService } from './payments.service';
 
+class RecordPayoutDto extends createZodDto(recordPayoutSchema) {}
 class CreateOrderDto extends createZodDto(z.object({ jobId: z.uuid() })) {}
 class VerifyDto extends createZodDto(
   z.object({
@@ -96,5 +101,21 @@ export class PaymentsController {
   @Get('admin/ledger/balances')
   balances() {
     return this.payments.balances();
+  }
+
+  @ZodResponse({ status: 200, type: [PayoutDueDto] })
+  @ApiBearerAuth()
+  @Roles('ops', 'finance', 'super_admin')
+  @Get('admin/payouts')
+  payoutsDue() {
+    return this.payments.payoutsDue();
+  }
+
+  @ZodResponse({ status: 201, type: PayoutRecordedDto })
+  @ApiBearerAuth()
+  @Roles('finance', 'super_admin')
+  @Post('admin/payouts')
+  recordPayout(@CurrentUser() staff: AuthUser, @Body() body: RecordPayoutDto, @Ip() ip: string) {
+    return this.payments.recordPayout(staff, body, ip);
   }
 }

@@ -19,6 +19,7 @@ import { PartnersModule } from './modules/partners/partners.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { QuotesModule } from './modules/quotes/quotes.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     QuotesModule,
     NotificationsModule,
     PaymentsModule,
+    AdminModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

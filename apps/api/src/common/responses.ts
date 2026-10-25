@@ -1,4 +1,9 @@
 import {
+  adminJobResponse,
+  adminOverviewResponse,
+  adminPartnerResponse,
+  payoutDueResponse,
+  payoutRecordedResponse,
   authSessionResponse,
   categoryResponse,
   healthResponse,
@@ -55,3 +60,8 @@ export class NotificationDto extends createZodDto(notificationResponse, { codec:
 export class WaitlistJoinedDto extends createZodDto(waitlistJoinedResponse, { codec: true }) {}
 export class WaitlistPageDto extends createZodDto(waitlistPageResponse, { codec: true }) {}
 export class WaitlistSummaryDto extends createZodDto(waitlistSummaryResponse, { codec: true }) {}
+export class AdminPartnerDto extends createZodDto(adminPartnerResponse, { codec: true }) {}
+export class AdminOverviewDto extends createZodDto(adminOverviewResponse, { codec: true }) {}
+export class AdminJobDto extends createZodDto(adminJobResponse, { codec: true }) {}
+export class PayoutDueDto extends createZodDto(payoutDueResponse, { codec: true }) {}
+export class PayoutRecordedDto extends createZodDto(payoutRecordedResponse, { codec: true }) {}

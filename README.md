@@ -22,7 +22,8 @@ One TypeScript monorepo for all five surfaces: customer app, partner app, websit
 | `packages/api-client`: typed client and TanStack Query hooks generated from OpenAPI                                                       | ✅                                             |
 | `apps/web` website (pre-launch mode, waitlist)                                                                                            | ✅                                             |
 | `apps/mobile`: Expo customer and partner apps on the typed client                                                                         | ✅                                             |
-| `apps/vendor`, `apps/admin`, `packages/ui-web`, `packages/ui-native`                                                                      | ⏳ Phase 1                                     |
+| `apps/admin`: staff portal (partner verification, disputes, payouts, ledger, waitlist)                                                    | ✅                                             |
+| `apps/vendor`, `packages/ui-web`, `packages/ui-native`                                                                                    | ⏳ Phase 3                                     |
 
 ## Layout
 
@@ -30,6 +31,7 @@ One TypeScript monorepo for all five surfaces: customer app, partner app, websit
 apps/
   web/            Next.js website (abhiyantrisetu.com)
   mobile/         Expo app: customer and partner variants (see apps/mobile/README.md)
+  admin/          Next.js staff portal (see apps/admin/README.md)
   api/            NestJS modular monolith (+ BullMQ worker entrypoint: src/worker.ts)
     drizzle/      versioned SQL migrations (generated from src/db/schema.ts)
 packages/
@@ -110,6 +112,7 @@ POST|GET|PATCH /v1/partners/me   GET /v1/admin/partners   POST /v1/admin/partner
 GET  /v1/partner/leads           POST /v1/partner/leads/:id/{seen|decline|quote}
 GET  /v1/quotes/:id              POST /v1/quotes/:id/{revise|withdraw|negotiate|accept}
 GET  /v1/requirements/:id/quotes
+GET  /v1/admin/overview          GET /v1/admin/jobs?state=        GET|POST /v1/admin/payouts
 POST /v1/payments/orders         POST /v1/payments/verify        GET /v1/jobs/:id/payments
 POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 ```
@@ -134,6 +137,6 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-1. `apps/admin` v1: partner verification, disputes, payouts, waitlist, ledger.
-2. Move throttling to a Redis store before running more than one API task.
+1. Move throttling to a Redis store before running more than one API task.
+2. Refunds through Razorpay when ops resolves a dispute as a refund (today: issued from the Razorpay dashboard).
 3. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.

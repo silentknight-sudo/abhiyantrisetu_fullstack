@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+/* Semantic colours come from @setu/ui-tokens as --setu-* CSS variables (see layout.tsx). */
+@theme inline {
+  --color-primary: var(--setu-primary);
+  --color-primary-hover: var(--setu-primary-hover);
+  --color-on-primary: var(--setu-on-primary);
+  --color-accent: var(--setu-accent);
+  --color-on-accent: var(--setu-on-accent);
+  --color-background: var(--setu-background);
+  --color-surface: var(--setu-surface);
+  --color-surface-muted: var(--setu-surface-muted);
+  --color-border: var(--setu-border);
+  --color-text: var(--setu-text);
+  --color-text-muted: var(--setu-text-muted);
+  --color-success: var(--setu-success);
+  --color-success-bg: var(--setu-success-bg);
+  --color-danger: var(--setu-danger);
+  --color-danger-bg: var(--setu-danger-bg);
+  --color-warning: var(--setu-warning);
+  --color-warning-bg: var(--setu-warning-bg);
+  --color-info: var(--setu-info);
+  --color-info-bg: var(--setu-info-bg);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-cormorant), Georgia, serif;
+}
+
+body {
+  background: var(--setu-background);
+  color: var(--setu-text);
+  -webkit-font-smoothing: antialiased;
+}

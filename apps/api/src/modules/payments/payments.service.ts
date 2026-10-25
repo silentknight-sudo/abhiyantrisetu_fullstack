@@ -11,12 +11,13 @@ import {
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   assertBalanced,
+  formatINR,
   isStaff,
   LedgerAccounts,
   type LedgerLine,
   releaseLines,
 } from '@setu/domain';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, like, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '../../common/auth';
 import { hmac, safeEqualHex, sha256 } from '../../common/crypto';
@@ -24,7 +25,15 @@ import { DomainEvents, type JobTransitionedEvent } from '../../common/events';
 import { ENV, type Env } from '../../config/env';
 import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
-import { inboundWebhooks, jobs, ledgerEntries, partners, payments } from '../../db/schema';
+import {
+  auditLog,
+  inboundWebhooks,
+  jobs,
+  ledgerEntries,
+  partners,
+  payments,
+  users,
+} from '../../db/schema';
 import { PAYMENT_GATEWAY, type PaymentGateway } from './razorpay.provider';
 
 /** Jobs a customer can pay for. Closed jobs have already released their held money. */
@@ -368,5 +377,109 @@ export class PaymentsService {
       balancePaise: Number(r.creditPaise) - Number(r.debitPaise),
     }));
     return { accounts, trialBalancePaise: accounts.reduce((s, a) => s + a.balancePaise, 0) };
+  }
+
+  private async owed(db: Db | Tx, partnerId: string) {
+    const [row] = await db
+      .select({
+        n: sql<string>`coalesce(sum(${ledgerEntries.creditPaise} - ${ledgerEntries.debitPaise}), 0)`,
+      })
+      .from(ledgerEntries)
+      .where(eq(ledgerEntries.account, LedgerAccounts.partnerPayable(partnerId)));
+    return Number(row?.n ?? 0);
+  }
+
+  /** Partners with released money not yet paid out, most owed first. */
+  async payoutsDue() {
+    const rows = await this.db
+      .select({
+        account: ledgerEntries.account,
+        owed: sql<string>`sum(${ledgerEntries.creditPaise} - ${ledgerEntries.debitPaise})`,
+      })
+      .from(ledgerEntries)
+      .where(like(ledgerEntries.account, 'partner_payable:%'))
+      .groupBy(ledgerEntries.account);
+    const due = rows
+      .map((r) => ({
+        partnerId: r.account.slice('partner_payable:'.length),
+        owedPaise: Number(r.owed),
+      }))
+      .filter((r) => r.owedPaise > 0);
+    if (due.length === 0) return [];
+    const people = await this.db
+      .select({ id: partners.id, displayName: partners.displayName, phone: users.phone })
+      .from(partners)
+      .innerJoin(users, eq(users.id, partners.userId))
+      .where(
+        inArray(
+          partners.id,
+          due.map((d) => d.partnerId),
+        ),
+      );
+    return due
+      .map((d) => {
+        const p = people.find((x) => x.id === d.partnerId);
+        return { ...d, displayName: p?.displayName ?? 'Unknown partner', phone: p?.phone ?? '' };
+      })
+      .sort((a, b) => b.owedPaise - a.owedPaise);
+  }
+
+  /**
+   * Records a payout made outside Setu (bank transfer, UPI) until RazorpayX payouts land:
+   * moves it out of what the partner is owed, never more than that, with an audit entry.
+   */
+  async recordPayout(
+    staff: AuthUser,
+    input: { partnerId: string; amountPaise: number; reference: string },
+    ip?: string,
+  ) {
+    return this.db.transaction(async (tx) => {
+      // One payout per partner at a time, so two clicks cannot pay twice.
+      const [partner] = await tx
+        .select({ id: partners.id })
+        .from(partners)
+        .where(eq(partners.id, input.partnerId))
+        .for('update');
+      if (!partner) throw new NotFoundException();
+      const owed = await this.owed(tx, input.partnerId);
+      if (input.amountPaise > owed) {
+        throw new ConflictException({
+          code: 'MORE_THAN_OWED',
+          message: `Only ${formatINR(owed)} is owed to this partner`,
+        });
+      }
+      const txnId = await this.post(
+        tx,
+        'payout',
+        [
+          {
+            account: LedgerAccounts.partnerPayable(input.partnerId),
+            debit: input.amountPaise,
+            credit: 0,
+          },
+          { account: LedgerAccounts.gatewayClearing, debit: 0, credit: input.amountPaise },
+        ],
+        { memo: `Payout ${input.reference}` },
+      );
+      await tx.insert(auditLog).values({
+        actorId: staff.id,
+        action: 'payout.recorded',
+        entityType: 'partner',
+        entityId: input.partnerId,
+        before: { owedPaise: owed },
+        after: {
+          owedPaise: owed - input.amountPaise,
+          amountPaise: input.amountPaise,
+          reference: input.reference,
+          txnId,
+        },
+        ip,
+      });
+      return {
+        partnerId: input.partnerId,
+        paidPaise: input.amountPaise,
+        owedPaise: owed - input.amountPaise,
+      };
+    });
   }
 }

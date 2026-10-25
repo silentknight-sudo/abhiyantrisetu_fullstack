@@ -19,7 +19,7 @@ import {
 import { ZodResponse, ZodValidationPipe, createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Roles } from '../../common/auth';
-import { PartnerDto } from '../../common/responses';
+import { AdminPartnerDto, PartnerDto } from '../../common/responses';
 import { PartnersService } from './partners.service';
 
 class PartnerProfileDto extends createZodDto(partnerProfileSchema) {}
@@ -54,7 +54,7 @@ export class PartnersController {
     return this.partners.updateMine(user, body);
   }
 
-  @ZodResponse({ status: 200, type: [PartnerDto] })
+  @ZodResponse({ status: 200, type: [AdminPartnerDto] })
   @Get('admin/partners')
   @Roles('verification', 'ops', 'super_admin')
   list(@Query() q: PartnerListQueryDto) {

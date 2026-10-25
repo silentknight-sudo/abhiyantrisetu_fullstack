@@ -68,13 +68,16 @@ export class PartnersService {
     return p!;
   }
 
-  list(status?: PartnerRow['verificationStatus']) {
-    return this.db
-      .select()
+  /** Admin list, newest first, with the owner's phone so the team can call them. */
+  async list(status?: PartnerRow['verificationStatus']) {
+    const rows = await this.db
+      .select({ partner: partners, phone: users.phone, ownerName: users.name })
       .from(partners)
+      .innerJoin(users, eq(users.id, partners.userId))
       .where(status ? eq(partners.verificationStatus, status) : undefined)
       .orderBy(desc(partners.createdAt))
       .limit(200);
+    return rows.map((r) => ({ ...r.partner, phone: r.phone, ownerName: r.ownerName }));
   }
 
   async setVerification(

@@ -757,6 +757,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/admin/payouts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PaymentsController_payoutsDue_v1'];
+    put?: never;
+    post: operations['PaymentsController_recordPayout_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['AdminController_overview_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/jobs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['AdminController_jobs_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1136,6 +1184,40 @@ export interface components {
       serviceRadiusKm: number;
       gstin?: string;
     };
+    AdminPartnerDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      displayName: string;
+      businessName: string | null;
+      trades: string[];
+      gstin: string | null;
+      baseLocation: {
+        lat: number;
+        lng: number;
+      } | null;
+      serviceRadiusKm: number;
+      /** Format: double */
+      ratingAvg: number | null;
+      ratingCount: number;
+      avgResponseMinutes: number | null;
+      /** Format: double */
+      acceptanceRate: number | null;
+      /** @enum {string} */
+      tier: 'basic' | 'verified' | 'pro';
+      /** @enum {string} */
+      verificationStatus: 'pending' | 'in_review' | 'verified' | 'rejected' | 'suspended';
+      leadCredits: number;
+      /** Format: uuid */
+      onboardedById: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      phone: string;
+      ownerName: string | null;
+    };
     LeadInboxItemDto: {
       /** Format: uuid */
       id: string;
@@ -1451,6 +1533,75 @@ export interface components {
         balancePaise: number;
       }[];
       trialBalancePaise: number;
+    };
+    PayoutDueDto: {
+      /** Format: uuid */
+      partnerId: string;
+      displayName: string;
+      phone: string;
+      owedPaise: number;
+    };
+    RecordPayoutDto: {
+      /** Format: uuid */
+      partnerId: string;
+      amountPaise: number;
+      reference: string;
+    };
+    PayoutRecordedDto: {
+      /** Format: uuid */
+      partnerId: string;
+      paidPaise: number;
+      owedPaise: number;
+    };
+    AdminOverviewDto: {
+      partners: {
+        pending: number;
+        inReview: number;
+        verified: number;
+      };
+      openRequirements: number;
+      activeJobs: number;
+      disputedJobs: number;
+      waitlist: number;
+      heldPaise: number;
+      owedToPartnersPaise: number;
+    };
+    AdminJobDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      requirementId: string;
+      /** Format: uuid */
+      quoteId: string | null;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: uuid */
+      partnerId: string;
+      /** @enum {string} */
+      state:
+        'hired' | 'scheduled' | 'in_progress' | 'completed' | 'closed' | 'cancelled' | 'disputed';
+      agreedTotalPaise: number;
+      /** Format: date-time */
+      slotStart: string | null;
+      /** Format: date-time */
+      startedAt: string | null;
+      /** Format: date-time */
+      completedAt: string | null;
+      /** Format: date-time */
+      closedAt: string | null;
+      /** Format: date-time */
+      cancelledAt: string | null;
+      /** Format: date-time */
+      disputedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      title: string;
+      customerPhone: string;
+      customerName: string | null;
+      partnerName: string;
+      partnerPhone: string;
     };
     ApiError: {
       statusCode?: number;
@@ -2683,7 +2834,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['PartnerDto'][];
+          'application/json': components['schemas']['AdminPartnerDto'][];
         };
       };
       /** @description Error */
@@ -3345,6 +3496,125 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['LedgerBalancesDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_payoutsDue_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayoutDueDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_recordPayout_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RecordPayoutDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayoutRecordedDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  AdminController_overview_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminOverviewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  AdminController_jobs_v1: {
+    parameters: {
+      query?: {
+        state?:
+          'hired' | 'scheduled' | 'in_progress' | 'completed' | 'closed' | 'cancelled' | 'disputed';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminJobDto'][];
         };
       };
       /** @description Error */

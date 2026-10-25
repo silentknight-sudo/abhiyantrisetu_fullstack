@@ -372,3 +372,48 @@ export const waitlistSummaryResponse = z.object({
 
 /** Wire (JSON) type of a response schema. */
 export type Wire<S extends z.ZodType> = z.input<S>;
+
+// ---------- admin ----------
+
+/** A partner in the admin list: the profile plus who to call. */
+export const adminPartnerResponse = partnerResponse.extend({
+  phone: z.string(),
+  ownerName: text.nullable(),
+});
+
+export const adminOverviewResponse = z.object({
+  partners: z.object({
+    pending: z.number().int(),
+    inReview: z.number().int(),
+    verified: z.number().int(),
+  }),
+  openRequirements: z.number().int(),
+  activeJobs: z.number().int(),
+  disputedJobs: z.number().int(),
+  waitlist: z.number().int(),
+  /** Customer money held against jobs that have not closed. */
+  heldPaise: paise,
+  /** Released to partners and not yet paid out. */
+  owedToPartnersPaise: paise,
+});
+
+export const adminJobResponse = jobResponse.extend({
+  title: z.string(),
+  customerPhone: z.string(),
+  customerName: text.nullable(),
+  partnerName: z.string(),
+  partnerPhone: z.string(),
+});
+
+export const payoutDueResponse = z.object({
+  partnerId: uuid,
+  displayName: z.string(),
+  phone: z.string(),
+  owedPaise: paise,
+});
+
+export const payoutRecordedResponse = z.object({
+  partnerId: uuid,
+  paidPaise: paise,
+  owedPaise: paise,
+});

@@ -32,6 +32,8 @@ import {
   ledgerEntries,
   partners,
   payments,
+  refunds,
+  requirements,
   users,
 } from '../../db/schema';
 import { PAYMENT_GATEWAY, type PaymentGateway } from './razorpay.provider';
@@ -237,6 +239,9 @@ export class PaymentsService {
         .from(jobs)
         .where(eq(jobs.id, result.payment.jobId));
       if (job?.state === 'closed') await this.releaseForJob(result.payment.jobId);
+      if (job?.state === 'cancelled') {
+        await this.refundForJob(result.payment.jobId, 'Paid after the job was cancelled');
+      }
     }
     return result.payment;
   }
@@ -279,12 +284,188 @@ export class PaymentsService {
 
   @OnEvent(DomainEvents.JobTransitioned, { promisify: true })
   async onJobTransitioned(e: JobTransitionedEvent) {
-    if (e.to !== 'closed') return;
     try {
-      await this.releaseForJob(e.jobId);
+      if (e.to === 'closed') await this.releaseForJob(e.jobId);
+      if (e.to === 'cancelled') {
+        await this.refundForJob(
+          e.jobId,
+          e.from === 'disputed' ? 'Dispute resolved as a refund' : 'Job cancelled',
+        );
+      }
     } catch (err) {
-      this.logger.error(`Release failed for job ${e.jobId}: ${(err as Error).message}`);
+      this.logger.error(`Settling job ${e.jobId} (${e.to}) failed: ${(err as Error).message}`);
     }
+  }
+
+  // ---------- refunds ----------
+
+  /**
+   * Refunds every captured payment of a cancelled job, once each. The intent is recorded
+   * first (so a crash or a gateway error leaves a visible row to retry), then sent.
+   */
+  async refundForJob(jobId: string, reason: string) {
+    const created = await this.db.transaction(async (tx) => {
+      const [job] = await tx.select().from(jobs).where(eq(jobs.id, jobId)).for('update');
+      if (!job || job.state !== 'cancelled') return [];
+      const captured = await tx
+        .select()
+        .from(payments)
+        .where(and(eq(payments.jobId, jobId), eq(payments.status, 'captured')));
+      if (captured.length === 0) return [];
+      return tx
+        .insert(refunds)
+        .values(
+          captured.map((p) => ({ paymentId: p.id, jobId, amountPaise: p.amountPaise, reason })),
+        )
+        .onConflictDoNothing({ target: refunds.paymentId })
+        .returning({ id: refunds.id });
+    });
+    for (const r of created) await this.sendRefund(r.id);
+    return created.length;
+  }
+
+  /**
+   * Sends one refund to Razorpay. The row is claimed (`sending`) under a lock first, so two
+   * retries can never refund twice; success moves the money out of the job's held account.
+   */
+  async sendRefund(refundId: string) {
+    const claim = await this.db.transaction(async (tx) => {
+      const [r] = await tx.select().from(refunds).where(eq(refunds.id, refundId)).for('update');
+      if (!r || !['requested', 'failed'].includes(r.status)) return null;
+      const [p] = await tx.select().from(payments).where(eq(payments.id, r.paymentId));
+      await tx
+        .update(refunds)
+        .set({ status: 'sending', attempts: r.attempts + 1 })
+        .where(eq(refunds.id, r.id));
+      return { refund: r, razorpayPaymentId: p?.razorpayPaymentId ?? null };
+    });
+    if (!claim) return null;
+    const { refund } = claim;
+    let result: { id: string; status: 'pending' | 'processed' };
+    try {
+      if (!claim.razorpayPaymentId) throw new Error('Payment has no Razorpay payment id');
+      result = await this.gateway.refund({
+        razorpayPaymentId: claim.razorpayPaymentId,
+        amountPaise: refund.amountPaise,
+        receipt: refund.id,
+        notes: { jobId: refund.jobId, refundId: refund.id },
+      });
+    } catch (err) {
+      const message = (err as Error).message.slice(0, 300);
+      this.logger.error(`Refund ${refund.id} failed: ${message}`);
+      await this.db
+        .update(refunds)
+        .set({ status: 'failed', failureReason: message })
+        .where(eq(refunds.id, refund.id));
+      return 'failed' as const;
+    }
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(refunds)
+        .set({
+          status: result.status === 'processed' ? 'processed' : 'initiated',
+          razorpayRefundId: result.id,
+          failureReason: null,
+        })
+        .where(eq(refunds.id, refund.id));
+      await tx
+        .update(payments)
+        .set({ status: 'refunded' })
+        .where(eq(payments.id, refund.paymentId));
+      await this.post(
+        tx,
+        'refund',
+        [
+          {
+            account: LedgerAccounts.heldForJob(refund.jobId),
+            debit: refund.amountPaise,
+            credit: 0,
+          },
+          { account: LedgerAccounts.gatewayClearing, debit: 0, credit: refund.amountPaise },
+        ],
+        { jobId: refund.jobId, paymentId: refund.paymentId, memo: `Refund ${result.id}` },
+      );
+    });
+    return result.status === 'processed' ? ('processed' as const) : ('initiated' as const);
+  }
+
+  /** Razorpay's later word on a refund: reached the customer, or bounced back to us. */
+  private async settleRefund(
+    razorpayRefundId: string,
+    outcome: 'processed' | 'failed',
+    why?: string,
+  ) {
+    await this.db.transaction(async (tx) => {
+      const [r] = await tx
+        .select()
+        .from(refunds)
+        .where(eq(refunds.razorpayRefundId, razorpayRefundId))
+        .for('update');
+      if (!r || r.status === outcome || !['initiated', 'processed'].includes(r.status)) return;
+      if (outcome === 'processed') {
+        await tx.update(refunds).set({ status: 'processed' }).where(eq(refunds.id, r.id));
+        return;
+      }
+      // The money came back: hold it on the job again and leave the refund to retry.
+      await tx
+        .update(refunds)
+        .set({
+          status: 'failed',
+          failureReason: (why ?? 'Refund failed at the bank').slice(0, 300),
+        })
+        .where(eq(refunds.id, r.id));
+      await tx.update(payments).set({ status: 'captured' }).where(eq(payments.id, r.paymentId));
+      await this.post(
+        tx,
+        'refund_reversal',
+        [
+          { account: LedgerAccounts.gatewayClearing, debit: r.amountPaise, credit: 0 },
+          { account: LedgerAccounts.heldForJob(r.jobId), debit: 0, credit: r.amountPaise },
+        ],
+        { jobId: r.jobId, paymentId: r.paymentId, memo: `Refund ${razorpayRefundId} failed` },
+      );
+    });
+  }
+
+  /** Recent refunds for the admin, failures first; or one refund by id. */
+  async refundsList(id?: string) {
+    const customer = users;
+    const rows = await this.db
+      .select({
+        refund: refunds,
+        title: requirements.title,
+        customerPhone: customer.phone,
+        customerName: customer.name,
+      })
+      .from(refunds)
+      .innerJoin(jobs, eq(jobs.id, refunds.jobId))
+      .innerJoin(requirements, eq(requirements.id, jobs.requirementId))
+      .innerJoin(customer, eq(customer.id, jobs.customerId))
+      .where(id ? eq(refunds.id, id) : undefined)
+      .orderBy(sql`${refunds.status} = 'failed' desc`, desc(refunds.createdAt))
+      .limit(200);
+    return rows.map(({ refund, ...rest }) => ({ ...refund, ...rest }));
+  }
+
+  /** Staff retry of a failed refund (or one stuck before it reached Razorpay). */
+  async retryRefund(staff: AuthUser, refundId: string, ip?: string) {
+    const [r] = await this.db.select().from(refunds).where(eq(refunds.id, refundId));
+    if (!r) throw new NotFoundException();
+    if (!['requested', 'failed'].includes(r.status)) {
+      throw new ConflictException({ code: 'NOT_RETRYABLE', message: `This refund is ${r.status}` });
+    }
+    const outcome = await this.sendRefund(refundId);
+    await this.db.insert(auditLog).values({
+      actorId: staff.id,
+      action: 'refund.retried',
+      entityType: 'refund',
+      entityId: refundId,
+      before: { status: r.status, failureReason: r.failureReason },
+      after: { outcome },
+      ip,
+    });
+    const [after] = await this.refundsList(refundId);
+    return after!;
   }
 
   /** Payments and what is still owed, for the job's customer, its partner or staff. */
@@ -309,11 +490,15 @@ export class PaymentsService {
       .from(payments)
       .where(eq(payments.jobId, jobId))
       .orderBy(desc(payments.createdAt));
-    const paid = rows.filter((r) => r.status === 'captured').reduce((s, r) => s + r.amountPaise, 0);
+    const sum = (status: string[]) =>
+      rows.filter((r) => status.includes(r.status)).reduce((s, r) => s + r.amountPaise, 0);
+    const paid = sum(['captured', 'refunded']);
+    const refunded = sum(['refunded']);
     return {
       agreedTotalPaise: job.agreedTotalPaise,
       paidPaise: paid,
-      outstandingPaise: Math.max(0, job.agreedTotalPaise - paid),
+      refundedPaise: refunded,
+      outstandingPaise: job.state === 'cancelled' ? 0 : Math.max(0, job.agreedTotalPaise - paid),
       payments: rows,
     };
   }
@@ -332,6 +517,7 @@ export class PaymentsService {
         payment?: {
           entity?: { id: string; order_id: string; method?: string; error_description?: string };
         };
+        refund?: { entity?: { id: string; error_description?: string } };
       };
     };
     const [fresh] = await this.db
@@ -348,6 +534,11 @@ export class PaymentsService {
         await this.capture(entity.order_id, entity.id, entity.method);
       else if (body.event === 'payment.failed' && entity)
         await this.fail(entity.order_id, entity.error_description ?? 'Payment failed');
+      const refund = body.payload?.refund?.entity;
+      if (body.event === 'refund.processed' && refund)
+        await this.settleRefund(refund.id, 'processed');
+      else if (body.event === 'refund.failed' && refund)
+        await this.settleRefund(refund.id, 'failed', refund.error_description);
     } catch (err) {
       error = (err as Error).message;
       this.logger.error(`Razorpay ${body.event}: ${error}`);

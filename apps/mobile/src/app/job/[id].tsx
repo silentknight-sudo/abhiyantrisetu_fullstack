@@ -210,7 +210,7 @@ export default function JobDetail() {
         </Card>
       ) : null}
 
-      {isCustomer && j.state !== 'cancelled' ? (
+      {isCustomer ? (
         <PaySection
           jobId={j.id}
           canPay={['hired', 'scheduled', 'in_progress', 'completed'].includes(j.state)}

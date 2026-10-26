@@ -41,6 +41,12 @@ export default function Overview() {
             value={rupees(d.heldPaise)}
             hint="Customer money until each job closes"
           />
+          <Stat
+            label="Refunds to fix"
+            value={d.failedRefunds}
+            hint="Did not go through; retry or contact the customer"
+            href={can('ops', 'finance') ? '/refunds' : undefined}
+          />
           <Stat label="Verified partners" value={d.partners.verified} />
           <Stat label="Open requirements" value={d.openRequirements} hint="Posted, not yet hired" />
           <Stat

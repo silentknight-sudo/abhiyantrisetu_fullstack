@@ -1,4 +1,5 @@
 import {
+  adminRefundResponse,
   adminJobResponse,
   adminOverviewResponse,
   adminPartnerResponse,
@@ -65,3 +66,4 @@ export class AdminOverviewDto extends createZodDto(adminOverviewResponse, { code
 export class AdminJobDto extends createZodDto(adminJobResponse, { codec: true }) {}
 export class PayoutDueDto extends createZodDto(payoutDueResponse, { codec: true }) {}
 export class PayoutRecordedDto extends createZodDto(payoutRecordedResponse, { codec: true }) {}
+export class AdminRefundDto extends createZodDto(adminRefundResponse, { codec: true }) {}

@@ -60,7 +60,21 @@ export function PaySection({ jobId, canPay }: { jobId: string; canPay: boolean }
   }
 
   const s = summary.data;
-  if (!s) return null;
+  if (!s || (!canPay && s.paidPaise === 0)) return null;
+  if (s.refundedPaise > 0) {
+    return (
+      <Card>
+        <Row>
+          <Title>Payment</Title>
+          <Badge label="Refunded" tone="success" />
+        </Row>
+        <Small>
+          {rupees(s.refundedPaise)} is on its way back to the account or card you paid with. Banks
+          usually take 5–7 working days.
+        </Small>
+      </Card>
+    );
+  }
   return (
     <Card>
       <Row>

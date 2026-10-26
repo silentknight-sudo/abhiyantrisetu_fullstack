@@ -99,8 +99,8 @@ function Dispute({ job }: { job: AdminJob }) {
         </Button>
       </div>
       <p className="mt-2 text-xs text-text-muted">
-        Refunds are issued from the Razorpay dashboard for now; choosing Refund cancels the job and
-        keeps the money out of the partner's payout.
+        Refund cancels the job and returns the customer's payment to their original method through
+        Razorpay automatically; follow it on the Refunds page.
       </p>
       {resolve.error ? (
         <div className="mt-2">

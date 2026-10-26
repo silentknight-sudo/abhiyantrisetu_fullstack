@@ -17,6 +17,7 @@ export const NAV: { href: string; label: string; roles: Role[] }[] = [
   { href: '/disputes', label: 'Disputes', roles: ['ops', 'support'] },
   { href: '/jobs', label: 'Jobs', roles: ['ops', 'support', 'finance'] },
   { href: '/payouts', label: 'Payouts', roles: ['ops', 'finance'] },
+  { href: '/refunds', label: 'Refunds', roles: ['ops', 'finance'] },
   { href: '/ledger', label: 'Ledger', roles: ['ops', 'finance'] },
   { href: '/waitlist', label: 'Waitlist', roles: ['ops', 'support'] },
 ];

@@ -305,7 +305,10 @@ export const paymentVerifiedResponse = z.object({
 
 export const jobPaymentsResponse = z.object({
   agreedTotalPaise: paise,
+  /** Everything the customer has paid, including any since refunded. */
   paidPaise: paise,
+  /** Refunds started to the customer's original payment method. */
+  refundedPaise: paise,
   outstandingPaise: paise,
   payments: z.array(
     z.object({
@@ -395,6 +398,8 @@ export const adminOverviewResponse = z.object({
   heldPaise: paise,
   /** Released to partners and not yet paid out. */
   owedToPartnersPaise: paise,
+  /** Refunds that did not go through and need a retry. */
+  failedRefunds: z.number().int(),
 });
 
 export const adminJobResponse = jobResponse.extend({
@@ -416,4 +421,21 @@ export const payoutRecordedResponse = z.object({
   partnerId: uuid,
   paidPaise: paise,
   owedPaise: paise,
+});
+
+export const adminRefundResponse = z.object({
+  id: uuid,
+  jobId: uuid,
+  paymentId: uuid,
+  amountPaise: paise,
+  status: z.enum(['requested', 'sending', 'initiated', 'processed', 'failed']),
+  reason: z.string(),
+  razorpayRefundId: text.nullable(),
+  failureReason: text.nullable(),
+  attempts: z.number().int(),
+  title: z.string(),
+  customerPhone: z.string(),
+  customerName: text.nullable(),
+  createdAt: timestamp,
+  updatedAt: timestamp,
 });

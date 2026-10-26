@@ -10,6 +10,13 @@ export interface PaymentGateway {
     receipt: string;
     notes: Record<string, string>;
   }): Promise<{ id: string }>;
+  /** Refunds a captured payment back to the customer's original method. */
+  refund(input: {
+    razorpayPaymentId: string;
+    amountPaise: number;
+    receipt: string;
+    notes: Record<string, string>;
+  }): Promise<{ id: string; status: 'pending' | 'processed' }>;
 }
 
 /** Razorpay Orders API. Enable auto-capture in the dashboard so payments capture on success. */
@@ -47,6 +54,42 @@ export class RazorpayGateway implements PaymentGateway {
       throw new Error(`Razorpay ${res.status}: ${body.error?.description ?? 'order failed'}`);
     return { id: body.id };
   }
+
+  async refund(input: {
+    razorpayPaymentId: string;
+    amountPaise: number;
+    receipt: string;
+    notes: Record<string, string>;
+  }) {
+    const res = await this.fetchImpl(
+      `https://api.razorpay.com/v1/payments/${encodeURIComponent(input.razorpayPaymentId)}/refund`,
+      {
+        method: 'POST',
+        headers: {
+          authorization: `Basic ${Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64')}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: input.amountPaise,
+          speed: 'normal',
+          receipt: input.receipt,
+          notes: input.notes,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+    const body = (await res.json().catch(() => ({}))) as {
+      id?: string;
+      status?: string;
+      error?: { description?: string };
+    };
+    if (!res.ok || !body.id)
+      throw new Error(`Razorpay ${res.status}: ${body.error?.description ?? 'refund failed'}`);
+    return {
+      id: body.id,
+      status: body.status === 'processed' ? ('processed' as const) : ('pending' as const),
+    };
+  }
 }
 
 /** Development/test: local order ids. Signatures are still checked with the key secret. */
@@ -54,5 +97,8 @@ export class FakeGateway implements PaymentGateway {
   readonly keyId = 'rzp_test_fake';
   async createOrder() {
     return { id: `order_fake_${randomBytes(7).toString('hex')}` };
+  }
+  async refund(): Promise<{ id: string; status: 'pending' | 'processed' }> {
+    return { id: `rfnd_fake_${randomBytes(7).toString('hex')}`, status: 'processed' };
   }
 }

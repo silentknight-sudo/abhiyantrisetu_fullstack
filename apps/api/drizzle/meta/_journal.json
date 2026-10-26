@@ -43,6 +43,13 @@
       "when": 1792771426164,
       "tag": "0005_ledger_append_only",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793003326048,
+      "tag": "0006_refunds",
+      "breakpoints": true
     }
   ]
 }

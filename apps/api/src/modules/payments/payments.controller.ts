@@ -19,6 +19,7 @@ import { recordPayoutSchema } from '@setu/schemas';
 import { z } from 'zod';
 import { type AuthUser, CurrentUser, Public, Roles } from '../../common/auth';
 import {
+  AdminRefundDto,
   JobPaymentsDto,
   LedgerBalancesDto,
   PaymentOrderDto,
@@ -117,5 +118,25 @@ export class PaymentsController {
   @Post('admin/payouts')
   recordPayout(@CurrentUser() staff: AuthUser, @Body() body: RecordPayoutDto, @Ip() ip: string) {
     return this.payments.recordPayout(staff, body, ip);
+  }
+
+  @ZodResponse({ status: 200, type: [AdminRefundDto] })
+  @ApiBearerAuth()
+  @Roles('ops', 'finance', 'super_admin')
+  @Get('admin/refunds')
+  refunds() {
+    return this.payments.refundsList();
+  }
+
+  @ZodResponse({ status: 200, type: AdminRefundDto })
+  @ApiBearerAuth()
+  @Roles('finance', 'super_admin')
+  @Post('admin/refunds/:id/retry')
+  retryRefund(
+    @CurrentUser() staff: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Ip() ip: string,
+  ) {
+    return this.payments.retryRefund(staff, id, ip);
   }
 }

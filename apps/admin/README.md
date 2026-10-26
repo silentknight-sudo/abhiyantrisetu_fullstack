@@ -9,6 +9,7 @@ Staff portal for Abhiyantri Setu (Next.js, client-rendered). Staff sign in with 
 | Disputes | ops, support          | Both parties' phones, the customer's reason; release to partner or refund |
 | Jobs     | ops, support, finance | Every job by state, with customer and partner                             |
 | Payouts  | ops (view), finance   | What each partner is owed; record a bank/UPI payout with its reference    |
+| Refunds  | ops (view), finance   | Automatic refunds to customers and their status; retry failed ones        |
 | Ledger   | ops, finance          | Account balances and the trial balance                                    |
 | Waitlist | ops, support          | Sign-ups by role and sector, CSV export                                   |
 
@@ -33,4 +34,4 @@ They sign in again to pick up the role.
 
 Import the repo as a second Vercel project with **Root Directory** `apps/admin` (`vercel.json` builds the shared packages first), set `NEXT_PUBLIC_API_URL`, and add the admin's domain (e.g. `admin.abhiyantrisetu.com`) to the API's `CORS_ORIGINS`. Responses carry `noindex` and `X-Frame-Options: DENY`.
 
-Not yet: refunds through Razorpay (issue them from the Razorpay dashboard; the job is cancelled and the money stays out of payouts), RazorpayX payouts, partner documents/KYC review, user and role management.
+Not yet: RazorpayX payouts, partner documents/KYC review, user and role management.

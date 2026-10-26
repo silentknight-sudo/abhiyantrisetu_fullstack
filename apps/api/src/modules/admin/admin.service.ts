@@ -8,6 +8,7 @@ import {
   jobs,
   ledgerEntries,
   partners,
+  refunds,
   requirements,
   users,
   waitlistSignups,
@@ -29,7 +30,7 @@ export class AdminService {
         .from(ledgerEntries)
         .where(like(ledgerEntries.account, pattern))
         .then(([r]) => Number(r?.n ?? 0));
-    const [byStatus, [open], byState, [waitlist], held, owed] = await Promise.all([
+    const [byStatus, [open], byState, [waitlist], held, owed, [failed]] = await Promise.all([
       this.db
         .select({ status: partners.verificationStatus, n: count() })
         .from(partners)
@@ -42,6 +43,7 @@ export class AdminService {
       this.db.select({ n: count() }).from(waitlistSignups),
       balance('held:job:%'),
       balance('partner_payable:%'),
+      this.db.select({ n: count() }).from(refunds).where(eq(refunds.status, 'failed')),
     ]);
     const partnersBy = (s: string) => byStatus.find((r) => r.status === s)?.n ?? 0;
     const jobsIn = (states: string[]) =>
@@ -58,6 +60,7 @@ export class AdminService {
       waitlist: waitlist?.n ?? 0,
       heldPaise: held,
       owedToPartnersPaise: owed,
+      failedRefunds: failed?.n ?? 0,
     };
   }
 

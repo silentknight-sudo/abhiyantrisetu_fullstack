@@ -113,6 +113,7 @@ GET  /v1/partner/leads           POST /v1/partner/leads/:id/{seen|decline|quote}
 GET  /v1/quotes/:id              POST /v1/quotes/:id/{revise|withdraw|negotiate|accept}
 GET  /v1/requirements/:id/quotes
 GET  /v1/admin/overview          GET /v1/admin/jobs?state=        GET|POST /v1/admin/payouts
+GET  /v1/admin/refunds           POST /v1/admin/refunds/:id/retry
 POST /v1/payments/orders         POST /v1/payments/verify        GET /v1/jobs/:id/payments
 POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 ```
@@ -121,7 +122,7 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 - **Only the Jobs module changes job state.** It locks the row, runs the guarded transition table from `@setu/domain`, and writes a `job_events` row in the same transaction. Requirements follow the same pattern with `requirement_events`.
 - **Money is integer paise** (`bigint` in Postgres). GST is computed in `@setu/domain` so the quote screen, invoice and API agree.
-- **The ledger is append-only and double-entry.** Every rupee is a balanced transaction in `ledger_entries`; a database trigger rejects UPDATE and DELETE. Customer payments are held per job and released to the partner (less `PLATFORM_FEE_BPS`) only when the job closes, so disputed money stays held.
+- **The ledger is append-only and double-entry.** Every rupee is a balanced transaction in `ledger_entries`; a database trigger rejects UPDATE and DELETE. Customer payments are held per job and released to the partner (less `PLATFORM_FEE_BPS`) only when the job closes, so disputed money stays held; a cancelled job, or a dispute resolved as a refund, refunds the customer through Razorpay automatically (one refund per payment, failures kept for retry).
 - **No secrets at rest in plaintext**: OTPs, start codes and refresh tokens are stored only as hashes. Aadhaar is masked only.
 - **Every vendor sits behind an adapter** (e.g. `SmsProvider`). Swapping a vendor touches one file.
 - **Clients never talk to the database.** Everything goes through `/v1`.
@@ -137,5 +138,4 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-1. Refunds through Razorpay when ops resolves a dispute as a refund (today: issued from the Razorpay dashboard).
-2. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.
+1. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.

@@ -711,6 +711,41 @@ export const payments = pgTable(
   (t) => [index('payments_job_idx').on(t.jobId)],
 );
 
+export const refundStatusEnum = pgEnum('refund_status', [
+  'requested',
+  'sending',
+  'initiated',
+  'processed',
+  'failed',
+]);
+
+/**
+ * Money returned to a customer: one refund per captured payment (the unique payment id
+ * makes a double refund impossible). `initiated` = Razorpay accepted it and the ledger
+ * moved it out; `processed` = it reached the customer; `failed` can be retried.
+ */
+export const refunds = pgTable(
+  'refunds',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    paymentId: uuid('payment_id')
+      .notNull()
+      .unique()
+      .references(() => payments.id),
+    jobId: uuid('job_id')
+      .notNull()
+      .references(() => jobs.id),
+    amountPaise: money('amount_paise').notNull(),
+    status: refundStatusEnum('status').notNull().default('requested'),
+    reason: text('reason').notNull(),
+    razorpayRefundId: text('razorpay_refund_id').unique(),
+    failureReason: text('failure_reason'),
+    attempts: smallint('attempts').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('refunds_job_idx').on(t.jobId), index('refunds_status_idx').on(t.status)],
+);
+
 /**
  * Double-entry ledger. Append-only (a database trigger rejects UPDATE and DELETE); each
  * transaction's lines share a txn_id and balance. Balances are sums per account.

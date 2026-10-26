@@ -202,6 +202,28 @@ describe('RazorpayGateway', () => {
       receipt: 'r1',
     });
   });
+  it('refunds a payment at normal speed with a receipt', async () => {
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ id: 'rfnd_1', status: 'pending' }), { status: 200 }),
+    );
+    const gw = new RazorpayGateway('k', 's', fetchImpl as unknown as typeof fetch);
+    await expect(
+      gw.refund({
+        razorpayPaymentId: 'pay_9',
+        amountPaise: 75_000,
+        receipt: 'r-1',
+        notes: { jobId: 'j' },
+      }),
+    ).resolves.toEqual({ id: 'rfnd_1', status: 'pending' });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://api.razorpay.com/v1/payments/pay_9/refund');
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      amount: 75_000,
+      speed: 'normal',
+      receipt: 'r-1',
+    });
+  });
   it('throws with Razorpay’s error description', async () => {
     const fetchImpl = vi.fn(
       async () =>

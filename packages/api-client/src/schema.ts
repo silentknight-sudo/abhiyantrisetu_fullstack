@@ -773,6 +773,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/admin/refunds': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PaymentsController_refunds_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/refunds/{id}/retry': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['PaymentsController_retryRefund_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/admin/overview': {
     parameters: {
       query?: never;
@@ -1511,6 +1543,7 @@ export interface components {
     JobPaymentsDto: {
       agreedTotalPaise: number;
       paidPaise: number;
+      refundedPaise: number;
       outstandingPaise: number;
       payments: {
         /** Format: uuid */
@@ -1553,6 +1586,28 @@ export interface components {
       paidPaise: number;
       owedPaise: number;
     };
+    AdminRefundDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      jobId: string;
+      /** Format: uuid */
+      paymentId: string;
+      amountPaise: number;
+      /** @enum {string} */
+      status: 'requested' | 'sending' | 'initiated' | 'processed' | 'failed';
+      reason: string;
+      razorpayRefundId: string | null;
+      failureReason: string | null;
+      attempts: number;
+      title: string;
+      customerPhone: string;
+      customerName: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
     AdminOverviewDto: {
       partners: {
         pending: number;
@@ -1565,6 +1620,7 @@ export interface components {
       waitlist: number;
       heldPaise: number;
       owedToPartnersPaise: number;
+      failedRefunds: number;
     };
     AdminJobDto: {
       /** Format: uuid */
@@ -3556,6 +3612,64 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PayoutRecordedDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_refunds_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminRefundDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_retryRefund_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminRefundDto'];
         };
       };
       /** @description Error */

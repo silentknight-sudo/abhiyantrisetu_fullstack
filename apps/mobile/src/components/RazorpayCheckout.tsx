@@ -2,6 +2,7 @@ import type { PaymentOrder } from '@setu/api-client';
 import { Modal, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { type CheckoutPrefill, type CheckoutResult, checkoutOptions } from '@/lib/checkout';
+import { useI18n } from '@/lib/i18n';
 import { Button } from './ui';
 
 /**
@@ -17,6 +18,7 @@ export function RazorpayCheckout({
   prefill: CheckoutPrefill;
   onResult: (result: CheckoutResult | { error: string } | null) => void;
 }) {
+  const { t } = useI18n();
   if (!order) return null;
   const html = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script></head><body style="background:#F6EFE3">
@@ -55,7 +57,7 @@ export function RazorpayCheckout({
           onMessage={onMessage}
         />
         <View style={{ padding: 16 }}>
-          <Button title="Cancel" kind="outline" onPress={() => onResult(null)} />
+          <Button title={t('Cancel')} kind="outline" onPress={() => onResult(null)} />
         </View>
       </View>
     </Modal>

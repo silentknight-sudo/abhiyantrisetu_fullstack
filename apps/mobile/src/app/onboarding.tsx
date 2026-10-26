@@ -18,13 +18,15 @@ import {
 } from '@/components/ui';
 import { $api, client, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { tradeLabel } from '@/lib/format';
+import { tradeName } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 const RADII = [5, 10, 15, 25];
 type Trade = (typeof TRADES)[number];
 
 /** Partner business profile: create on first launch, edit later from Account. */
 export default function Onboarding() {
+  const { t } = useI18n();
   const existing = $api.useQuery('get', '/v1/partners/me', {}, { retry: false });
   const [displayName, setDisplayName] = useState('');
   const [businessName, setBusinessName] = useState('');
@@ -40,20 +42,24 @@ export default function Onboarding() {
     if (!p) return;
     setDisplayName(p.displayName);
     setBusinessName(p.businessName ?? '');
-    setTrades(p.trades.filter((t): t is Trade => (TRADES as readonly string[]).includes(t)));
+    setTrades(p.trades.filter((s): s is Trade => (TRADES as readonly string[]).includes(s)));
     setRadius(p.serviceRadiusKm);
     setGstin(p.gstin ?? '');
-    if (p.baseLocation) setBase({ ...p.baseLocation, label: 'Saved location' });
-  }, [existing.data]);
+    if (p.baseLocation) setBase({ ...p.baseLocation, label: t('Saved location') });
+  }, [existing.data, t]);
 
   async function useGps() {
     setError(null);
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== 'granted')
-        throw new Error('Location permission was not given. Pick your sector instead.');
+        throw new Error(t('Location permission was not given. Pick your sector instead.'));
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      setBase({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Current location' });
+      setBase({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        label: t('Current location'),
+      });
     } catch (err) {
       setError(errorMessage(err));
     }
@@ -73,8 +79,8 @@ export default function Onboarding() {
       const issue = parsed.error.issues[0];
       return setError(
         issue?.path[0] === 'baseLocation'
-          ? 'Pick where you work from'
-          : (issue?.message ?? 'Check the form'),
+          ? t('Pick where you work from')
+          : (issue?.message ?? t('Check the form')),
       );
     }
     setBusy(true);
@@ -97,43 +103,47 @@ export default function Onboarding() {
     <Screen>
       {!existing.data ? (
         <>
-          <Heading>Set up your business</Heading>
+          <Heading>{t('Set up your business')}</Heading>
           <Body muted>
-            Customers see your name, trades and rating. We verify your documents before leads start.
+            {t(
+              'Customers see your name, trades and rating. We verify your documents before leads start.',
+            )}
           </Body>
         </>
       ) : null}
       <Field
-        label="Name customers will see"
+        label={t('Name customers will see')}
         testID="display-name"
         value={displayName}
         onChangeText={setDisplayName}
-        placeholder="e.g. Ramesh Plumbing Works"
+        placeholder={t('e.g. Ramesh Plumbing Works')}
       />
       <Field
-        label="Registered business name (optional)"
+        label={t('Registered business name (optional)')}
         value={businessName}
         onChangeText={setBusinessName}
       />
       <Card>
-        <Title>Your trades</Title>
+        <Title>{t('Your trades')}</Title>
         <Chips>
-          {TRADES.map((t) => (
+          {TRADES.map((slug) => (
             <Chip
-              key={t}
-              label={tradeLabel(t)}
-              selected={trades.includes(t)}
+              key={slug}
+              label={tradeName(slug, t)}
+              selected={trades.includes(slug)}
               onPress={() =>
-                setTrades(trades.includes(t) ? trades.filter((x) => x !== t) : [...trades, t])
+                setTrades(
+                  trades.includes(slug) ? trades.filter((x) => x !== slug) : [...trades, slug],
+                )
               }
             />
           ))}
         </Chips>
-        <Small>Pick up to 6.</Small>
+        <Small>{t('Pick up to 6.')}</Small>
       </Card>
       <Card>
-        <Title>Where do you work from?</Title>
-        <Button title="Use my current location" kind="outline" onPress={useGps} />
+        <Title>{t('Where do you work from?')}</Title>
+        <Button title={t('Use my current location')} kind="outline" onPress={useGps} />
         <Chips>
           {SECTORS.map((s) => (
             <Chip
@@ -144,8 +154,8 @@ export default function Onboarding() {
             />
           ))}
         </Chips>
-        {base ? <Small>Selected: {base.label}</Small> : null}
-        <Title>How far will you travel?</Title>
+        {base ? <Small>{t('Selected: {value}', { value: base.label })}</Small> : null}
+        <Title>{t('How far will you travel?')}</Title>
         <Chips>
           {RADII.map((r) => (
             <Chip key={r} label={`${r} km`} selected={radius === r} onPress={() => setRadius(r)} />
@@ -153,16 +163,16 @@ export default function Onboarding() {
         </Chips>
       </Card>
       <Field
-        label="GSTIN (optional)"
+        label={t('GSTIN (optional)')}
         value={gstin}
         onChangeText={setGstin}
         autoCapitalize="characters"
         maxLength={15}
-        hint="Add it to send GST invoices; customers see a GST badge on your quotes."
+        hint={t('Add it to send GST invoices; customers see a GST badge on your quotes.')}
       />
       {error ? <Notice>{error}</Notice> : null}
       <Button
-        title={existing.data ? 'Save' : 'Continue'}
+        title={existing.data ? t('Save') : t('Continue')}
         kind="accent"
         testID="save-profile"
         loading={busy}

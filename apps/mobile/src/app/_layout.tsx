@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { queryClient } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
+import { I18nProvider, useI18n } from '@/lib/i18n';
 import { SessionProvider, useSession } from '@/lib/session';
 
 void SplashScreen.preventAutoHideAsync();
@@ -29,10 +30,12 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <ThemeProvider value={theme}>
-          <StatusBar style="auto" />
-          <Routes />
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider value={theme}>
+            <StatusBar style="auto" />
+            <Routes />
+          </ThemeProvider>
+        </I18nProvider>
       </SessionProvider>
     </QueryClientProvider>
   );
@@ -40,6 +43,7 @@ export default function RootLayout() {
 
 function Routes() {
   const { status } = useSession();
+  const { t } = useI18n();
   useEffect(() => {
     if (status !== 'loading') void SplashScreen.hideAsync();
   }, [status]);
@@ -52,15 +56,18 @@ function Routes() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="requirement/new"
-          options={{ title: 'Post a requirement', presentation: 'modal' }}
+          options={{ title: t('Post a requirement'), presentation: 'modal' }}
         />
-        <Stack.Screen name="requirement/[id]" options={{ title: 'Requirement' }} />
-        <Stack.Screen name="quote/[id]" options={{ title: 'Quote' }} />
-        <Stack.Screen name="job/[id]" options={{ title: 'Job' }} />
-        <Stack.Screen name="lead/[id]" options={{ title: 'Lead' }} />
+        <Stack.Screen name="requirement/[id]" options={{ title: t('Requirement') }} />
+        <Stack.Screen name="quote/[id]" options={{ title: t('Quote') }} />
+        <Stack.Screen name="job/[id]" options={{ title: t('Job') }} />
+        <Stack.Screen name="lead/[id]" options={{ title: t('Lead') }} />
         <Stack.Screen
           name="onboarding"
-          options={{ title: IS_PARTNER ? 'Your business' : 'Profile', headerBackVisible: false }}
+          options={{
+            title: IS_PARTNER ? t('Your business') : t('Profile'),
+            headerBackVisible: false,
+          }}
         />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>

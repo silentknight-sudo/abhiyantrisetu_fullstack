@@ -6,6 +6,7 @@ import type { ColorValue } from 'react-native';
 import { Loading } from '@/components/ui';
 import { $api } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
+import { useI18n } from '@/lib/i18n';
 import { usePalette } from '@/lib/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -17,6 +18,7 @@ const icon =
 
 export default function TabsLayout() {
   const c = usePalette();
+  const { t } = useI18n();
   // Partners finish their business profile before seeing leads.
   const partner = $api.useQuery(
     'get',
@@ -41,24 +43,27 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen
         name="home"
-        options={{ title: 'Home', href: show(false), tabBarIcon: icon('home-outline') }}
+        options={{ title: t('Home'), href: show(false), tabBarIcon: icon('home-outline') }}
       />
       <Tabs.Screen
         name="requests"
         options={{
-          title: 'My requests',
+          title: t('My requests'),
           href: show(false),
           tabBarIcon: icon('document-text-outline'),
         }}
       />
       <Tabs.Screen
         name="leads"
-        options={{ title: 'Leads', href: show(true), tabBarIcon: icon('flash-outline') }}
+        options={{ title: t('Leads'), href: show(true), tabBarIcon: icon('flash-outline') }}
       />
-      <Tabs.Screen name="jobs" options={{ title: 'Jobs', tabBarIcon: icon('construct-outline') }} />
+      <Tabs.Screen
+        name="jobs"
+        options={{ title: t('Jobs'), tabBarIcon: icon('construct-outline') }}
+      />
       <Tabs.Screen
         name="account"
-        options={{ title: 'Account', tabBarIcon: icon('person-circle-outline') }}
+        options={{ title: t('Account'), tabBarIcon: icon('person-circle-outline') }}
       />
     </Tabs>
   );

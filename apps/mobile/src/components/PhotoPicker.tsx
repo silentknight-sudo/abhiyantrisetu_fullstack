@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { client } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
+import { useI18n } from '@/lib/i18n';
 import { radius, spacing, typeScale, usePalette } from '@/lib/theme';
 import { Button, Notice, Small } from './ui';
 
@@ -28,6 +29,7 @@ export function PhotoPicker({
   onChange: (keys: string[], uploading: boolean) => void;
 }) {
   const c = usePalette();
+  const { t } = useI18n();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +56,7 @@ export function PhotoPicker({
       headers: slot.data.upload.headers,
       body: blob,
     });
-    if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+    if (!res.ok) throw new Error(t('Upload failed ({status})', { status: res.status }));
     return slot.data.fileKey;
   }
 
@@ -85,7 +87,8 @@ export function PhotoPicker({
       publish(current);
     }
     const failed = current.find((p) => p.error);
-    if (failed) setError(`A photo could not be uploaded: ${failed.error}`);
+    if (failed)
+      setError(t('A photo could not be uploaded: {reason}', { reason: failed.error ?? '' }));
   }
 
   return (
@@ -95,7 +98,7 @@ export function PhotoPicker({
           {photos.map((p) => (
             <Pressable
               key={p.uri}
-              accessibilityLabel="Remove photo"
+              accessibilityLabel={t('Remove photo')}
               onPress={() => publish(photos.filter((x) => x.uri !== p.uri))}
               style={{ width: 72, height: 72 }}
             >
@@ -132,13 +135,17 @@ export function PhotoPicker({
       {error ? <Notice>{error}</Notice> : null}
       {photos.length < max ? (
         <Button
-          title={photos.length ? 'Add more photos' : 'Add photos'}
+          title={photos.length ? t('Add more photos') : t('Add photos')}
           kind="outline"
           testID="add-photos"
           onPress={() => void pick()}
         />
       ) : null}
-      <Small>Photos help professionals quote accurately. Up to {max}; tap one to remove it.</Small>
+      <Small>
+        {t('Photos help professionals quote accurately. Up to {n}; tap one to remove it.', {
+          n: max,
+        })}
+      </Small>
     </View>
   );
 }

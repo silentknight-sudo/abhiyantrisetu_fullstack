@@ -13,9 +13,11 @@ import {
 } from '@/components/ui';
 import { $api } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { ago, LEAD_STATUS, requirementTypeLabel, rupees } from '@/lib/format';
+import { ago, LEAD_STATUS, rupees } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 export default function Leads() {
+  const { t, d } = useI18n();
   const partner = $api.useQuery('get', '/v1/partners/me');
   const leads = $api.useQuery('get', '/v1/partner/leads');
   const verified = partner.data?.verificationStatus === 'verified';
@@ -24,14 +26,18 @@ export default function Leads() {
     <Screen refreshing={leads.isRefetching} onRefresh={() => void leads.refetch()}>
       {partner.data && !verified ? (
         <Notice tone="info">
-          Your profile is being verified. You will start getting leads once our team has checked
-          your documents.
+          {t(
+            'Your profile is being verified. You will start getting leads once our team has checked your documents.',
+          )}
         </Notice>
       ) : null}
       {leads.isPending ? <Loading /> : null}
       {leads.error ? <Notice>{errorMessage(leads.error)}</Notice> : null}
       {leads.data?.length === 0 ? (
-        <Empty title="No leads yet" body="New jobs near you will appear here and on WhatsApp." />
+        <Empty
+          title={t('No leads yet')}
+          body={t('New jobs near you will appear here and on WhatsApp.')}
+        />
       ) : null}
       {leads.data?.map((l) => {
         const [label, tone] = LEAD_STATUS[l.status];
@@ -40,14 +46,15 @@ export default function Leads() {
           <Card key={l.id} onPress={() => router.push(`/lead/${l.id}`)}>
             <Row>
               <Small>
-                {requirementTypeLabel(l.requirement.type)} · {l.distanceKm} km · {ago(l.sentAt)}
+                {d.requirementType[l.requirement.type]} · {t('{km} km', { km: l.distanceKm })} ·{' '}
+                {ago(l.sentAt, t)}
               </Small>
-              <Badge label={label} tone={tone} />
+              <Badge label={t(label)} tone={tone} />
             </Row>
             <Title>{l.requirement.title}</Title>
             <Body muted>
               {[l.area.sector, l.area.city].filter(Boolean).join(', ')}
-              {budget ? ` · up to ${rupees(budget)}` : ''}
+              {budget ? ` · ${t('up to {amount}', { amount: rupees(budget) })}` : ''}
             </Body>
           </Card>
         );

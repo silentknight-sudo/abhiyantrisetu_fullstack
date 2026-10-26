@@ -20,7 +20,8 @@ import {
 } from '@/components/ui';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { jobStateLabel, jobTone, rupees, when } from '@/lib/format';
+import { jobTone, rupees, when } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 /** Quick visit slots; a full date-time picker can come later. */
 function slots(now = new Date()) {
@@ -36,6 +37,7 @@ function slots(now = new Date()) {
 }
 
 export default function JobDetail() {
+  const { t, d } = useI18n();
   const params = useLocalSearchParams<{ id: string; startCode?: string }>();
   const path = { params: { path: { id: params.id } } };
   const job = $api.useQuery('get', '/v1/jobs/{id}', path);
@@ -89,17 +91,19 @@ export default function JobDetail() {
       <Card>
         <Row>
           <Title>{rupees(j.agreedTotalPaise)}</Title>
-          <Badge label={jobStateLabel(j.state)} tone={jobTone(j.state)} />
+          <Badge label={d.jobState[j.state]} tone={jobTone(j.state)} />
         </Row>
         <Small>
-          {j.slotStart ? `Visit: ${when(j.slotStart)}` : 'Visit not scheduled yet'}
-          {j.completedAt ? ` · Completed ${when(j.completedAt)}` : ''}
+          {j.slotStart
+            ? t('Visit: {when}', { when: when(j.slotStart) })
+            : t('Visit not scheduled yet')}
+          {j.completedAt ? ` · ${t('Completed {when}', { when: when(j.completedAt) })}` : ''}
         </Small>
       </Card>
 
       {j.contact ? (
         <Card>
-          <Small>{isCustomer ? 'Your professional' : 'Customer'}</Small>
+          <Small>{isCustomer ? t('Your professional') : t('Customer')}</Small>
           <Title>{j.contact.name ?? j.contact.phone}</Title>
           {j.contact.address ? (
             <Body>
@@ -119,13 +123,13 @@ export default function JobDetail() {
           ) : null}
           <Row style={{ justifyContent: 'flex-start' }}>
             <Button
-              title="Call"
+              title={t('Call')}
               kind="outline"
               onPress={() => void Linking.openURL(`tel:${j.contact!.phone}`)}
             />
             {j.contact.address ? (
               <Button
-                title="Directions"
+                title={t('Directions')}
                 kind="outline"
                 onPress={() => {
                   const { lat, lng } = j.contact!.address!.location;
@@ -141,7 +145,7 @@ export default function JobDetail() {
 
       {isCustomer && startCode && ['hired', 'scheduled'].includes(j.state) ? (
         <Card>
-          <Small>Start code: share it only when the professional arrives</Small>
+          <Small>{t('Start code: share it only when the professional arrives')}</Small>
           <Title>{startCode.split('').join(' ')}</Title>
         </Card>
       ) : null}
@@ -150,7 +154,7 @@ export default function JobDetail() {
 
       {pickSlot ? (
         <Card>
-          <Title>{j.slotStart ? 'Change the visit time' : 'Pick a visit time'}</Title>
+          <Title>{j.slotStart ? t('Change the visit time') : t('Pick a visit time')}</Title>
           <Chips>
             {slots().map((s) => (
               <Chip
@@ -165,9 +169,9 @@ export default function JobDetail() {
 
       {can('start') ? (
         <Card>
-          <Title>Start the job</Title>
+          <Title>{t('Start the job')}</Title>
           <Field
-            label="Customer's 4-digit start code"
+            label={t("Customer's 4-digit start code")}
             testID="start-code"
             value={codeInput}
             onChangeText={setCodeInput}
@@ -175,7 +179,7 @@ export default function JobDetail() {
             maxLength={4}
           />
           <Button
-            title="Start"
+            title={t('Start')}
             testID="start"
             loading={start.isPending}
             disabled={!/^\d{4}$/.test(codeInput)}
@@ -186,7 +190,7 @@ export default function JobDetail() {
 
       {can('complete') ? (
         <Button
-          title="Mark work as done"
+          title={t('Mark work as done')}
           kind="accent"
           testID="complete"
           loading={complete.isPending}
@@ -196,13 +200,14 @@ export default function JobDetail() {
 
       {can('confirm') ? (
         <Card>
-          <Title>Is the work done?</Title>
+          <Title>{t('Is the work done?')}</Title>
           <Small>
-            Confirming releases the payment to the professional. If you do nothing, the job is
-            confirmed automatically after 48 hours.
+            {t(
+              'Confirming releases the payment to the professional. If you do nothing, the job is confirmed automatically after 48 hours.',
+            )}
           </Small>
           <Button
-            title="Yes, confirm"
+            title={t('Yes, confirm')}
             kind="accent"
             testID="confirm"
             loading={confirm.isPending}
@@ -220,7 +225,7 @@ export default function JobDetail() {
 
       {isCustomer && (can('start') || ['hired', 'scheduled'].includes(j.state)) ? (
         <Button
-          title="Get a new start code"
+          title={t('Get a new start code')}
           kind="outline"
           loading={newCode.isPending}
           onPress={() => newCode.mutate(path)}
@@ -230,13 +235,13 @@ export default function JobDetail() {
       {asking ? (
         <Card>
           <Field
-            label={asking === 'dispute' ? 'What went wrong?' : 'Why are you cancelling?'}
+            label={asking === 'dispute' ? t('What went wrong?') : t('Why are you cancelling?')}
             value={reason}
             onChangeText={setReason}
             multiline
           />
           <Button
-            title={asking === 'dispute' ? 'Raise a dispute' : 'Cancel job'}
+            title={asking === 'dispute' ? t('Raise a dispute') : t('Cancel job')}
             kind="danger"
             loading={dispute.isPending || cancel.isPending}
             disabled={reason.trim().length < 3}
@@ -247,22 +252,26 @@ export default function JobDetail() {
               })
             }
           />
-          <Button title="Back" kind="outline" onPress={() => setAsking(null)} />
+          <Button title={t('Back')} kind="outline" onPress={() => setAsking(null)} />
         </Card>
       ) : (
         <>
           {can('dispute') ? (
-            <Button title="Report a problem" kind="outline" onPress={() => setAsking('dispute')} />
+            <Button
+              title={t('Report a problem')}
+              kind="outline"
+              onPress={() => setAsking('dispute')}
+            />
           ) : null}
           {can('cancel') ? (
-            <Button title="Cancel job" kind="outline" onPress={() => setAsking('cancel')} />
+            <Button title={t('Cancel job')} kind="outline" onPress={() => setAsking('cancel')} />
           ) : null}
         </>
       )}
 
       {j.state === 'disputed' ? (
         <Notice tone="info">
-          Our team is looking into this. Payment stays on hold until it is resolved.
+          {t('Our team is looking into this. Payment stays on hold until it is resolved.')}
         </Notice>
       ) : null}
 
@@ -270,10 +279,10 @@ export default function JobDetail() {
 
       {history.data?.length ? (
         <Card>
-          <Title>Timeline</Title>
+          <Title>{t('Timeline')}</Title>
           {history.data.map((e) => (
             <Body key={e.id}>
-              {jobStateLabel(e.toState)} <Small>· {when(e.createdAt)}</Small>
+              {d.jobState[e.toState]} <Small>· {when(e.createdAt)}</Small>
             </Body>
           ))}
         </Card>

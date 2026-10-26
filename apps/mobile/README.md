@@ -32,6 +32,15 @@ npx eas-cli@latest build --profile production       # store builds (and producti
 
 Profiles in `eas.json` set `APP_VARIANT` and `EXPO_PUBLIC_API_URL`.
 
+## Languages
+
+Screens are in English, Hindi and Hinglish. Text is written as `t('English text', { vars })`
+from `useI18n()`; the English is the key, and `src/lib/messages/hi.ts` and `hinglish.ts` hold
+the translations (TypeScript fails if a key is missing from either). Shared labels such as job
+states come from `@setu/domain` through `d`. The language is the account's saved one once
+signed in (the API uses it for WhatsApp and push too); a choice made on the login screen is
+saved to the account on sign-in.
+
 ## Layout
 
 ```

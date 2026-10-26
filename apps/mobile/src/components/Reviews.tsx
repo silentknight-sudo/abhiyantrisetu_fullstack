@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import { when } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 import { spacing, typeScale, usePalette } from '@/lib/theme';
 import { Body, Button, Card, Field, Notice, Small, Title } from './ui';
 
@@ -16,11 +17,12 @@ export function Stars({
   size?: number;
 }) {
   const c = usePalette();
+  const { t } = useI18n();
   return (
     <View
       style={{ flexDirection: 'row', gap: spacing[1] }}
       accessibilityRole={onChange ? 'adjustable' : 'text'}
-      accessibilityLabel={`${value} of 5 stars`}
+      accessibilityLabel={t('{n} of 5 stars', { n: value })}
     >
       {[1, 2, 3, 4, 5].map((n) => (
         <Pressable
@@ -55,6 +57,7 @@ export function JobReview({
   viewer: 'customer' | 'partner' | 'ops' | 'system';
   closed: boolean;
 }) {
+  const { t } = useI18n();
   const path = { params: { path: { id: jobId } } };
   const review = $api.useQuery('get', '/v1/jobs/{id}/review', path, { enabled: closed });
   const [rating, setRating] = useState(0);
@@ -71,10 +74,10 @@ export function JobReview({
     if (viewer !== 'customer') return null;
     return (
       <Card>
-        <Title>How was the work?</Title>
+        <Title>{t('How was the work?')}</Title>
         <Stars value={rating} onChange={setRating} />
         <Field
-          label="A few words for others (optional)"
+          label={t('A few words for others (optional)')}
           value={comment}
           onChangeText={setComment}
           multiline
@@ -82,7 +85,7 @@ export function JobReview({
         />
         {create.error ? <Notice>{errorMessage(create.error)}</Notice> : null}
         <Button
-          title="Post review"
+          title={t('Post review')}
           testID="post-review"
           disabled={rating === 0}
           loading={create.isPending}
@@ -90,28 +93,30 @@ export function JobReview({
             create.mutate({ ...path, body: { rating, comment: comment.trim() || undefined } })
           }
         />
-        <Small>Reviews are public and show your first name only.</Small>
+        <Small>{t('Reviews are public and show your first name only.')}</Small>
       </Card>
     );
   }
 
   return (
     <Card>
-      <Title>{viewer === 'customer' ? 'Your review' : 'Customer review'}</Title>
+      <Title>{viewer === 'customer' ? t('Your review') : t('Customer review')}</Title>
       <Stars value={r.rating} size={20} />
       {r.comment ? <Body>{r.comment}</Body> : null}
       <Small>
-        {r.customerFirstName ?? 'Customer'} · {when(r.createdAt)}
+        {r.customerFirstName ?? t('Customer')} · {when(r.createdAt)}
       </Small>
       {r.partnerReply ? (
         <View style={{ marginTop: spacing[2] }}>
-          <Text style={[typeScale.sm, { fontWeight: '600' }]}>Reply from the professional</Text>
+          <Text style={[typeScale.sm, { fontWeight: '600' }]}>
+            {t('Reply from the professional')}
+          </Text>
           <Body muted>{r.partnerReply}</Body>
         </View>
       ) : viewer === 'partner' ? (
         <>
           <Field
-            label="Reply publicly (once)"
+            label={t('Reply publicly (once)')}
             value={reply}
             onChangeText={setReply}
             multiline
@@ -119,7 +124,7 @@ export function JobReview({
           />
           {answer.error ? <Notice>{errorMessage(answer.error)}</Notice> : null}
           <Button
-            title="Post reply"
+            title={t('Post reply')}
             kind="outline"
             disabled={reply.trim().length < 2}
             loading={answer.isPending}
@@ -135,21 +140,22 @@ export function JobReview({
 
 /** The latest reviews of a partner, on the quote a customer is weighing. */
 export function PartnerReviews({ partnerId }: { partnerId: string }) {
+  const { t } = useI18n();
   const list = $api.useQuery('get', '/v1/partners/{id}/reviews', {
     params: { path: { id: partnerId } },
   });
   if (!list.data?.length) return null;
   return (
     <Card>
-      <Title>What customers say</Title>
+      <Title>{t('What customers say')}</Title>
       {list.data.slice(0, 3).map((r) => (
         <View key={r.id} style={{ gap: 2, marginTop: spacing[1] }}>
           <Stars value={r.rating} size={16} />
           {r.comment ? <Body>{r.comment}</Body> : null}
           <Small>
-            {r.customerFirstName ?? 'Customer'} · {when(r.createdAt)}
+            {r.customerFirstName ?? t('Customer')} · {when(r.createdAt)}
           </Small>
-          {r.partnerReply ? <Small>Reply: {r.partnerReply}</Small> : null}
+          {r.partnerReply ? <Small>{t('Reply: {text}', { text: r.partnerReply })}</Small> : null}
         </View>
       ))}
     </Card>

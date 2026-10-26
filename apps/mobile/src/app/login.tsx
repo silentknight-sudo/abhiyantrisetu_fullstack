@@ -1,14 +1,16 @@
-import { normalizeIndianMobile } from '@setu/domain';
+import { LOCALES, normalizeIndianMobile } from '@setu/domain';
 import { Image } from 'react-native';
 import { useState } from 'react';
-import { Body, Button, Field, Heading, Notice, Screen, Small } from '@/components/ui';
+import { Body, Button, Chip, Chips, Field, Heading, Notice, Screen, Small } from '@/components/ui';
 import { client } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { errorMessage } from '@/lib/errors';
+import { LANGUAGE_NAMES, useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/session';
 
 export default function Login() {
   const { signIn } = useSession();
+  const { t, locale, setLocale } = useI18n();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'phone' | 'code'>('phone');
@@ -18,14 +20,16 @@ export default function Login() {
 
   async function sendCode() {
     setError(null);
-    if (!normalizeIndianMobile(phone)) return setError('Enter a 10-digit Indian mobile number');
+    if (!normalizeIndianMobile(phone)) return setError(t('Enter a 10-digit Indian mobile number'));
     setBusy(true);
     try {
       const res = await client.api.POST('/v1/auth/otp/send', { body: { phone } });
       if (!res.response.ok) throw res.error;
       setStep('code');
       setInfo(
-        `We sent a 6-digit code by SMS. You can ask for a new one in ${res.data!.resendAfterSeconds}s.`,
+        t('We sent a 6-digit code by SMS. You can ask for a new one in {seconds}s.', {
+          seconds: res.data!.resendAfterSeconds,
+        }),
       );
     } catch (err) {
       setError(errorMessage(err));
@@ -36,7 +40,7 @@ export default function Login() {
 
   async function verify() {
     setError(null);
-    if (!/^\d{6}$/.test(code)) return setError('Enter the 6-digit code');
+    if (!/^\d{6}$/.test(code)) return setError(t('Enter the 6-digit code'));
     setBusy(true);
     try {
       await signIn(phone, code);
@@ -54,19 +58,31 @@ export default function Login() {
         style={{ width: 96, height: 96, borderRadius: 20, marginTop: 24 }}
         accessibilityLabel="Abhiyantri Setu"
       />
+      <Chips>
+        {LOCALES.map((l) => (
+          <Chip
+            key={l}
+            label={LANGUAGE_NAMES[l]}
+            selected={locale === l}
+            onPress={() => setLocale(l)}
+          />
+        ))}
+      </Chips>
       <Heading size="4xl">
-        {IS_PARTNER ? 'Grow your work' : 'Build, Renovate, Repair & Maintain'}
+        {IS_PARTNER ? t('Grow your work') : t('Build, Renovate, Repair & Maintain')}
       </Heading>
       <Body muted>
         {IS_PARTNER
-          ? 'Get verified leads near you in Greater Noida. Quote, get hired and get paid on time.'
-          : 'Verified professionals in Greater Noida. Post once, compare quotes, pay safely.'}
+          ? t(
+              'Get verified leads near you in Greater Noida. Quote, get hired and get paid on time.',
+            )
+          : t('Verified professionals in Greater Noida. Post once, compare quotes, pay safely.')}
       </Body>
 
       {step === 'phone' ? (
         <>
           <Field
-            label="Mobile number"
+            label={t('Mobile number')}
             testID="phone"
             value={phone}
             onChangeText={setPhone}
@@ -77,13 +93,13 @@ export default function Login() {
             onSubmitEditing={sendCode}
           />
           {error ? <Notice>{error}</Notice> : null}
-          <Button title="Send code" testID="send-code" onPress={sendCode} loading={busy} />
+          <Button title={t('Send code')} testID="send-code" onPress={sendCode} loading={busy} />
         </>
       ) : (
         <>
           {info ? <Notice tone="info">{info}</Notice> : null}
           <Field
-            label="6-digit code"
+            label={t('6-digit code')}
             testID="code"
             value={code}
             onChangeText={setCode}
@@ -94,9 +110,14 @@ export default function Login() {
             onSubmitEditing={verify}
           />
           {error ? <Notice>{error}</Notice> : null}
-          <Button title="Verify and continue" testID="verify" onPress={verify} loading={busy} />
           <Button
-            title="Change number"
+            title={t('Verify and continue')}
+            testID="verify"
+            onPress={verify}
+            loading={busy}
+          />
+          <Button
+            title={t('Change number')}
             kind="outline"
             onPress={() => {
               setStep('phone');
@@ -107,8 +128,9 @@ export default function Login() {
         </>
       )}
       <Small>
-        By continuing you agree to our Terms and Privacy Policy. Your number is never shown to
-        anyone before you hire.
+        {t(
+          'By continuing you agree to our Terms and Privacy Policy. Your number is never shown to anyone before you hire.',
+        )}
       </Small>
     </Screen>
   );

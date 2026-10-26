@@ -14,9 +14,11 @@ import {
 import { $api } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { errorMessage } from '@/lib/errors';
-import { jobStateLabel, jobTone, rupees, when } from '@/lib/format';
+import { jobTone, rupees, when } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 export default function Jobs() {
+  const { t, d } = useI18n();
   const jobs = $api.useQuery('get', '/v1/jobs');
   const mine = (jobs.data ?? []).filter((j) =>
     IS_PARTNER ? j.viewerRole === 'partner' : j.viewerRole === 'customer',
@@ -27,11 +29,11 @@ export default function Jobs() {
       {jobs.error ? <Notice>{errorMessage(jobs.error)}</Notice> : null}
       {jobs.data && mine.length === 0 ? (
         <Empty
-          title="No jobs yet"
+          title={t('No jobs yet')}
           body={
             IS_PARTNER
-              ? 'Send quotes on your leads. Jobs appear here once a customer hires you.'
-              : 'Accept a quote to hire a professional. Your jobs appear here.'
+              ? t('Send quotes on your leads. Jobs appear here once a customer hires you.')
+              : t('Accept a quote to hire a professional. Your jobs appear here.')
           }
         />
       ) : null}
@@ -39,10 +41,14 @@ export default function Jobs() {
         <Card key={j.id} onPress={() => router.push(`/job/${j.id}`)}>
           <Row>
             <Body>{rupees(j.agreedTotalPaise)}</Body>
-            <Badge label={jobStateLabel(j.state)} tone={jobTone(j.state)} />
+            <Badge label={d.jobState[j.state]} tone={jobTone(j.state)} />
           </Row>
           <Title>{j.title}</Title>
-          <Small>{j.slotStart ? `Visit ${when(j.slotStart)}` : `Hired ${when(j.createdAt)}`}</Small>
+          <Small>
+            {j.slotStart
+              ? t('Visit {when}', { when: when(j.slotStart) })
+              : t('Hired {when}', { when: when(j.createdAt) })}
+          </Small>
         </Card>
       ))}
     </Screen>

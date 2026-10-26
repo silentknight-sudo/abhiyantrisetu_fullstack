@@ -17,16 +17,11 @@ import {
 import { PhotoStrip } from '@/components/PhotoStrip';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import {
-  ago,
-  requirementStatusLabel,
-  requirementTone,
-  detailLines,
-  requirementTypeLabel,
-  rupees,
-} from '@/lib/format';
+import { ago, detailLines, QUOTE_STATUS_LABEL, requirementTone, rupees } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 export default function RequirementDetail() {
+  const { t, d } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const path = { params: { path: { id } } };
   const req = $api.useQuery('get', '/v1/requirements/{id}', path);
@@ -63,76 +58,83 @@ export default function RequirementDetail() {
         void quotes.refetch();
       }}
     >
-      <Stack.Screen options={{ title: requirementTypeLabel(r.type) }} />
+      <Stack.Screen options={{ title: d.requirementType[r.type] }} />
       <Card>
         <Row>
-          <Small>Posted {ago(r.createdAt)}</Small>
-          <Badge label={requirementStatusLabel(r.status)} tone={requirementTone(r.status)} />
+          <Small>{t('Posted {when}', { when: ago(r.createdAt, t) })}</Small>
+          <Badge label={d.requirementStatus[r.status]} tone={requirementTone(r.status)} />
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body muted>{description}</Body> : null}
-        {detailLines(r.details).map((line) => (
+        {detailLines(r.details, t).map((line) => (
           <Small key={line}>{line}</Small>
         ))}
         <PhotoStrip urls={r.photoUrls} />
-        {r.budgetMaxPaise ? <Small>Budget up to {rupees(r.budgetMaxPaise)}</Small> : null}
+        {r.budgetMaxPaise ? (
+          <Small>{t('Budget up to {amount}', { amount: rupees(r.budgetMaxPaise) })}</Small>
+        ) : null}
       </Card>
 
-      {job ? <Button title="Open job" onPress={() => router.push(`/job/${job.id}`)} /> : null}
+      {job ? <Button title={t('Open job')} onPress={() => router.push(`/job/${job.id}`)} /> : null}
 
-      <Title>Quotes {sent.length ? `(${sent.length})` : ''}</Title>
+      <Title>{sent.length ? t('Quotes ({n})', { n: sent.length }) : t('Quotes')}</Title>
       {quotes.isPending ? <Loading /> : null}
       {quotes.data && sent.length === 0 && open ? (
         <Empty
-          title="Waiting for quotes"
-          body="We've told verified professionals near you. You'll get a notification when a quote arrives."
+          title={t('Waiting for quotes')}
+          body={t(
+            "We've told verified professionals near you. You'll get a notification when a quote arrives.",
+          )}
         />
       ) : null}
       {sent.map((q) => (
         <Card key={q.id} onPress={() => router.push(`/quote/${q.id}`)}>
           <Row>
-            <Title>{q.partner?.displayName ?? 'Professional'}</Title>
+            <Title>{q.partner?.displayName ?? t('Professional')}</Title>
             <Title>{rupees(q.totalPaise)}</Title>
           </Row>
           <Row>
             <Small>
               {q.partner?.ratingAvg
                 ? `★ ${q.partner.ratingAvg.toFixed(1)} (${q.partner.ratingCount})`
-                : 'New on Setu'}
-              {q.partner?.verificationStatus === 'verified' ? ' · Verified' : ''}
-              {q.gstPaise > 0 ? ' · GST invoice' : ''}
+                : t('New on Setu')}
+              {q.partner?.verificationStatus === 'verified' ? ` · ${t('Verified')}` : ''}
+              {q.gstPaise > 0 ? ` · ${t('GST invoice')}` : ''}
             </Small>
             {q.status !== 'sent' ? (
-              <Badge label={q.status} tone={q.status === 'accepted' ? 'success' : 'neutral'} />
+              <Badge
+                label={t(QUOTE_STATUS_LABEL[q.status])}
+                tone={q.status === 'accepted' ? 'success' : 'neutral'}
+              />
             ) : null}
           </Row>
           <Small>
-            {q.items.length} item{q.items.length === 1 ? '' : 's'}
-            {q.version > 1 ? ` · revised (v${q.version})` : ''}
+            {t('{n} items', { n: q.items.length })}
+            {q.version > 1 ? ` · ${t('revised (v{n})', { n: q.version })}` : ''}
           </Small>
         </Card>
       ))}
 
       {open && !cancelling ? (
-        <Button title="Cancel request" kind="outline" onPress={() => setCancelling(true)} />
+        <Button title={t('Cancel request')} kind="outline" onPress={() => setCancelling(true)} />
       ) : null}
       {cancelling ? (
         <Card>
           <Field
-            label="Why are you cancelling?"
+            label={t('Why are you cancelling?')}
             value={reason}
             onChangeText={setReason}
-            placeholder="e.g. Fixed it myself"
+            placeholder={t('e.g. Fixed it myself')}
           />
           {cancel.error ? <Notice>{errorMessage(cancel.error)}</Notice> : null}
           <Button
-            title="Cancel request"
+            title={t('Cancel request')}
             kind="danger"
             loading={cancel.isPending}
             disabled={reason.trim().length < 3}
             onPress={() => cancel.mutate({ ...path, body: { reason: reason.trim() } })}
           />
-          <Button title="Keep it open" kind="outline" onPress={() => setCancelling(false)} />
+          <Button title={t('Keep it open')} kind="outline" onPress={() => setCancelling(false)} />
         </Card>
       ) : null}
     </Screen>

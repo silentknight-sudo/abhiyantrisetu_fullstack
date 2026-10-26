@@ -16,9 +16,11 @@ import {
 } from '@/components/ui';
 import { $api, client, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { ago, detailLines, LEAD_STATUS, requirementTypeLabel, rupees, when } from '@/lib/format';
+import { ago, detailLines, LEAD_STATUS, QUOTE_STATUS_LABEL, rupees, when } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 export default function LeadDetail() {
+  const { t, d } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const leads = $api.useQuery('get', '/v1/partner/leads');
   const partner = $api.useQuery('get', '/v1/partners/me');
@@ -46,11 +48,11 @@ export default function LeadDetail() {
   if (!lead)
     return (
       <Screen>
-        <Notice>This lead is no longer available.</Notice>
+        <Notice>{t('This lead is no longer available.')}</Notice>
       </Screen>
     );
   const r = lead.requirement;
-  const details = detailLines(r.details);
+  const details = detailLines(r.details, t);
   const description = typeof r.details.description === 'string' ? r.details.description : null;
   const canQuote =
     ['sent', 'seen'].includes(lead.status) && ['requested', 'matched', 'quoted'].includes(r.status);
@@ -78,9 +80,9 @@ export default function LeadDetail() {
       <Card>
         <Row>
           <Small>
-            {requirementTypeLabel(r.type)} · {lead.distanceKm} km · {ago(lead.sentAt)}
+            {d.requirementType[r.type]} · {lead.distanceKm} km · {ago(lead.sentAt, t)}
           </Small>
-          <Badge label={LEAD_STATUS[lead.status][0]} tone={LEAD_STATUS[lead.status][1]} />
+          <Badge label={t(LEAD_STATUS[lead.status][0])} tone={LEAD_STATUS[lead.status][1]} />
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body>{description}</Body> : null}
@@ -90,17 +92,21 @@ export default function LeadDetail() {
         ))}
         <Small>
           {[lead.area.sector, lead.area.city, lead.area.pincode].filter(Boolean).join(', ')}
-          {r.budgetMaxPaise ? ` · budget up to ${rupees(r.budgetMaxPaise)}` : ''}
+          {r.budgetMaxPaise
+            ? ` · ${t('Budget up to {amount}', { amount: rupees(r.budgetMaxPaise) })}`
+            : ''}
         </Small>
-        <Small>The exact address and phone number are shared once the customer hires you.</Small>
+        <Small>
+          {t('The exact address and phone number are shared once the customer hires you.')}
+        </Small>
       </Card>
 
       {canQuote ? (
         <>
-          <Title>Your quote</Title>
+          <Title>{t('Your quote')}</Title>
           <QuoteBuilder
             gstRegistered={Boolean(partner.data?.gstin)}
-            submitLabel="Send quote"
+            submitLabel={t('Send quote')}
             busy={busy}
             error={error}
             onSubmit={(body) =>
@@ -113,7 +119,7 @@ export default function LeadDetail() {
             }
           />
           <Button
-            title="Not interested"
+            title={t('Not interested')}
             kind="outline"
             onPress={() =>
               run(async () => {
@@ -131,15 +137,17 @@ export default function LeadDetail() {
       {quote.data && !revising ? (
         <Card>
           <Row>
-            <Title>Quote sent: {rupees(quote.data.totalPaise)}</Title>
+            <Title>{t('Quote sent: {amount}', { amount: rupees(quote.data.totalPaise) })}</Title>
             <Badge
-              label={quote.data.status}
+              label={t(QUOTE_STATUS_LABEL[quote.data.status])}
               tone={quote.data.status === 'accepted' ? 'success' : 'neutral'}
             />
           </Row>
           <Small>
-            Version {quote.data.version}
-            {quote.data.validUntil ? ` · valid until ${when(quote.data.validUntil)}` : ''}
+            {t('Version {n}', { n: quote.data.version })}
+            {quote.data.validUntil
+              ? ` · ${t('Valid until {when}', { when: when(quote.data.validUntil) })}`
+              : ''}
           </Small>
           {quote.data.thread.slice(1).map((m, idx) => (
             <Body key={idx}>
@@ -149,9 +157,9 @@ export default function LeadDetail() {
           {error ? <Notice>{error}</Notice> : null}
           {quote.data.status === 'sent' ? (
             <>
-              <Button title="Revise quote" kind="outline" onPress={() => setRevising(true)} />
+              <Button title={t('Revise quote')} kind="outline" onPress={() => setRevising(true)} />
               <Button
-                title="Withdraw quote"
+                title={t('Withdraw quote')}
                 kind="danger"
                 loading={busy}
                 onPress={() =>
@@ -171,7 +179,7 @@ export default function LeadDetail() {
         <QuoteBuilder
           initial={quote.data}
           gstRegistered={Boolean(partner.data?.gstin)}
-          submitLabel="Send revised quote"
+          submitLabel={t('Send revised quote')}
           withMessage
           busy={busy}
           error={error}

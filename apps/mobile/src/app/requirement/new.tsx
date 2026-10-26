@@ -19,17 +19,18 @@ import {
 import { PhotoPicker } from '@/components/PhotoPicker';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
+import { type MessageKey, useI18n } from '@/lib/i18n';
 
 type Kind = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
-const KINDS: { kind: Kind; label: string }[] = [
+const KINDS: { kind: Kind; label: MessageKey }[] = [
   { kind: 'service', label: 'Repair & maintain' },
   { kind: 'renovation', label: 'Renovate' },
   { kind: 'consult', label: 'Ask an expert' },
   { kind: 'material_rfq', label: 'Buy materials' },
   { kind: 'equipment', label: 'Rent equipment' },
 ];
-const TITLE_HINT: Record<Kind, string> = {
+const TITLE_HINT: Record<Kind, MessageKey> = {
   service: 'e.g. Kitchen tap leaking',
   renovation: 'e.g. Redo the master bathroom',
   consult: 'e.g. Crack in the living room beam',
@@ -57,14 +58,14 @@ interface MaterialRow {
 }
 
 /** The next 7 days as YYYY-MM-DD (local time) with a short label. */
-function nextDays(n = 7) {
+function nextDays(dateLocale: string, n = 7) {
   return Array.from({ length: n }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i + 1);
     const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return {
       iso,
-      label: d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }),
+      label: d.toLocaleDateString(dateLocale, { weekday: 'short', day: 'numeric', month: 'short' }),
     };
   });
 }
@@ -89,7 +90,7 @@ const SCOPE = [
   'Plumbing',
   'Waterproofing',
   'Full home',
-];
+] as const;
 const TOPICS = [
   ['structural', 'Structural'],
   ['architecture', 'Architecture'],
@@ -102,6 +103,7 @@ const TOPICS = [
 const toggle = <T,>(xs: T[], x: T) => (xs.includes(x) ? xs.filter((y) => y !== x) : [...xs, x]);
 
 export default function NewRequirement() {
+  const { t, locale } = useI18n();
   const params = useLocalSearchParams<{ type?: string }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
@@ -147,7 +149,7 @@ export default function NewRequirement() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== 'granted')
-        throw new Error('Location permission was not given. Pick your sector instead.');
+        throw new Error(t('Location permission was not given. Pick your sector instead.'));
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       setGps({ lat: pos.coords.latitude, lng: pos.coords.longitude });
     } catch (err) {
@@ -205,7 +207,7 @@ export default function NewRequirement() {
         location: gps ?? { lat: sector.lat, lng: sector.lng },
       },
     });
-    if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? 'Check the form');
+    if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? t('Check the form'));
     create.mutate({ body: parsed.data });
   }
 
@@ -215,7 +217,7 @@ export default function NewRequirement() {
         {KINDS.map((k) => (
           <Chip
             key={k.kind}
-            label={k.label}
+            label={t(k.label)}
             selected={kind === k.kind}
             onPress={() => {
               setKind(k.kind);
@@ -227,12 +229,12 @@ export default function NewRequirement() {
 
       {categories.length > 0 ? (
         <Card>
-          <Title>What kind of work?</Title>
+          <Title>{t('What kind of work?')}</Title>
           <Chips>
             {categories.map((c) => (
               <Chip
                 key={c.id}
-                label={c.nameEn}
+                label={locale === 'hi' ? c.nameHi : c.nameEn}
                 selected={categoryId === c.id}
                 onPress={() => setCategoryId(categoryId === c.id ? undefined : c.id)}
               />
@@ -242,40 +244,40 @@ export default function NewRequirement() {
       ) : null}
 
       <Field
-        label="Title"
+        label={t('Title')}
         testID="title"
         value={title}
         onChangeText={setTitle}
-        placeholder={TITLE_HINT[kind]}
+        placeholder={t(TITLE_HINT[kind])}
         maxLength={120}
       />
 
       {kind === 'renovation' ? (
         <Card>
-          <Title>Property</Title>
+          <Title>{t('Property')}</Title>
           <Chips>
             {PROPERTY.map(([v, l]) => (
               <Chip
                 key={v}
-                label={l}
+                label={t(l)}
                 selected={propertyType === v}
                 onPress={() => setPropertyType(v)}
               />
             ))}
           </Chips>
-          <Small>Areas of work</Small>
+          <Small>{t('Areas of work')}</Small>
           <Chips>
             {SCOPE.map((s) => (
               <Chip
                 key={s}
-                label={s}
+                label={t(s)}
                 selected={scope.includes(s)}
                 onPress={() => setScope(toggle(scope, s))}
               />
             ))}
           </Chips>
           <Field
-            label="Carpet area (sq ft, optional)"
+            label={t('Carpet area (sq ft, optional)')}
             value={areaSqft}
             onChangeText={setAreaSqft}
             keyboardType="number-pad"
@@ -285,10 +287,10 @@ export default function NewRequirement() {
 
       {kind === 'consult' ? (
         <Card>
-          <Title>Topic</Title>
+          <Title>{t('Topic')}</Title>
           <Chips>
             {TOPICS.map(([v, l]) => (
-              <Chip key={v} label={l} selected={topic === v} onPress={() => setTopic(v)} />
+              <Chip key={v} label={t(l)} selected={topic === v} onPress={() => setTopic(v)} />
             ))}
           </Chips>
         </Card>
@@ -296,20 +298,20 @@ export default function NewRequirement() {
 
       {kind === 'material_rfq' ? (
         <Card>
-          <Title>What do you need?</Title>
+          <Title>{t('What do you need?')}</Title>
           {materials.map((m, i) => (
             <View key={i} style={{ gap: 8 }}>
               <Field
-                label={`Item ${i + 1}`}
+                label={t('Item {n}', { n: i + 1 })}
                 testID={`material-${i}-name`}
                 value={m.name}
                 onChangeText={(v) =>
                   setMaterials(materials.map((r, j) => (j === i ? { ...r, name: v } : r)))
                 }
-                placeholder="e.g. OPC 53 grade cement"
+                placeholder={t('e.g. OPC 53 grade cement')}
               />
               <Field
-                label="Quantity"
+                label={t('Quantity')}
                 testID={`material-${i}-qty`}
                 value={m.quantity}
                 onChangeText={(v) =>
@@ -332,18 +334,18 @@ export default function NewRequirement() {
             </View>
           ))}
           <Button
-            title="Add another item"
+            title={t('Add another item')}
             kind="outline"
             onPress={() => setMaterials([...materials, { name: '', quantity: '', unit: 'bag' }])}
           />
           <Chips>
             <Chip
-              label="We will unload"
+              label={t('We will unload')}
               selected={!needsUnloading}
               onPress={() => setNeedsUnloading(false)}
             />
             <Chip
-              label="Supplier unloads"
+              label={t('Supplier unloads')}
               selected={needsUnloading}
               onPress={() => setNeedsUnloading(true)}
             />
@@ -354,15 +356,15 @@ export default function NewRequirement() {
       {kind === 'equipment' ? (
         <Card>
           <Field
-            label="Equipment"
+            label={t('Equipment')}
             testID="equipment-type"
             value={equipmentType}
             onChangeText={setEquipmentType}
-            placeholder="e.g. JCB 3DX, concrete mixer, scaffolding"
+            placeholder={t('e.g. JCB 3DX, concrete mixer, scaffolding')}
           />
-          <Title>Start date</Title>
+          <Title>{t('Start date')}</Title>
           <Chips>
-            {nextDays().map((d) => (
+            {nextDays(locale === 'hi' ? 'hi-IN' : 'en-IN').map((d) => (
               <Chip
                 key={d.iso}
                 label={d.label}
@@ -372,7 +374,7 @@ export default function NewRequirement() {
             ))}
           </Chips>
           <Field
-            label="For how many days?"
+            label={t('For how many days?')}
             testID="duration-days"
             value={durationDays}
             onChangeText={setDurationDays}
@@ -380,12 +382,12 @@ export default function NewRequirement() {
           />
           <Chips>
             <Chip
-              label="With operator"
+              label={t('With operator')}
               selected={withOperator}
               onPress={() => setWithOperator(true)}
             />
             <Chip
-              label="Machine only"
+              label={t('Machine only')}
               selected={!withOperator}
               onPress={() => setWithOperator(false)}
             />
@@ -395,15 +397,15 @@ export default function NewRequirement() {
 
       {kind !== 'material_rfq' ? (
         <Field
-          label={kind === 'equipment' ? 'Anything else (optional)' : 'Describe the work'}
+          label={kind === 'equipment' ? t('Anything else (optional)') : t('Describe the work')}
           testID="description"
           value={description}
           onChangeText={setDescription}
           multiline
           placeholder={
             kind === 'equipment'
-              ? 'Site access, soil type, working hours'
-              : 'What is the problem, how big is the job, anything the professional should know'
+              ? t('Site access, soil type, working hours')
+              : t('What is the problem, how big is the job, anything the professional should know')
           }
           maxLength={kind === 'equipment' ? 500 : 2000}
         />
@@ -411,10 +413,10 @@ export default function NewRequirement() {
 
       {kind === 'service' ? (
         <Card>
-          <Title>When?</Title>
+          <Title>{t('When?')}</Title>
           <Chips>
             {URGENCY.map(([v, l]) => (
-              <Chip key={v} label={l} selected={urgency === v} onPress={() => setUrgency(v)} />
+              <Chip key={v} label={t(l)} selected={urgency === v} onPress={() => setUrgency(v)} />
             ))}
           </Chips>
         </Card>
@@ -422,7 +424,7 @@ export default function NewRequirement() {
 
       {kind === 'service' || kind === 'renovation' ? (
         <Card>
-          <Title>Photos (optional)</Title>
+          <Title>{t('Photos (optional)')}</Title>
           <PhotoPicker
             onChange={(keys, busy) => {
               setPhotos(keys);
@@ -433,15 +435,15 @@ export default function NewRequirement() {
       ) : null}
 
       <Field
-        label="Budget up to (₹, optional)"
+        label={t('Budget up to (₹, optional)')}
         value={budget}
         onChangeText={setBudget}
         keyboardType="number-pad"
-        hint="Leave empty if you'd like professionals to suggest a price."
+        hint={t("Leave empty if you'd like professionals to suggest a price.")}
       />
 
       <Card>
-        <Title>Where?</Title>
+        <Title>{t('Where?')}</Title>
         <Chips>
           {SECTORS.map((s) => (
             <Chip
@@ -453,24 +455,24 @@ export default function NewRequirement() {
           ))}
         </Chips>
         <Field
-          label="Flat / house, tower and society"
+          label={t('Flat / house, tower and society')}
           testID="line1"
           value={line1}
           onChangeText={setLine1}
-          placeholder="e.g. C-1203, Tower C, Ansal Golf Links"
+          placeholder={t('e.g. C-1203, Tower C, Ansal Golf Links')}
         />
         <Button
-          title={gps ? 'Exact location added ✓' : 'Use my exact location'}
+          title={gps ? t('Exact location added ✓') : t('Use my exact location')}
           kind="outline"
           loading={locating}
           onPress={locate}
         />
-        <Small>Professionals only see your sector until you hire them.</Small>
+        <Small>{t('Professionals only see your sector until you hire them.')}</Small>
       </Card>
 
       {error ? <Notice>{error}</Notice> : null}
       <Button
-        title={uploading ? 'Uploading photos…' : 'Post requirement'}
+        title={uploading ? t('Uploading photos…') : t('Post requirement')}
         kind="accent"
         testID="submit"
         loading={create.isPending}
@@ -478,8 +480,9 @@ export default function NewRequirement() {
         onPress={submit}
       />
       <Body muted>
-        Verified professionals nearby are notified right away. Quotes usually arrive within a few
-        hours.
+        {t(
+          'Verified professionals nearby are notified right away. Quotes usually arrive within a few hours.',
+        )}
       </Body>
     </Screen>
   );

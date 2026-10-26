@@ -141,4 +141,4 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-1. Mobile: Hindi and Hinglish screen text.
+1. Mobile: test on real phones with EAS builds (needs `eas init` on the Expo account).

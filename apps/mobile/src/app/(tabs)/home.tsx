@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { Badge, Body, Button, Card, Heading, Row, Screen, Small, Title } from '@/components/ui';
 import { $api } from '@/lib/api';
-import { jobStateLabel, jobTone, rupees } from '@/lib/format';
+import { jobTone, rupees } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 const STARTS = [
   {
@@ -24,6 +25,7 @@ const STARTS = [
 ] as const;
 
 export default function Home() {
+  const { t, d } = useI18n();
   const me = $api.useQuery('get', '/v1/me');
   const jobs = $api.useQuery('get', '/v1/jobs');
   const active = (jobs.data ?? []).filter((j) => !['closed', 'cancelled'].includes(j.state));
@@ -31,12 +33,12 @@ export default function Home() {
 
   return (
     <Screen refreshing={jobs.isRefetching} onRefresh={() => void jobs.refetch()}>
-      <Heading>{firstName ? `Namaste, ${firstName}` : 'Namaste'}</Heading>
+      <Heading>{firstName ? t('Namaste, {name}', { name: firstName }) : t('Namaste')}</Heading>
       <Body muted>
-        What do you need done? Post once and verified professionals nearby send quotes.
+        {t('What do you need done? Post once and verified professionals nearby send quotes.')}
       </Body>
       <Button
-        title="Post a requirement"
+        title={t('Post a requirement')}
         kind="accent"
         testID="post-requirement"
         onPress={() => router.push('/requirement/new')}
@@ -46,18 +48,18 @@ export default function Home() {
           key={s.type}
           onPress={() => router.push({ pathname: '/requirement/new', params: { type: s.type } })}
         >
-          <Title>{s.title}</Title>
-          <Small>{s.body}</Small>
+          <Title>{t(s.title)}</Title>
+          <Small>{t(s.body)}</Small>
         </Card>
       ))}
       {active.length > 0 ? (
         <>
-          <Title>Active jobs</Title>
+          <Title>{t('Active jobs')}</Title>
           {active.map((j) => (
             <Card key={j.id} onPress={() => router.push(`/job/${j.id}`)}>
               <Row>
                 <Body>{rupees(j.agreedTotalPaise)}</Body>
-                <Badge label={jobStateLabel(j.state)} tone={jobTone(j.state)} />
+                <Badge label={d.jobState[j.state]} tone={jobTone(j.state)} />
               </Row>
               <Title>{j.title}</Title>
             </Card>

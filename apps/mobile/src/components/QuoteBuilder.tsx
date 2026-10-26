@@ -4,6 +4,7 @@ import { createQuoteSchema } from '@setu/schemas';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { rupees } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 import { Button, Card, Chip, Chips, Divider, Field, Notice, Row, Small, Title } from './ui';
 
 interface Line {
@@ -39,6 +40,7 @@ export function QuoteBuilder({
   onSubmit: (body: QuoteBody, message?: string) => void;
   withMessage?: boolean;
 }) {
+  const { t } = useI18n();
   const [lines, setLines] = useState<Line[]>(
     initial?.items.map((i) => ({
       description: i.description,
@@ -82,8 +84,9 @@ export function QuoteBuilder({
     });
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
-      const line = typeof issue?.path[1] === 'number' ? `Line ${issue.path[1] + 1}: ` : '';
-      return setLocalError(`${line}${issue?.message ?? 'Check the quote'}`);
+      const line =
+        typeof issue?.path[1] === 'number' ? `${t('Line {n}', { n: issue.path[1] + 1 })}: ` : '';
+      return setLocalError(`${line}${issue?.message ?? t('Check the quote')}`);
     }
     onSubmit(parsed.data, message.trim() || undefined);
   }
@@ -93,22 +96,25 @@ export function QuoteBuilder({
       {lines.map((l, idx) => (
         <Card key={idx}>
           <Row>
-            <Title>Item {idx + 1}</Title>
+            <Title>{t('Item {n}', { n: idx + 1 })}</Title>
             {lines.length > 1 ? (
-              <Chip label="Remove" onPress={() => setLines(lines.filter((_, i) => i !== idx))} />
+              <Chip
+                label={t('Remove')}
+                onPress={() => setLines(lines.filter((_, i) => i !== idx))}
+              />
             ) : null}
           </Row>
           <Field
-            label="Description"
+            label={t('Description')}
             testID={`item-${idx}-description`}
             value={l.description}
             onChangeText={(v) => set(idx, { description: v })}
-            placeholder="e.g. Replace kitchen mixer tap"
+            placeholder={t('e.g. Replace kitchen mixer tap')}
           />
           <Row>
             <View style={{ flex: 1 }}>
               <Field
-                label="Qty"
+                label={t('Qty')}
                 value={l.quantity}
                 onChangeText={(v) => set(idx, { quantity: v })}
                 keyboardType="decimal-pad"
@@ -116,15 +122,15 @@ export function QuoteBuilder({
             </View>
             <View style={{ flex: 1 }}>
               <Field
-                label="Unit"
+                label={t('Unit')}
                 value={l.unit}
                 onChangeText={(v) => set(idx, { unit: v })}
-                placeholder="pc, sqft"
+                placeholder={t('pc, sqft')}
               />
             </View>
             <View style={{ flex: 1.4 }}>
               <Field
-                label="Rate (₹)"
+                label={t('Rate (₹)')}
                 testID={`item-${idx}-price`}
                 value={l.price}
                 onChangeText={(v) => set(idx, { price: v })}
@@ -134,35 +140,35 @@ export function QuoteBuilder({
           </Row>
         </Card>
       ))}
-      <Button title="Add item" kind="outline" onPress={() => setLines([...lines, blank()])} />
+      <Button title={t('Add item')} kind="outline" onPress={() => setLines([...lines, blank()])} />
 
       <Card>
-        <Title>GST</Title>
+        <Title>{t('GST')}</Title>
         <Chips>
-          <Chip label="No GST" selected={gstRate === null} onPress={() => setGstRate(null)} />
+          <Chip label={t('No GST')} selected={gstRate === null} onPress={() => setGstRate(null)} />
           {GST_RATES.filter((r) => r > 0).map((r) => (
             <Chip key={r} label={`${r}%`} selected={gstRate === r} onPress={() => setGstRate(r)} />
           ))}
         </Chips>
         {!gstRegistered && gstRate !== null ? (
-          <Small>Add your GSTIN in your profile to charge GST.</Small>
+          <Small>{t('Add your GSTIN in your profile to charge GST.')}</Small>
         ) : null}
       </Card>
 
       <Field
-        label="Notes for the customer (optional)"
+        label={t('Notes for the customer (optional)')}
         value={notes}
         onChangeText={setNotes}
         multiline
-        placeholder="What's included, warranty, materials"
+        placeholder={t("What's included, warranty, materials")}
       />
       <Card>
-        <Title>Quote valid for</Title>
+        <Title>{t('Quote valid for')}</Title>
         <Chips>
           {[3, 7, 15].map((d) => (
             <Chip
               key={d}
-              label={`${d} days`}
+              label={t('{n} days', { n: d })}
               selected={validDays === d}
               onPress={() => setValidDays(d)}
             />
@@ -171,27 +177,27 @@ export function QuoteBuilder({
       </Card>
       {withMessage ? (
         <Field
-          label="Message (optional)"
+          label={t('Message (optional)')}
           value={message}
           onChangeText={setMessage}
-          placeholder="What changed in this revision"
+          placeholder={t('What changed in this revision')}
         />
       ) : null}
 
       <Card>
         <Row>
-          <Small>Subtotal</Small>
+          <Small>{t('Subtotal')}</Small>
           <Small>{rupees(totals.subtotal)}</Small>
         </Row>
         {totals.gst ? (
           <Row>
-            <Small>GST {totals.gst.rate}%</Small>
+            <Small>{t('GST {rate}%', { rate: totals.gst.rate })}</Small>
             <Small>{rupees(totals.gst.totalTax)}</Small>
           </Row>
         ) : null}
         <Divider />
         <Row>
-          <Title>Customer pays</Title>
+          <Title>{t('Customer pays')}</Title>
           <Title>{rupees(totals.total)}</Title>
         </Row>
       </Card>

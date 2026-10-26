@@ -17,9 +17,11 @@ import {
 } from '@/components/ui';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { rupees, tradeLabel, when } from '@/lib/format';
+import { QUOTE_STATUS_LABEL, rupees, tradeName, when } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
 
 export default function QuoteDetail() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const path = { params: { path: { id } } };
   const quote = $api.useQuery('get', '/v1/quotes/{id}', path);
@@ -58,14 +60,18 @@ export default function QuoteDetail() {
     <Screen>
       <Card>
         <Row>
-          <Title>{p?.displayName ?? 'Professional'}</Title>
-          {p?.verificationStatus === 'verified' ? <Badge label="Verified" tone="success" /> : null}
+          <Title>{p?.displayName ?? t('Professional')}</Title>
+          {p?.verificationStatus === 'verified' ? (
+            <Badge label={t('Verified')} tone="success" />
+          ) : null}
         </Row>
         {p ? (
           <Small>
-            {p.trades.map(tradeLabel).join(', ')}
+            {p.trades.map((s) => tradeName(s, t)).join(', ')}
             {p.ratingAvg ? ` · ★ ${p.ratingAvg.toFixed(1)} (${p.ratingCount})` : ''}
-            {p.avgResponseMinutes ? ` · replies in ~${p.avgResponseMinutes} min` : ''}
+            {p.avgResponseMinutes
+              ? ` · ${t('replies in ~{n} min', { n: p.avgResponseMinutes })}`
+              : ''}
           </Small>
         ) : null}
       </Card>
@@ -82,31 +88,34 @@ export default function QuoteDetail() {
         ))}
         <Divider />
         <Row>
-          <Small>Subtotal</Small>
+          <Small>{t('Subtotal')}</Small>
           <Small>{rupees(q.subtotalPaise)}</Small>
         </Row>
         {q.gstPaise > 0 ? (
           <Row>
-            <Small>GST {q.gstRate}%</Small>
+            <Small>{t('GST {rate}%', { rate: q.gstRate ?? 0 })}</Small>
             <Small>{rupees(q.gstPaise)}</Small>
           </Row>
         ) : null}
         <Row>
-          <Title>Total</Title>
+          <Title>{t('Total')}</Title>
           <Title>{rupees(q.totalPaise)}</Title>
         </Row>
         {q.notes ? <Body muted>{q.notes}</Body> : null}
-        {q.validUntil ? <Small>Valid until {when(q.validUntil)}</Small> : null}
+        {q.validUntil ? (
+          <Small>{t('Valid until {when}', { when: when(q.validUntil) })}</Small>
+        ) : null}
       </Card>
 
       {p ? <PartnerReviews partnerId={p.id} /> : null}
 
       {q.thread.length > 1 ? (
         <Card>
-          <Title>Conversation</Title>
+          <Title>{t('Conversation')}</Title>
           {q.thread.slice(1).map((m, idx) => (
             <Body key={idx}>
-              {m.message ?? `Revised quote (v${m.version})`} <Small>· {when(m.createdAt)}</Small>
+              {m.message ?? t('Revised quote (v{n})', { n: m.version })}{' '}
+              <Small>· {when(m.createdAt)}</Small>
             </Body>
           ))}
         </Card>
@@ -116,33 +125,34 @@ export default function QuoteDetail() {
         <>
           {accept.error ? <Notice>{errorMessage(accept.error)}</Notice> : null}
           <Button
-            title={`Hire for ${rupees(q.totalPaise)}`}
+            title={t('Hire for {amount}', { amount: rupees(q.totalPaise) })}
             kind="accent"
             testID="accept-quote"
             loading={accept.isPending}
             onPress={() => accept.mutate(path)}
           />
           <Small>
-            You pay through Setu after hiring. The money is held safely and released to the
-            professional only when you confirm the work is done.
+            {t(
+              'You pay through Setu after hiring. The money is held safely and released to the professional only when you confirm the work is done.',
+            )}
           </Small>
           <Card>
-            <Title>Ask for changes</Title>
+            <Title>{t('Ask for changes')}</Title>
             <Field
-              label="Message"
+              label={t('Message')}
               value={message}
               onChangeText={setMessage}
-              placeholder="e.g. Can you include the fittings?"
+              placeholder={t('e.g. Can you include the fittings?')}
             />
             <Field
-              label="Your price (₹, optional)"
+              label={t('Your price (₹, optional)')}
               value={counter}
               onChangeText={setCounter}
               keyboardType="number-pad"
             />
             {negotiate.error ? <Notice>{errorMessage(negotiate.error)}</Notice> : null}
             <Button
-              title="Send"
+              title={t('Send')}
               kind="outline"
               loading={negotiate.isPending}
               disabled={message.trim().length < 3}
@@ -159,7 +169,9 @@ export default function QuoteDetail() {
           </Card>
         </>
       ) : (
-        <Notice tone="info">This quote is {q.status}.</Notice>
+        <Notice tone="info">
+          {t('This quote is {status}.', { status: t(QUOTE_STATUS_LABEL[q.status]).toLowerCase() })}
+        </Notice>
       )}
     </Screen>
   );

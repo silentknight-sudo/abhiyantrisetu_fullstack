@@ -19,16 +19,12 @@ import {
 import { $api, client, queryClient } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { errorMessage } from '@/lib/errors';
-import { tradeLabel } from '@/lib/format';
+import { tradeName, VERIFICATION_LABEL } from '@/lib/format';
+import { LANGUAGE_NAMES, useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/session';
 
-const LANG: Record<(typeof LOCALES)[number], string> = {
-  en: 'English',
-  hi: 'हिन्दी',
-  hinglish: 'Hinglish',
-};
-
 export default function Account() {
+  const { t, locale, setLocale } = useI18n();
   const { signOut } = useSession();
   const me = $api.useQuery('get', '/v1/me');
   const partner = $api.useQuery('get', '/v1/partners/me', {}, { enabled: IS_PARTNER });
@@ -49,38 +45,40 @@ export default function Account() {
       await client.api.DELETE('/v1/me');
       await signOut();
     };
-    const msg =
-      'This removes your personal details. Past jobs and payments stay on record without your name.';
+    const title = t('Delete account?');
+    const msg = t(
+      'This removes your personal details. Past jobs and payments stay on record without your name.',
+    );
     if (Platform.OS === 'web') {
-      if (globalThis.confirm?.(`Delete account?\n\n${msg}`)) void run();
+      if (globalThis.confirm?.(`${title}\n\n${msg}`)) void run();
       return;
     }
-    Alert.alert('Delete account?', msg, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => void run() },
+    Alert.alert(title, msg, [
+      { text: t('Cancel'), style: 'cancel' },
+      { text: t('Delete'), style: 'destructive', onPress: () => void run() },
     ]);
   }
 
   return (
     <Screen>
       <Card>
-        <Small>Signed in as</Small>
+        <Small>{t('Signed in as')}</Small>
         <Title>{me.data?.phone ?? '…'}</Title>
-        <Field label="Your name" value={name} onChangeText={setName} placeholder="Name" />
-        <Small>Language</Small>
+        <Field label={t('Your name')} value={name} onChangeText={setName} placeholder={t('Name')} />
+        <Small>{t('Language')}</Small>
         <Chips>
           {LOCALES.map((l) => (
             <Chip
               key={l}
-              label={LANG[l]}
-              selected={me.data?.locale === l}
-              onPress={() => update.mutate({ body: { locale: l } })}
+              label={LANGUAGE_NAMES[l]}
+              selected={locale === l}
+              onPress={() => setLocale(l)}
             />
           ))}
         </Chips>
         {update.error ? <Notice>{errorMessage(update.error)}</Notice> : null}
         <Button
-          title="Save"
+          title={t('Save')}
           kind="outline"
           loading={update.isPending}
           disabled={!name.trim() || name === me.data?.name}
@@ -90,7 +88,7 @@ export default function Account() {
 
       <Card>
         <Row>
-          <Body>Updates on WhatsApp</Body>
+          <Body>{t('Updates on WhatsApp')}</Body>
           <Switch
             value={whatsapp}
             onValueChange={(v) => {
@@ -100,8 +98,10 @@ export default function Account() {
           />
         </Row>
         <Small>
-          {IS_PARTNER ? 'New leads with one-tap accept or decline.' : 'Quotes and job updates.'} You
-          can turn this off any time.
+          {IS_PARTNER
+            ? t('New leads with one-tap accept or decline.')
+            : t('Quotes and job updates.')}{' '}
+          {t('You can turn this off any time.')}
         </Small>
       </Card>
 
@@ -110,24 +110,29 @@ export default function Account() {
           <Row>
             <Title>{partner.data.displayName}</Title>
             <Badge
-              label={partner.data.verificationStatus.replace('_', ' ')}
+              label={t(VERIFICATION_LABEL[partner.data.verificationStatus])}
               tone={partner.data.verificationStatus === 'verified' ? 'success' : 'warning'}
             />
           </Row>
           <Small>
-            {partner.data.trades.map(tradeLabel).join(', ')} · within {partner.data.serviceRadiusKm}{' '}
-            km
+            {partner.data.trades.map((s) => tradeName(s, t)).join(', ')} ·{' '}
+            {t('within {km} km', { km: partner.data.serviceRadiusKm })}
           </Small>
           <Button
-            title="Edit business profile"
+            title={t('Edit business profile')}
             kind="outline"
             onPress={() => router.push('/onboarding')}
           />
         </Card>
       ) : null}
 
-      <Button title="Sign out" kind="outline" testID="sign-out" onPress={() => void signOut()} />
-      <Button title="Delete account" kind="danger" onPress={confirmDelete} />
+      <Button
+        title={t('Sign out')}
+        kind="outline"
+        testID="sign-out"
+        onPress={() => void signOut()}
+      />
+      <Button title={t('Delete account')} kind="danger" onPress={confirmDelete} />
     </Screen>
   );
 }

@@ -8,6 +8,8 @@ import { AuthGuard } from './common/auth';
 import { ConfigModule } from './config/config.module';
 import { ENV, type Env } from './config/env';
 import { DbModule } from './db/db.module';
+import { RateLimitModule, THROTTLER_STORAGE_REDIS } from './common/rate-limit.module';
+import type { RedisThrottlerStorage } from './common/redis-throttler.storage';
 import { CatalogController } from './modules/catalog/catalog.controller';
 import { HealthController } from './modules/health/health.controller';
 import { IdentityModule } from './modules/identity/identity.module';
@@ -35,8 +37,15 @@ import { AdminModule } from './modules/admin/admin.module';
         verifyOptions: { issuer: 'abhiyantrisetu', audience: 'setu-api' },
       }),
     }),
-    // Per-IP limits. In-memory store: move to a Redis store before running >1 API task.
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
+    // Per-IP limits, shared through Redis in production so they hold across API tasks.
+    ThrottlerModule.forRootAsync({
+      imports: [RateLimitModule],
+      inject: [THROTTLER_STORAGE_REDIS],
+      useFactory: (storage: RedisThrottlerStorage | null) => ({
+        throttlers: [{ name: 'default', ttl: 60_000, limit: 120 }],
+        ...(storage ? { storage } : {}),
+      }),
+    }),
     IdentityModule,
     RequirementsModule,
     JobsModule,

@@ -34,6 +34,8 @@ const envSchema = z
     PLATFORM_FEE_BPS: z.coerce.number().int().min(0).max(10_000).default(0),
     // inline: send during the request (dev/test). queue: hand to the BullMQ worker (production).
     NOTIFICATIONS_DELIVERY: z.enum(['inline', 'queue']).default('inline'),
+    /** Where rate-limit counters live; `redis` is required to run more than one API task. */
+    THROTTLE_STORE: z.enum(['memory', 'redis']).optional(),
     CORS_ORIGINS: z
       .string()
       .default('')

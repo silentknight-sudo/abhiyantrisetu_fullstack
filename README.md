@@ -137,6 +137,5 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-1. Move throttling to a Redis store before running more than one API task.
-2. Refunds through Razorpay when ops resolves a dispute as a refund (today: issued from the Razorpay dashboard).
-3. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.
+1. Refunds through Razorpay when ops resolves a dispute as a refund (today: issued from the Razorpay dashboard).
+2. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.

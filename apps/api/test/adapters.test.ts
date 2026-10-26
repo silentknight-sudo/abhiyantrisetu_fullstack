@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { useRedisStore } from '../src/common/rate-limit.module';
 import { loadEnv } from '../src/config/env';
 import { DisabledSmsProvider } from '../src/modules/identity/sms/disabled.provider';
 import { Msg91SmsProvider } from '../src/modules/identity/sms/msg91.provider';
@@ -27,6 +28,19 @@ describe('env validation', () => {
         PAYMENTS_PROVIDER: 'disabled',
       }).SMS_PROVIDER,
     ).toBe('disabled');
+  });
+  it('keeps rate limits in Redis in production unless told otherwise', () => {
+    const prod = {
+      ...base,
+      NODE_ENV: 'production',
+      SMS_PROVIDER: 'disabled',
+      WHATSAPP_PROVIDER: 'disabled',
+      PUSH_PROVIDER: 'disabled',
+      PAYMENTS_PROVIDER: 'disabled',
+    };
+    expect(useRedisStore(loadEnv(prod))).toBe(true);
+    expect(useRedisStore(loadEnv({ ...prod, THROTTLE_STORE: 'memory' }))).toBe(false);
+    expect(useRedisStore(loadEnv(base))).toBe(false);
   });
   it('forbids console WhatsApp and push in production', () => {
     expect(() =>

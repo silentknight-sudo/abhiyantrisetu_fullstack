@@ -16,16 +16,7 @@ import {
 } from '@/components/ui';
 import { $api, client, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { ago, LEAD_STATUS, requirementTypeLabel, rupees, when } from '@/lib/format';
-
-const DETAIL_LABELS: Record<string, string> = {
-  urgency: 'When',
-  propertyType: 'Property',
-  scope: 'Areas',
-  areaSqft: 'Area (sq ft)',
-  topic: 'Topic',
-  mode: 'Consultation',
-};
+import { ago, detailLines, LEAD_STATUS, requirementTypeLabel, rupees, when } from '@/lib/format';
 
 export default function LeadDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -59,9 +50,7 @@ export default function LeadDetail() {
       </Screen>
     );
   const r = lead.requirement;
-  const details = Object.entries(r.details).filter(
-    ([k, v]) => DETAIL_LABELS[k] && v !== undefined && v !== null,
-  );
+  const details = detailLines(r.details);
   const description = typeof r.details.description === 'string' ? r.details.description : null;
   const canQuote =
     ['sent', 'seen'].includes(lead.status) && ['requested', 'matched', 'quoted'].includes(r.status);
@@ -96,10 +85,8 @@ export default function LeadDetail() {
         <Title>{r.title}</Title>
         {description ? <Body>{description}</Body> : null}
         <PhotoStrip urls={r.photoUrls} />
-        {details.map(([k, v]) => (
-          <Small key={k}>
-            {DETAIL_LABELS[k]}: {Array.isArray(v) ? v.join(', ') : String(v).replace(/_/g, ' ')}
-          </Small>
+        {details.map((line) => (
+          <Small key={line}>{line}</Small>
         ))}
         <Small>
           {[lead.area.sector, lead.area.city, lead.area.pincode].filter(Boolean).join(', ')}

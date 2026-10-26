@@ -15,6 +15,12 @@ const STARTS = [
     title: 'Ask an expert',
     body: 'Structural, architect, interior, cost estimate',
   },
+  { type: 'material_rfq', title: 'Buy materials', body: 'Cement, steel, sand, bricks, tiles' },
+  {
+    type: 'equipment',
+    title: 'Rent equipment',
+    body: 'JCB, mixer, scaffolding, with or without operator',
+  },
 ] as const;
 
 export default function Home() {

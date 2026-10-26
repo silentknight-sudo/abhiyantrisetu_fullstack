@@ -21,6 +21,7 @@ import {
   ago,
   requirementStatusLabel,
   requirementTone,
+  detailLines,
   requirementTypeLabel,
   rupees,
 } from '@/lib/format';
@@ -70,6 +71,9 @@ export default function RequirementDetail() {
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body muted>{description}</Body> : null}
+        {detailLines(r.details).map((line) => (
+          <Small key={line}>{line}</Small>
+        ))}
         <PhotoStrip urls={r.photoUrls} />
         {r.budgetMaxPaise ? <Small>Budget up to {rupees(r.budgetMaxPaise)}</Small> : null}
       </Card>

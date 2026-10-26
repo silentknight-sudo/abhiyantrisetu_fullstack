@@ -58,3 +58,52 @@ export const LEAD_STATUS = {
   declined: ['Declined', 'danger'],
   expired: ['Expired', 'danger'],
 } as const;
+
+const pretty = (v: unknown) => String(v).replace(/_/g, ' ');
+const URGENCY_LABEL: Record<string, string> = {
+  asap: 'right away',
+  today: 'today',
+  this_week: 'this week',
+  flexible: 'flexible',
+};
+
+/** A requirement's type-specific details as short readable lines (any request type). */
+export function detailLines(details: Record<string, unknown>): string[] {
+  const d = details as {
+    urgency?: string;
+    propertyType?: string;
+    scope?: string[];
+    areaSqft?: number;
+    topic?: string;
+    mode?: string;
+    items?: { name: string; quantity: number; unit: string; brand?: string }[];
+    needsUnloading?: boolean;
+    deliveryBy?: string;
+    equipmentType?: string;
+    quantity?: number;
+    startDate?: string;
+    durationDays?: number;
+    withOperator?: boolean;
+    spec?: string;
+  };
+  const lines: string[] = [];
+  if (d.urgency) lines.push(`When: ${URGENCY_LABEL[d.urgency] ?? pretty(d.urgency)}`);
+  if (d.propertyType) lines.push(`Property: ${pretty(d.propertyType)}`);
+  if (d.scope?.length) lines.push(`Areas: ${d.scope.join(', ')}`);
+  if (d.areaSqft) lines.push(`Area: ${d.areaSqft} sq ft`);
+  if (d.topic) lines.push(`Topic: ${pretty(d.topic)}`);
+  if (d.mode) lines.push(`Consultation: ${pretty(d.mode)}`);
+  for (const i of d.items ?? []) {
+    lines.push(`${i.name}${i.brand ? ` (${i.brand})` : ''}: ${i.quantity} ${i.unit}`);
+  }
+  if (d.items?.length) lines.push(d.needsUnloading ? 'Supplier unloads' : 'Customer unloads');
+  if (d.deliveryBy) lines.push(`Deliver by ${d.deliveryBy}`);
+  if (d.equipmentType) {
+    lines.push(`${d.quantity && d.quantity > 1 ? `${d.quantity} × ` : ''}${d.equipmentType}`);
+    if (d.startDate)
+      lines.push(`From ${d.startDate} for ${d.durationDays} day${d.durationDays === 1 ? '' : 's'}`);
+    lines.push(d.withOperator ? 'With operator' : 'Machine only');
+  }
+  if (d.spec) lines.push(d.spec);
+  return lines;
+}

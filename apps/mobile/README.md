@@ -38,7 +38,7 @@ Profiles in `eas.json` set `APP_VARIANT` and `EXPO_PUBLIC_API_URL`.
 src/app/            routes (Expo Router)
   login.tsx           phone OTP (partner logins bind to the device)
   (tabs)/             home, requests (customer) · leads (partner) · jobs, account (both)
-  requirement/        post (service, renovation, consult) and detail with quotes
+  requirement/        post (repair, renovation, consult, materials, equipment) and detail with quotes
   quote/[id].tsx      compare, negotiate, hire
   job/[id].tsx        schedule, start code, complete/confirm, pay, dispute, contact
   lead/[id].tsx       lead detail and quote builder (send, revise, withdraw)
@@ -47,4 +47,4 @@ src/components/     UI kit on @setu/ui-tokens, quote builder, Razorpay checkout
 src/lib/            API client and session (SecureStore), push registration, formatting
 ```
 
-Not in v1 yet: material RFQs and equipment hire (on the website), in-app chat.
+Not in v1 yet: BOQ upload for material orders, in-app chat.

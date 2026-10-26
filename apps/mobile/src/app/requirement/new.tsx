@@ -3,6 +3,7 @@ import { createRequirementSchema } from '@setu/schemas';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import {
   Body,
   Button,
@@ -19,13 +20,54 @@ import { PhotoPicker } from '@/components/PhotoPicker';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 
-type Kind = 'service' | 'renovation' | 'consult';
+type Kind = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
 const KINDS: { kind: Kind; label: string }[] = [
   { kind: 'service', label: 'Repair & maintain' },
   { kind: 'renovation', label: 'Renovate' },
   { kind: 'consult', label: 'Ask an expert' },
+  { kind: 'material_rfq', label: 'Buy materials' },
+  { kind: 'equipment', label: 'Rent equipment' },
 ];
+const TITLE_HINT: Record<Kind, string> = {
+  service: 'e.g. Kitchen tap leaking',
+  renovation: 'e.g. Redo the master bathroom',
+  consult: 'e.g. Crack in the living room beam',
+  material_rfq: 'e.g. Cement and TMT bars for the slab',
+  equipment: 'e.g. JCB for foundation digging',
+};
+/** Units the materials schema accepts. */
+const UNITS = [
+  'bag',
+  'kg',
+  'tonne',
+  'cft',
+  'cum',
+  'sqft',
+  'piece',
+  'litre',
+  'metre',
+  'truck',
+] as const;
+type Unit = (typeof UNITS)[number];
+interface MaterialRow {
+  name: string;
+  quantity: string;
+  unit: Unit;
+}
+
+/** The next 7 days as YYYY-MM-DD (local time) with a short label. */
+function nextDays(n = 7) {
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i + 1);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return {
+      iso,
+      label: d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }),
+    };
+  });
+}
 const URGENCY = [
   ['asap', 'Right away'],
   ['today', 'Today'],
@@ -78,6 +120,14 @@ export default function NewRequirement() {
   const [gps, setGps] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [materials, setMaterials] = useState<MaterialRow[]>([
+    { name: '', quantity: '', unit: 'bag' },
+  ]);
+  const [needsUnloading, setNeedsUnloading] = useState(false);
+  const [equipmentType, setEquipmentType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [durationDays, setDurationDays] = useState('3');
+  const [withOperator, setWithOperator] = useState(true);
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -120,7 +170,26 @@ export default function NewRequirement() {
               areaSqft: areaSqft ? Number(areaSqft) : undefined,
               photos,
             }
-          : { topic, description };
+          : kind === 'consult'
+            ? { topic, description }
+            : kind === 'material_rfq'
+              ? {
+                  items: materials
+                    .filter((m) => m.name.trim() || m.quantity.trim())
+                    .map((m) => ({
+                      name: m.name.trim(),
+                      quantity: Number(m.quantity),
+                      unit: m.unit,
+                    })),
+                  needsUnloading,
+                }
+              : {
+                  equipmentType,
+                  startDate,
+                  durationDays: Number(durationDays),
+                  withOperator,
+                  spec: description.trim() || undefined,
+                };
     const rupees = Number(budget.replace(/[^\d]/g, ''));
     const parsed = createRequirementSchema.safeParse({
       type: kind,
@@ -177,7 +246,7 @@ export default function NewRequirement() {
         testID="title"
         value={title}
         onChangeText={setTitle}
-        placeholder="e.g. Kitchen tap leaking"
+        placeholder={TITLE_HINT[kind]}
         maxLength={120}
       />
 
@@ -225,15 +294,120 @@ export default function NewRequirement() {
         </Card>
       ) : null}
 
-      <Field
-        label="Describe the work"
-        testID="description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-        placeholder="What is the problem, how big is the job, anything the professional should know"
-        maxLength={2000}
-      />
+      {kind === 'material_rfq' ? (
+        <Card>
+          <Title>What do you need?</Title>
+          {materials.map((m, i) => (
+            <View key={i} style={{ gap: 8 }}>
+              <Field
+                label={`Item ${i + 1}`}
+                testID={`material-${i}-name`}
+                value={m.name}
+                onChangeText={(v) =>
+                  setMaterials(materials.map((r, j) => (j === i ? { ...r, name: v } : r)))
+                }
+                placeholder="e.g. OPC 53 grade cement"
+              />
+              <Field
+                label="Quantity"
+                testID={`material-${i}-qty`}
+                value={m.quantity}
+                onChangeText={(v) =>
+                  setMaterials(materials.map((r, j) => (j === i ? { ...r, quantity: v } : r)))
+                }
+                keyboardType="decimal-pad"
+              />
+              <Chips>
+                {UNITS.map((u) => (
+                  <Chip
+                    key={u}
+                    label={u}
+                    selected={m.unit === u}
+                    onPress={() =>
+                      setMaterials(materials.map((r, j) => (j === i ? { ...r, unit: u } : r)))
+                    }
+                  />
+                ))}
+              </Chips>
+            </View>
+          ))}
+          <Button
+            title="Add another item"
+            kind="outline"
+            onPress={() => setMaterials([...materials, { name: '', quantity: '', unit: 'bag' }])}
+          />
+          <Chips>
+            <Chip
+              label="We will unload"
+              selected={!needsUnloading}
+              onPress={() => setNeedsUnloading(false)}
+            />
+            <Chip
+              label="Supplier unloads"
+              selected={needsUnloading}
+              onPress={() => setNeedsUnloading(true)}
+            />
+          </Chips>
+        </Card>
+      ) : null}
+
+      {kind === 'equipment' ? (
+        <Card>
+          <Field
+            label="Equipment"
+            testID="equipment-type"
+            value={equipmentType}
+            onChangeText={setEquipmentType}
+            placeholder="e.g. JCB 3DX, concrete mixer, scaffolding"
+          />
+          <Title>Start date</Title>
+          <Chips>
+            {nextDays().map((d) => (
+              <Chip
+                key={d.iso}
+                label={d.label}
+                selected={startDate === d.iso}
+                onPress={() => setStartDate(d.iso)}
+              />
+            ))}
+          </Chips>
+          <Field
+            label="For how many days?"
+            testID="duration-days"
+            value={durationDays}
+            onChangeText={setDurationDays}
+            keyboardType="number-pad"
+          />
+          <Chips>
+            <Chip
+              label="With operator"
+              selected={withOperator}
+              onPress={() => setWithOperator(true)}
+            />
+            <Chip
+              label="Machine only"
+              selected={!withOperator}
+              onPress={() => setWithOperator(false)}
+            />
+          </Chips>
+        </Card>
+      ) : null}
+
+      {kind !== 'material_rfq' ? (
+        <Field
+          label={kind === 'equipment' ? 'Anything else (optional)' : 'Describe the work'}
+          testID="description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          placeholder={
+            kind === 'equipment'
+              ? 'Site access, soil type, working hours'
+              : 'What is the problem, how big is the job, anything the professional should know'
+          }
+          maxLength={kind === 'equipment' ? 500 : 2000}
+        />
+      ) : null}
 
       {kind === 'service' ? (
         <Card>
@@ -246,7 +420,7 @@ export default function NewRequirement() {
         </Card>
       ) : null}
 
-      {kind !== 'consult' ? (
+      {kind === 'service' || kind === 'renovation' ? (
         <Card>
           <Title>Photos (optional)</Title>
           <PhotoPicker

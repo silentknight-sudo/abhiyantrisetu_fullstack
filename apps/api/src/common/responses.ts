@@ -1,4 +1,7 @@
 import {
+  jobReviewResponse,
+  reviewResponse,
+  uploadSlotResponse,
   adminRefundResponse,
   adminJobResponse,
   adminOverviewResponse,
@@ -67,3 +70,6 @@ export class AdminJobDto extends createZodDto(adminJobResponse, { codec: true })
 export class PayoutDueDto extends createZodDto(payoutDueResponse, { codec: true }) {}
 export class PayoutRecordedDto extends createZodDto(payoutRecordedResponse, { codec: true }) {}
 export class AdminRefundDto extends createZodDto(adminRefundResponse, { codec: true }) {}
+export class UploadSlotDto extends createZodDto(uploadSlotResponse, { codec: true }) {}
+export class ReviewDto extends createZodDto(reviewResponse, { codec: true }) {}
+export class JobReviewDto extends createZodDto(jobReviewResponse, { codec: true }) {}

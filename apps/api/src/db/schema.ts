@@ -711,6 +711,33 @@ export const payments = pgTable(
   (t) => [index('payments_job_idx').on(t.jobId)],
 );
 
+/** One review per closed job, by its customer; the partner can reply once. */
+export const reviews = pgTable(
+  'reviews',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    jobId: uuid('job_id')
+      .notNull()
+      .unique()
+      .references(() => jobs.id),
+    partnerId: uuid('partner_id')
+      .notNull()
+      .references(() => partners.id),
+    customerId: uuid('customer_id')
+      .notNull()
+      .references(() => users.id),
+    rating: smallint('rating').notNull(),
+    comment: text('comment'),
+    partnerReply: text('partner_reply'),
+    repliedAt: timestamp('replied_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('reviews_partner_idx').on(t.partnerId, t.createdAt),
+    check('reviews_rating_range', sql`${t.rating} BETWEEN 1 AND 5`),
+  ],
+);
+
 export const refundStatusEnum = pgEnum('refund_status', [
   'requested',
   'sending',

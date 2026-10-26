@@ -1,4 +1,5 @@
 import { type INestApplication, VersioningType } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import helmet from 'helmet';
@@ -8,6 +9,8 @@ import type { Env } from './config/env';
 /** Shared by main.ts and the e2e tests so tests exercise the real HTTP setup. */
 export function configureApp(app: INestApplication, env: Pick<Env, 'CORS_ORIGINS'>) {
   app.use(helmet());
+  // Photo bytes for the local (development) upload store; JSON stays the default elsewhere.
+  (app as NestExpressApplication).useBodyParser('raw', { type: 'image/*', limit: '10mb' });
   app.enableCors({ origin: env.CORS_ORIGINS, credentials: true });
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.enableShutdownHooks();

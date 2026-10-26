@@ -114,6 +114,8 @@ GET  /v1/quotes/:id              POST /v1/quotes/:id/{revise|withdraw|negotiate|
 GET  /v1/requirements/:id/quotes
 GET  /v1/admin/overview          GET /v1/admin/jobs?state=        GET|POST /v1/admin/payouts
 GET  /v1/admin/refunds           POST /v1/admin/refunds/:id/retry
+POST /v1/uploads                 POST|GET /v1/jobs/:id/review     GET /v1/partners/:id/reviews
+POST /v1/reviews/:id/reply
 POST /v1/payments/orders         POST /v1/payments/verify        GET /v1/jobs/:id/payments
 POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 ```
@@ -124,6 +126,7 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 - **Money is integer paise** (`bigint` in Postgres). GST is computed in `@setu/domain` so the quote screen, invoice and API agree.
 - **The ledger is append-only and double-entry.** Every rupee is a balanced transaction in `ledger_entries`; a database trigger rejects UPDATE and DELETE. Customer payments are held per job and released to the partner (less `PLATFORM_FEE_BPS`) only when the job closes, so disputed money stays held; a cancelled job, or a dispute resolved as a refund, refunds the customer through Razorpay automatically (one refund per payment, failures kept for retry).
 - **No secrets at rest in plaintext**: OTPs, start codes and refresh tokens are stored only as hashes. Aadhaar is masked only.
+- **Photos never pass through the API.** Clients upload straight to S3 with signed, expiring links (SigV4, no AWS SDK) under a key the API chose for them, and the API only accepts a requirement's photos from that user's own prefix.
 - **Every vendor sits behind an adapter** (e.g. `SmsProvider`). Swapping a vendor touches one file.
 - **Clients never talk to the database.** Everything goes through `/v1`.
 - **Every response has a schema.** Controllers declare `@ZodResponse` with a schema from `@setu/schemas`; the API encodes through it (fields not listed are never sent), type-checks the controller against it, and documents it, so `@setu/api-client` is fully typed:
@@ -138,4 +141,4 @@ POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 
 ## Next (Phase 1: core loop)
 
-1. Mobile: photo uploads, ratings and reviews, material RFQs and equipment hire.
+1. Mobile: material RFQs and equipment hire.

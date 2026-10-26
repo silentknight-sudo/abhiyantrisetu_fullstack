@@ -6,4 +6,6 @@ export * from './waitlist';
 export * from './partners';
 export * from './quotes';
 export * from './admin';
+export * from './uploads';
+export * from './reviews';
 export * from './responses';

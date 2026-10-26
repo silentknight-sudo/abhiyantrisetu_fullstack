@@ -93,6 +93,8 @@ export const requirementResponse = z.object({
   hiredAt: timestamp.nullable(),
   createdAt: timestamp,
   updatedAt: timestamp,
+  /** The photos in `details.photos`, as links that expire after 30 minutes. */
+  photoUrls: z.array(z.string()),
 });
 
 export const jobResponse = z.object({
@@ -214,6 +216,7 @@ export const leadInboxItemResponse = z.object({
     budgetMinPaise: true,
     budgetMaxPaise: true,
     createdAt: true,
+    photoUrls: true,
   }),
   area: z.object({ sector: text.nullable(), city: z.string(), pincode: z.string() }),
   distanceKm: z.number(),
@@ -439,3 +442,29 @@ export const adminRefundResponse = z.object({
   createdAt: timestamp,
   updatedAt: timestamp,
 });
+
+/** Where to PUT one photo: send exactly these headers; then pass `fileKey` back to the API. */
+export const uploadSlotResponse = z.object({
+  fileKey: z.string(),
+  upload: z.object({
+    method: z.literal('PUT'),
+    url: z.string(),
+    headers: z.record(z.string(), z.string()),
+  }),
+  expiresInSeconds: z.number().int(),
+});
+
+/** A verified-hire review. Customers appear by first name only. */
+export const reviewResponse = z.object({
+  id: uuid,
+  jobId: uuid,
+  rating: z.number().int().min(1).max(5),
+  comment: text.nullable(),
+  partnerReply: text.nullable(),
+  repliedAt: timestamp.nullable(),
+  createdAt: timestamp,
+  customerFirstName: text.nullable(),
+});
+
+/** GET /jobs/{id}/review: wrapped so "no review yet" is `{ review: null }`. */
+export const jobReviewResponse = z.object({ review: reviewResponse.nullable() });

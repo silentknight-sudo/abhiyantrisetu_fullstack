@@ -22,6 +22,7 @@ The API and the background worker ship as one Docker image (`apps/api/Dockerfile
 | `DATABASE_URL`                                                                               | RDS connection string                                                  | —                                                                                                                                                                                            |
 | `REDIS_URL`                                                                                  | ElastiCache endpoint (notification queue and rate limits)              | —                                                                                                                                                                                            |
 | `THROTTLE_STORE`                                                                             | `redis` (the production default: rate limits shared by every API task) | —                                                                                                                                                                                            |
+| `STORAGE_PROVIDER`                                                                           | `disabled` (no photo uploads yet)                                      | `s3` with `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` (see Photo storage)                                                                                           |
 | `JWT_ACCESS_SECRET`, `OTP_HASH_SECRET`                                                       | 48+ random characters each (`openssl rand -base64 48`)                 | —                                                                                                                                                                                            |
 | `SMS_PROVIDER`                                                                               | `disabled` (login closed; sign-ups still work)                         | `msg91` once DLT templates are approved                                                                                                                                                      |
 | `MSG91_AUTH_KEY`, `MSG91_OTP_TEMPLATE_ID`                                                    | empty                                                                  | from MSG91                                                                                                                                                                                   |
@@ -58,8 +59,39 @@ Staff accounts (role `ops`, `support` or `super_admin`) can call:
 - `GET /v1/admin/waitlist/summary` for counts by role and sector
 - `GET /v1/admin/waitlist/export.csv` for a spreadsheet
 
-Admin portal v1 (Phase 1) will put these behind buttons. Until then, give a staff role to your own account in the database (`update users set roles = '{customer,super_admin}' where phone = '+91…'`) and call the endpoints with your login token.
+The admin portal (`apps/admin`, see its README) shows this list with filters and a CSV download. Give your own account a staff role once in the database (`update users set roles = '{customer,super_admin}' where phone = '+91…'`), then sign in there.
 
-## Before scaling beyond one API task
+## Running more than one API task
 
-Request rate limits are kept in each task's memory. Move them to Redis before running more than one task for real traffic (planned in Phase 1).
+Rate limits are kept in Redis (`THROTTLE_STORE=redis`, the production default), so they hold across tasks behind the load balancer.
+
+## Photo storage (S3)
+
+Customers attach photos to requirements; the apps upload them straight to S3 with signed links that expire (10 minutes to upload, 30 minutes to view). The bucket stays private.
+
+1. Create a bucket in `ap-south-1` (e.g. `setu-uploads`) with **Block all public access** on.
+2. Create an IAM user for the API with only this policy, and an access key for it:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": ["s3:PutObject", "s3:GetObject"],
+         "Resource": "arn:aws:s3:::setu-uploads/u/*"
+       }
+     ]
+   }
+   ```
+3. Bucket CORS, so the website and web previews can upload (the phone apps don't need it):
+   ```json
+   [
+     {
+       "AllowedMethods": ["PUT", "GET"],
+       "AllowedOrigins": ["https://abhiyantrisetu.com"],
+       "AllowedHeaders": ["content-type"],
+       "MaxAgeSeconds": 3600
+     }
+   ]
+   ```
+4. Set `STORAGE_PROVIDER=s3`, `S3_BUCKET`, `S3_REGION=ap-south-1`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`. Until then photo uploads answer _Photo uploads open at launch_; posting without photos works.

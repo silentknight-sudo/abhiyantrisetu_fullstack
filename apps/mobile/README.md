@@ -47,4 +47,4 @@ src/components/     UI kit on @setu/ui-tokens, quote builder, Razorpay checkout
 src/lib/            API client and session (SecureStore), push registration, formatting
 ```
 
-Not in v1 yet: material RFQs and equipment hire (on the website), photo uploads, ratings and reviews, in-app chat.
+Not in v1 yet: material RFQs and equipment hire (on the website), in-app chat.

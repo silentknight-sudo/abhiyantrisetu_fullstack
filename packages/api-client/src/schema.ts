@@ -837,6 +837,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/uploads': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['StorageController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/review': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReviewsController_forJob_v1'];
+    put?: never;
+    post: operations['ReviewsController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/partners/{id}/reviews': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ReviewsController_forPartner_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/reviews/{id}/reply': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['ReviewsController_reply_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -967,6 +1031,7 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      photoUrls: string[];
     };
     CancelRequirementDto: {
       reason: string;
@@ -1274,6 +1339,7 @@ export interface components {
         budgetMaxPaise: number | null;
         /** Format: date-time */
         createdAt: string;
+        photoUrls: string[];
       };
       area: {
         sector: string | null;
@@ -1658,6 +1724,62 @@ export interface components {
       customerName: string | null;
       partnerName: string;
       partnerPhone: string;
+    };
+    UploadRequestDto: {
+      /** @enum {string} */
+      purpose: 'requirement_photo';
+      /** @enum {string} */
+      contentType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/heic';
+      sizeBytes: number;
+    };
+    UploadSlotDto: {
+      fileKey: string;
+      upload: {
+        /** @enum {string} */
+        method: 'PUT';
+        url: string;
+        headers: {
+          [key: string]: string;
+        };
+      };
+      expiresInSeconds: number;
+    };
+    CreateReviewDto: {
+      rating: number;
+      comment?: string;
+    };
+    ReviewDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      jobId: string;
+      rating: number;
+      comment: string | null;
+      partnerReply: string | null;
+      /** Format: date-time */
+      repliedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      customerFirstName: string | null;
+    };
+    JobReviewDto: {
+      review: {
+        /** Format: uuid */
+        id: string;
+        /** Format: uuid */
+        jobId: string;
+        rating: number;
+        comment: string | null;
+        partnerReply: string | null;
+        /** Format: date-time */
+        repliedAt: string | null;
+        /** Format: date-time */
+        createdAt: string;
+        customerFirstName: string | null;
+      } | null;
+    };
+    ReviewReplyDto: {
+      reply: string;
     };
     ApiError: {
       statusCode?: number;
@@ -3729,6 +3851,166 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AdminJobDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  StorageController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UploadRequestDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UploadSlotDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ReviewsController_forJob_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobReviewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ReviewsController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReviewDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReviewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ReviewsController_forPartner_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReviewDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ReviewsController_reply_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReviewReplyDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReviewDto'];
         };
       };
       /** @description Error */

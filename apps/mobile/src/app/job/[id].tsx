@@ -2,6 +2,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
 import { useState } from 'react';
 import { PaySection } from '@/components/PaySection';
+import { JobReview } from '@/components/Reviews';
 import {
   Badge,
   Body,
@@ -264,6 +265,8 @@ export default function JobDetail() {
           Our team is looking into this. Payment stays on hold until it is resolved.
         </Notice>
       ) : null}
+
+      <JobReview jobId={j.id} viewer={j.viewerRole} closed={j.state === 'closed'} />
 
       {history.data?.length ? (
         <Card>

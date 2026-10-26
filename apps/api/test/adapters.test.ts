@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { useRedisStore } from '../src/common/rate-limit.module';
 import { loadEnv } from '../src/config/env';
+import { storageMode } from '../src/modules/storage/storage.module';
 import { DisabledSmsProvider } from '../src/modules/identity/sms/disabled.provider';
 import { Msg91SmsProvider } from '../src/modules/identity/sms/msg91.provider';
 import { ExpoPushProvider } from '../src/modules/notifications/providers/push.provider';
@@ -28,6 +29,33 @@ describe('env validation', () => {
         PAYMENTS_PROVIDER: 'disabled',
       }).SMS_PROVIDER,
     ).toBe('disabled');
+  });
+  it('keeps photos off in production until S3 is configured, and never on local disk', () => {
+    const prod = {
+      ...base,
+      NODE_ENV: 'production',
+      SMS_PROVIDER: 'disabled',
+      WHATSAPP_PROVIDER: 'disabled',
+      PUSH_PROVIDER: 'disabled',
+      PAYMENTS_PROVIDER: 'disabled',
+    };
+    expect(storageMode(loadEnv(prod))).toBe('disabled');
+    expect(storageMode(loadEnv(base))).toBe('local');
+    expect(() => loadEnv({ ...prod, STORAGE_PROVIDER: 'local' })).toThrow(/local photo storage/);
+    expect(() => loadEnv({ ...prod, STORAGE_PROVIDER: 's3', S3_BUCKET: 'b' })).toThrow(
+      /S3_ACCESS_KEY_ID/,
+    );
+    expect(
+      storageMode(
+        loadEnv({
+          ...prod,
+          STORAGE_PROVIDER: 's3',
+          S3_BUCKET: 'b',
+          S3_ACCESS_KEY_ID: 'k',
+          S3_SECRET_ACCESS_KEY: 's',
+        }),
+      ),
+    ).toBe('s3');
   });
   it('keeps rate limits in Redis in production unless told otherwise', () => {
     const prod = {

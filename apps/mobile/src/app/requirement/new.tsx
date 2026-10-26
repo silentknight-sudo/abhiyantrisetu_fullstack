@@ -15,6 +15,7 @@ import {
   Small,
   Title,
 } from '@/components/ui';
+import { PhotoPicker } from '@/components/PhotoPicker';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 
@@ -77,6 +78,8 @@ export default function NewRequirement() {
   const [gps, setGps] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const catalog = $api.useQuery('get', '/v1/catalog/categories');
   const categories = (catalog.data ?? []).filter((c) => c.requirementType === kind);
@@ -108,9 +111,15 @@ export default function NewRequirement() {
     setError(null);
     const details =
       kind === 'service'
-        ? { description, urgency }
+        ? { description, urgency, photos }
         : kind === 'renovation'
-          ? { propertyType, scope, description, areaSqft: areaSqft ? Number(areaSqft) : undefined }
+          ? {
+              propertyType,
+              scope,
+              description,
+              areaSqft: areaSqft ? Number(areaSqft) : undefined,
+              photos,
+            }
           : { topic, description };
     const rupees = Number(budget.replace(/[^\d]/g, ''));
     const parsed = createRequirementSchema.safeParse({
@@ -237,6 +246,18 @@ export default function NewRequirement() {
         </Card>
       ) : null}
 
+      {kind !== 'consult' ? (
+        <Card>
+          <Title>Photos (optional)</Title>
+          <PhotoPicker
+            onChange={(keys, busy) => {
+              setPhotos(keys);
+              setUploading(busy);
+            }}
+          />
+        </Card>
+      ) : null}
+
       <Field
         label="Budget up to (₹, optional)"
         value={budget}
@@ -275,10 +296,11 @@ export default function NewRequirement() {
 
       {error ? <Notice>{error}</Notice> : null}
       <Button
-        title="Post requirement"
+        title={uploading ? 'Uploading photos…' : 'Post requirement'}
         kind="accent"
         testID="submit"
         loading={create.isPending}
+        disabled={uploading}
         onPress={submit}
       />
       <Body muted>

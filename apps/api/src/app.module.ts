@@ -22,6 +22,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { QuotesModule } from './modules/quotes/quotes.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { StorageModule } from './modules/storage/storage.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { AdminModule } from './modules/admin/admin.module';
     NotificationsModule,
     PaymentsModule,
     AdminModule,
+    StorageModule,
+    ReviewsModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

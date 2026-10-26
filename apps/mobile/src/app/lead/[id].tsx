@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { PhotoStrip } from '@/components/PhotoStrip';
 import { QuoteBuilder } from '@/components/QuoteBuilder';
 import {
   Badge,
@@ -94,6 +95,7 @@ export default function LeadDetail() {
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body>{description}</Body> : null}
+        <PhotoStrip urls={r.photoUrls} />
         {details.map(([k, v]) => (
           <Small key={k}>
             {DETAIL_LABELS[k]}: {Array.isArray(v) ? v.join(', ') : String(v).replace(/_/g, ' ')}

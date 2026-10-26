@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { PartnerReviews } from '@/components/Reviews';
 import { useState } from 'react';
 import {
   Badge,
@@ -97,6 +98,8 @@ export default function QuoteDetail() {
         {q.notes ? <Body muted>{q.notes}</Body> : null}
         {q.validUntil ? <Small>Valid until {when(q.validUntil)}</Small> : null}
       </Card>
+
+      {p ? <PartnerReviews partnerId={p.id} /> : null}
 
       {q.thread.length > 1 ? (
         <Card>

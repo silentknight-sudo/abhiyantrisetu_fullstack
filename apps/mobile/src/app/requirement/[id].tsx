@@ -14,6 +14,7 @@ import {
   Small,
   Title,
 } from '@/components/ui';
+import { PhotoStrip } from '@/components/PhotoStrip';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import {
@@ -69,6 +70,7 @@ export default function RequirementDetail() {
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body muted>{description}</Body> : null}
+        <PhotoStrip urls={r.photoUrls} />
         {r.budgetMaxPaise ? <Small>Budget up to {rupees(r.budgetMaxPaise)}</Small> : null}
       </Card>
 

@@ -36,6 +36,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     ['expo-notifications', { color: '#FF9F43' }],
     [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Photos you choose are attached to your request so professionals can quote accurately.',
+        cameraPermission: false,
+      },
+    ],
+    [
       'expo-location',
       {
         locationWhenInUsePermission: isPartner

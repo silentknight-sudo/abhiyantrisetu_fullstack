@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import os from 'node:os';
+import path from 'node:path';
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { normalizeIndianMobile } from '@setu/domain';
@@ -24,6 +26,7 @@ Object.assign(process.env, {
   SMS_PROVIDER: 'console',
   WHATSAPP_APP_SECRET: 'test-whatsapp-app-secret',
   WHATSAPP_VERIFY_TOKEN: 'test-verify-token',
+  STORAGE_LOCAL_DIR: path.join(os.tmpdir(), 'setu-test-uploads'),
   RAZORPAY_KEY_SECRET: 'test-razorpay-key-secret',
   RAZORPAY_WEBHOOK_SECRET: 'test-razorpay-webhook-secret',
 });

@@ -26,6 +26,7 @@ import {
 import { JobsService } from '../jobs/jobs.service';
 import { PartnersService } from '../partners/partners.service';
 import { RequirementsService } from '../requirements/requirements.service';
+import { StorageService } from '../storage/storage.service';
 
 type QuoteRow = typeof quotes.$inferSelect;
 
@@ -67,6 +68,7 @@ export class QuotesService {
     @Inject(RequirementsService) private readonly requirements: RequirementsService,
     @Inject(JobsService) private readonly jobs: JobsService,
     @Inject(EventEmitter2) private readonly bus: EventEmitter2,
+    @Inject(StorageService) private readonly storage: StorageService,
   ) {}
 
   /** Fires after commit; listener failures never undo the action. */
@@ -82,7 +84,7 @@ export class QuotesService {
    */
   async myLeads(user: AuthUser) {
     const me = await this.partners.requireMine(user);
-    return this.db
+    const rows = await this.db
       .select({
         id: leads.id,
         status: leads.status,
@@ -113,6 +115,13 @@ export class QuotesService {
       .where(eq(leads.partnerId, me.id))
       .orderBy(desc(leads.sentAt))
       .limit(100);
+    return rows.map((l) => ({
+      ...l,
+      requirement: {
+        ...l.requirement,
+        photoUrls: this.storage.viewUrls(l.requirement.details.photos as unknown[] | undefined),
+      },
+    }));
   }
 
   private async lockMyLead(tx: Tx, user: AuthUser, leadId: string) {

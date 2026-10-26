@@ -27,6 +27,15 @@ const envSchema = z
     EXPO_ACCESS_TOKEN: z.string().optional(),
     // Payments. fake: local order ids, same signature checks (dev/test only).
     PAYMENTS_PROVIDER: z.enum(['fake', 'razorpay', 'disabled']).default('fake'),
+    /** Photo storage. Default: local disk in development and test, disabled in production. */
+    STORAGE_PROVIDER: z.enum(['local', 's3', 'disabled']).optional(),
+    STORAGE_LOCAL_DIR: z.string().default('.uploads'),
+    S3_BUCKET: z.string().optional(),
+    S3_REGION: z.string().default('ap-south-1'),
+    S3_ACCESS_KEY_ID: z.string().optional(),
+    S3_SECRET_ACCESS_KEY: z.string().optional(),
+    /** Where this API is reachable, for local-storage upload links (dev only). */
+    PUBLIC_API_URL: z.string().url().optional(),
     RAZORPAY_KEY_ID: z.string().optional(),
     RAZORPAY_KEY_SECRET: z.string().optional(),
     RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
@@ -52,6 +61,24 @@ const envSchema = z
         code: 'custom',
         path: ['SMS_PROVIDER'],
         message: 'console SMS is not allowed in production',
+      });
+    }
+    if (env.NODE_ENV === 'production' && env.STORAGE_PROVIDER === 'local') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['STORAGE_PROVIDER'],
+        message: 'local photo storage is not allowed in production; use s3',
+      });
+    }
+    if (
+      env.STORAGE_PROVIDER === 's3' &&
+      (!env.S3_BUCKET || !env.S3_ACCESS_KEY_ID || !env.S3_SECRET_ACCESS_KEY)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['S3_BUCKET'],
+        message:
+          'S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY are required when STORAGE_PROVIDER=s3',
       });
     }
     if (env.NODE_ENV === 'production' && env.PAYMENTS_PROVIDER === 'fake') {

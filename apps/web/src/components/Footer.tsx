@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LAUNCHED } from '@/lib/launch';
-import { SECTORS, SITE, TRADES } from '@/lib/content';
+import { CITY, CITY_SERVICES } from '@/lib/city-services';
+import { SECTORS, SITE } from '@/lib/content';
 import { Logo } from './Logo';
 
 export function Footer() {
@@ -37,10 +38,10 @@ export function Footer() {
         <div>
           <h3 className="text-sm font-semibold text-white">Services</h3>
           <ul className="mt-4 space-y-2 text-sm">
-            {TRADES.map((t) => (
-              <li key={t.slug}>
-                <Link className="hover:text-orange-300" href={`/services/${t.slug}/sector-pi`}>
-                  {t.name}
+            {CITY_SERVICES.map((s) => (
+              <li key={s.slug}>
+                <Link className="hover:text-orange-300" href={`/${CITY.slug}/${s.slug}`}>
+                  {s.name}
                 </Link>
               </li>
             ))}

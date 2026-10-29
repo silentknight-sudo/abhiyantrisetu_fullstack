@@ -17,34 +17,26 @@ import { Stats } from '@/components/home/Stats';
 import { TrustStack } from '@/components/home/TrustStack';
 import { SectionDots } from '@/components/SectionDots';
 import { FAQS, SITE } from '@/lib/content';
+import { faqLd, jsonLdScript, organizationLd } from '@/lib/seo';
 
-const jsonLd = [
+const jsonLd = jsonLdScript([
+  organizationLd,
   {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'WebSite',
+    '@id': `${SITE.url}/#website`,
     name: SITE.name,
+    alternateName: 'अभियंत्री सेतु',
     url: SITE.url,
-    logo: `${SITE.url}/logo.png`,
-    areaServed: 'Greater Noida, Uttar Pradesh, India',
+    inLanguage: ['en-IN', 'hi-IN'],
+    publisher: { '@id': `${SITE.url}/#organization` },
   },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: FAQS.map((f) => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
-  },
-];
+  faqLd(FAQS.map((f) => [f.q, f.a] as const)),
+]);
 
 export default function Home() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd} />
       <Hero />
       <ServiceCards />
       <QuoteForm />

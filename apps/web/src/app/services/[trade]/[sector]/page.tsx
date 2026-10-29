@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Reveal } from '@/components/Reveal';
+import { CITY, findCityService } from '@/lib/city-services';
 import { SECTORS, SITE, TRADES } from '@/lib/content';
+import { breadcrumbLd, faqLd, jsonLdScript, organizationLd } from '@/lib/seo';
 
 type Params = { trade: string; sector: string };
 
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const r = resolve(await params);
   if (!r) return {};
   return {
-    title: `${r.t.name} in ${r.s.name}, Greater Noida`,
+    title: { absolute: `${r.t.name} in ${r.s.name}, Greater Noida | From ₹${r.t.from}` },
     description: `Book a verified ${r.t.name.toLowerCase()} in ${r.s.name}, Greater Noida. Prices from ₹${r.t.from}${priceUnit(r.t.slug)}, start codes on site, and quotes within 24 hours.`,
     alternates: { canonical: `/services/${r.t.slug}/${r.s.slug}` },
   };
@@ -37,8 +39,8 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
   if (!r) notFound();
   const { t, s } = r;
   const nearby = SECTORS.filter((x) => x.slug !== s.slug).slice(0, 6);
+  const city = findCityService(t.slug);
   const jsonLd = {
-    '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: t.name,
     name: `${t.name} in ${s.name}, Greater Noida`,
@@ -67,7 +69,17 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
     <div className="bg-background pt-[72px]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={jsonLdScript([
+          organizationLd,
+          jsonLd,
+          breadcrumbLd([
+            ['Home', '/'],
+            ['Services', '/services'],
+            [`${t.name} in Greater Noida`, `/${CITY.slug}/${t.slug}`],
+            [s.name, `/services/${t.slug}/${s.slug}`],
+          ]),
+          ...(city ? [faqLd(city.faqs)] : []),
+        ])}
       />
       <section className="bg-surface-muted text-navy-700">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
@@ -75,7 +87,11 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
             <Link href="/services" className="hover:text-navy-700">
               Services
             </Link>{' '}
-            / {t.name} / {s.name}
+            /{' '}
+            <Link href={`/${CITY.slug}/${t.slug}`} className="hover:text-navy-700">
+              {t.name} in Greater Noida
+            </Link>{' '}
+            / {s.name}
           </nav>
           <Reveal>
             <h1 className="mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.03]">
@@ -125,6 +141,40 @@ export default async function TradeSectorPage({ params }: { params: Promise<Para
           </Reveal>
         ))}
       </section>
+
+      {city ? (
+        <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+          <h2 className="text-3xl text-navy-700">
+            {t.name} prices in {s.name}
+          </h2>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {city.prices.map(([job, price]) => (
+              <li
+                key={job}
+                className="flex justify-between gap-4 rounded-2xl border border-border bg-surface px-4 py-3 text-sm"
+              >
+                <span className="text-navy-700">{job}</span>
+                <span className="font-semibold whitespace-nowrap text-orange-600">{price}</span>
+              </li>
+            ))}
+          </ul>
+          <h2 className="mt-12 text-3xl text-navy-700">Common questions</h2>
+          <div className="mt-4 divide-y divide-border">
+            {city.faqs.map(([q, a]) => (
+              <details key={q} className="py-3">
+                <summary className="cursor-pointer font-semibold text-navy-700">{q}</summary>
+                <p className="mt-2 text-text-muted">{a}</p>
+              </details>
+            ))}
+          </div>
+          <Link
+            href={`/${CITY.slug}/${t.slug}`}
+            className="mt-6 inline-block font-semibold text-orange-600 hover:underline"
+          >
+            All {t.name.toLowerCase()} services in Greater Noida →
+          </Link>
+        </section>
+      ) : null}
 
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
         <h2 className="text-3xl text-navy-700">{t.plural} in nearby sectors</h2>

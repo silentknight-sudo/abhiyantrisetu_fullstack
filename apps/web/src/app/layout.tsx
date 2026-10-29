@@ -27,12 +27,37 @@ const notoDeva = Noto_Sans_Devanagari({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name}: verified home services, construction & materials in ${SITE.city}`,
+    default: `${SITE.name}: Home Services, House Construction & Materials in ${SITE.city}`,
     template: `%s | ${SITE.name}`,
   },
   description:
-    'Book verified plumbers and electricians, renovate or build your house with milestone payments, buy materials and rent equipment in Greater Noida.',
-  openGraph: { siteName: SITE.name, type: 'website', locale: 'en_IN', images: ['/logo.png'] },
+    'Verified plumbers, electricians, painters and contractors in Greater Noida. Build or renovate with milestone payments, buy materials, rent a JCB.',
+  keywords: [
+    'home services Greater Noida',
+    'plumber Greater Noida',
+    'electrician Greater Noida',
+    'house construction Greater Noida',
+    'construction cost per sq ft Greater Noida',
+    'interior designer Greater Noida',
+    'building material supplier Greater Noida',
+    'JCB on rent Greater Noida',
+    'Abhiyantri Setu',
+  ],
+  applicationName: SITE.name,
+  alternates: { canonical: '/' },
+  openGraph: {
+    siteName: SITE.name,
+    type: 'website',
+    locale: 'en_IN',
+    url: '/',
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  // Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the code from Google Search Console.
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
+  formatDetection: { telephone: true },
 };
 
 export const viewport: Viewport = { themeColor: '#F6EFE3' };

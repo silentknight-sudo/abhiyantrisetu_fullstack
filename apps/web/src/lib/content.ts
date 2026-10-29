@@ -4,7 +4,12 @@ export const SITE = {
   name: 'Abhiyantri Setu',
   tagline: 'The bridge between your home and the people who build it.',
   city: 'Greater Noida',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  /** Canonical origin: used in sitemap, canonical links and structured data. */
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.NODE_ENV === 'production'
+      ? 'https://www.abhiyantrisetu.com'
+      : 'http://localhost:3000'),
   phone: '+91 92895 53069',
   email: 'info@abhiyantrisetu.com',
   /** WhatsApp business number: quote requests from the website go here. */

@@ -52,22 +52,26 @@ export function DreamHome() {
             sizes="100vw"
           />
         </motion.div>
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pt-24 pb-10 sm:px-6">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-6 text-white">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-4 pt-16 pb-6 sm:px-6 sm:pt-24 sm:pb-10">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-4 text-white sm:gap-6">
             <div>
               <SectionLabel dark>From foundation to handover</SectionLabel>
-              <h2 className="text-balance text-[clamp(2rem,4.6vw,3.6rem)] leading-[1.05]">
+              <h2 className="text-balance text-[clamp(1.6rem,4.6vw,3.6rem)] leading-[1.05]">
                 Your dream home, <em>built floor by floor.</em>
               </h2>
-              <p className="mt-3 max-w-lg text-white/80">
+              <p className="mt-3 hidden max-w-lg text-white/80 sm:block">
                 Scroll to watch it rise. Every stage is inspected and photographed before you pay
                 for it.
               </p>
             </div>
-            <div className="min-w-56">
-              <p className="text-sm tracking-[0.18em] text-white/70 uppercase">Built</p>
-              <motion.p className="font-display text-5xl font-bold tabular-nums">{pct}</motion.p>
-              <ul className="mt-3 space-y-1.5 text-sm">
+            <div className="flex items-end gap-6 sm:block sm:min-w-56">
+              <div>
+                <p className="text-sm tracking-[0.18em] text-white/70 uppercase">Built</p>
+                <motion.p className="font-display text-4xl font-bold tabular-nums sm:text-5xl">
+                  {pct}
+                </motion.p>
+              </div>
+              <ul className="space-y-1 text-xs sm:mt-3 sm:space-y-1.5 sm:text-sm">
                 {STEPS.map((s) => (
                   <Step key={s.label} at={s.at} label={s.label} build={build} />
                 ))}

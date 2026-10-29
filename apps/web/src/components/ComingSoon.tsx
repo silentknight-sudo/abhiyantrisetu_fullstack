@@ -75,7 +75,7 @@ export function ComingSoonProvider() {
             >
               <X size={18} />
             </button>
-            <Image src="/logo.png" alt="" width={334} height={190} className="mx-auto w-24" />
+            <Image src="/logo.png" alt="" width={334} height={185} className="mx-auto w-24" />
             <p className="mt-5 text-xs font-semibold tracking-[0.3em] text-orange-600 uppercase">
               Coming soon
             </p>

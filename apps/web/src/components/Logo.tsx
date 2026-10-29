@@ -4,14 +4,10 @@ import Link from 'next/link';
 export function Logo({ onDark = false, compact = false }: { onDark?: boolean; compact?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5" aria-label="Abhiyantri Setu home">
-      <Image
-        src={onDark ? '/logo-on-dark.png' : '/logo.png'}
-        alt=""
-        width={334}
-        height={190}
-        priority
-        className="h-9 w-auto"
-      />
+      {/* The original colour logo; on dark backgrounds it sits on a white chip. */}
+      <span className={onDark ? 'rounded-xl bg-white px-2 py-1.5' : ''}>
+        <Image src="/logo.png" alt="" width={334} height={185} priority className="h-9 w-auto" />
+      </span>
       {!compact && (
         <span className="leading-none">
           <span

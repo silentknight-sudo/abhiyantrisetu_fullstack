@@ -7,7 +7,7 @@ import { FLOWS, SITE } from '@/lib/content';
 export function ComingSoonPage() {
   return (
     <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-      <Image src="/logo.png" alt="" width={334} height={190} className="mx-auto w-32" />
+      <Image src="/logo.png" alt="" width={334} height={185} className="mx-auto w-32" />
       <p className="mt-8 text-sm font-semibold tracking-[0.3em] text-orange-600 uppercase">
         Coming soon
       </p>

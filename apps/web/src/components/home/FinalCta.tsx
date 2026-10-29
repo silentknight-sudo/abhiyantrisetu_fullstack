@@ -26,7 +26,7 @@ export function FinalCta() {
         className="relative mx-auto max-w-7xl overflow-hidden bg-gradient-to-br from-sand-200 to-sand-300 px-6 py-20 text-center text-navy-700 sm:px-12"
       >
         <span className="mx-auto grid w-fit place-items-center rounded-[28px] bg-white px-6 py-4 shadow-[0_20px_50px_-20px_rgba(10,24,35,0.5)]">
-          <Image src="/logo.png" alt="" width={334} height={190} className="w-36" />
+          <Image src="/logo.png" alt="" width={334} height={185} className="w-36" />
         </span>
         {LAUNCHED ? null : (
           <p className="mx-auto mt-8 w-fit rounded-full bg-orange-500 px-4 py-1.5 text-xs font-bold tracking-[0.2em] text-white uppercase">

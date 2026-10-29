@@ -40,7 +40,7 @@ export function Partners() {
         style={{ rotate: logoRotate }}
         className="absolute -right-32 -bottom-24 w-[640px] opacity-[0.05]"
       >
-        <Image src="/logo-on-dark.png" alt="" width={334} height={190} className="w-full" />
+        <Image src="/logo-on-dark.png" alt="" width={334} height={185} className="w-full" />
       </motion.div>
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-2">
         <div>

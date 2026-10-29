@@ -41,7 +41,7 @@ function Emblem({ rotate }: { rotate: MotionValue<number> }) {
             src="/logo.png"
             alt="Abhiyantri Setu"
             width={334}
-            height={190}
+            height={185}
             priority
             className="mx-auto w-[64%]"
           />

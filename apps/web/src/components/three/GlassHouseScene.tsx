@@ -204,7 +204,10 @@ function Rig({ progress }: { progress: MotionValue<number> }) {
     const p = progress.get();
     // starts low and close at the footing, rises and pulls back as the floors go up
     const angle = 0.55 - p * 0.35 + pointer.x * 0.06;
-    const r = 20 + p * 6;
+    // on narrow (phone) screens, back off until the whole building fits the width
+    const cam = camera as THREE.PerspectiveCamera;
+    const fit = (W / 2 + 2) / (Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect);
+    const r = Math.max(20 + p * 6, fit * 0.95);
     const desired = new THREE.Vector3(Math.sin(angle) * r, 3 + p * 6, Math.cos(angle) * r);
     camera.position.lerp(desired, 1 - Math.pow(0.003, dt));
     target.y = 1.5 + p * 3.5;

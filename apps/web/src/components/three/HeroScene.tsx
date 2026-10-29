@@ -1,10 +1,17 @@
 'use client';
 
-import { ContactShadows, Line } from '@react-three/drei';
+import { ContactShadows, Environment, Lightformer, Line } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import type { MotionValue } from 'motion/react';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import {
+  brickTexture,
+  concreteTexture,
+  grassTexture,
+  plasterTexture,
+  soilTexture,
+} from './textures';
 
 /*
  * The Setu story in one scene: service providers on the left bank, clients' homes on the
@@ -47,11 +54,15 @@ function Bank({ side }: { side: -1 | 1 }) {
     <group>
       <mesh position={[x, BANK_TOP / 2, 0]} receiveShadow castShadow>
         <boxGeometry args={[5.6, BANK_TOP, 9]} />
-        <meshStandardMaterial color={BANK_SIDE} roughness={1} />
+        <meshStandardMaterial map={soilTexture([3, 1])} color={BANK_SIDE} roughness={1} />
       </mesh>
       <mesh position={[x, BANK_TOP + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[5.6, 9]} />
-        <meshStandardMaterial color={BANK} roughness={1} />
+        <meshStandardMaterial
+          map={side < 0 ? concreteTexture([3, 5]) : grassTexture([4, 6])}
+          color={side < 0 ? '#e8e2d6' : '#ffffff'}
+          roughness={1}
+        />
       </mesh>
     </group>
   );
@@ -71,7 +82,7 @@ function Leg({ from }: { from: V3 }) {
   return (
     <mesh position={position} quaternion={quaternion} castShadow>
       <boxGeometry args={[0.34, length, 0.34]} />
-      <meshStandardMaterial color={NAVY} roughness={0.55} />
+      <meshStandardMaterial map={concreteTexture([1, 4])} color={NAVY_LIGHT} roughness={0.6} />
     </mesh>
   );
 }
@@ -94,8 +105,18 @@ function Bridge() {
     <group>
       <mesh position={[0, DECK_Y, 0]} castShadow receiveShadow>
         <boxGeometry args={[BRIDGE_HALF * 2 + 1, 0.24, 1.8]} />
-        <meshStandardMaterial color={NAVY_LIGHT} roughness={0.6} />
+        <meshStandardMaterial map={concreteTexture([6, 1])} color="#c9ccd0" roughness={0.8} />
       </mesh>
+      <mesh position={[0, DECK_Y + 0.125, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[BRIDGE_HALF * 2 + 1, 1.4]} />
+        <meshStandardMaterial color="#3a3f45" roughness={0.9} />
+      </mesh>
+      {Array.from({ length: 9 }, (_, i) => -BRIDGE_HALF + 0.5 + i * 1.15).map((x) => (
+        <mesh key={x} position={[x, DECK_Y + 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.5, 0.06]} />
+          <meshStandardMaterial color="#f4f1ea" />
+        </mesh>
+      ))}
       {[-0.9, 0.9].map((z) => (
         <mesh key={z} position={[0, DECK_Y + 0.15, z]}>
           <boxGeometry args={[BRIDGE_HALF * 2 + 1, 0.06, 0.05]} />
@@ -143,67 +164,217 @@ function Person({ provider, tint }: { provider: boolean; tint: string }) {
   );
 }
 
+function Glass({ p, s }: { p: V3; s: [number, number] }) {
+  return (
+    <mesh position={p}>
+      <planeGeometry args={s} />
+      <meshStandardMaterial color="#9fc3d6" roughness={0.08} metalness={0.5} />
+    </mesh>
+  );
+}
+
+/** A two-storey home: plastered walls, windows, a sloped roof or a flat terrace. */
 function House({ position, tall = false }: { position: V3; tall?: boolean }) {
-  const h = tall ? 3.4 : 1.1;
+  if (tall) {
+    // a society tower: concrete frame, balconies and lit windows
+    return (
+      <group position={position}>
+        <mesh position={[0, 1.7, 0]} castShadow receiveShadow>
+          <boxGeometry args={[1.2, 3.4, 1.2]} />
+          <meshStandardMaterial map={plasterTexture([1, 3])} color="#d9dde2" roughness={0.85} />
+        </mesh>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <group key={i}>
+            <mesh position={[0, 0.45 + i * 0.62, 0.62]} castShadow>
+              <boxGeometry args={[1, 0.05, 0.18]} />
+              <meshStandardMaterial color={NAVY} />
+            </mesh>
+            <Glass p={[0, 0.65 + i * 0.62, 0.605]} s={[0.8, 0.3]} />
+          </group>
+        ))}
+        <mesh position={[0.3, 3.55, -0.2]} castShadow>
+          <cylinderGeometry args={[0.16, 0.16, 0.3, 14]} />
+          <meshStandardMaterial color="#1d1f21" />
+        </mesh>
+      </group>
+    );
+  }
   return (
     <group position={position}>
-      <mesh position={[0, h / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={tall ? [1.2, h, 1.2] : [1.3, h, 1.1]} />
-        <meshStandardMaterial color={tall ? NAVY_LIGHT : CREAM} roughness={0.85} />
+      <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.3, 1.1, 1.1]} />
+        <meshStandardMaterial map={plasterTexture([1, 1])} color={CREAM} roughness={0.9} />
       </mesh>
-      {tall ? (
-        Array.from({ length: 5 }).map((_, i) => (
-          <mesh key={i} position={[0, 0.5 + i * 0.62, 0.61]}>
-            <planeGeometry args={[0.8, 0.22]} />
-            <meshStandardMaterial color="#FFB870" emissive="#FFB870" emissiveIntensity={0.5} />
-          </mesh>
-        ))
-      ) : (
-        <>
-          <mesh position={[0, h + 0.38, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
-            <coneGeometry args={[1.05, 0.75, 4]} />
-            <meshStandardMaterial color={ORANGE} roughness={0.6} />
-          </mesh>
-          <mesh position={[0, 0.32, 0.56]}>
-            <planeGeometry args={[0.32, 0.6]} />
-            <meshStandardMaterial color={NAVY} />
-          </mesh>
-        </>
-      )}
+      <mesh position={[0, 1.48, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[1.05, 0.75, 4]} />
+        <meshStandardMaterial color="#b4532a" roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.3, 0.56]}>
+        <planeGeometry args={[0.3, 0.58]} />
+        <meshStandardMaterial color="#7a4a24" />
+      </mesh>
+      {[-0.4, 0.4].map((x) => (
+        <Glass key={x} p={[x, 0.68, 0.556]} s={[0.26, 0.26]} />
+      ))}
     </group>
   );
 }
 
-/** Providers' side: a workshop, a materials yard and pros waiting for work. */
+/** A client's house mid-renovation: bamboo scaffold and a pro painting the wall. */
+function RenovationSite({ position }: { position: V3 }) {
+  const brush = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (brush.current) brush.current.position.y = 1.15 + Math.sin(clock.elapsedTime * 2.4) * 0.22;
+  });
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.5, 1.6, 1.1]} />
+        <meshStandardMaterial map={brickTexture([1, 1])} roughness={0.9} />
+      </mesh>
+      {/* the freshly painted half */}
+      <mesh position={[-0.37, 0.8, 0.552]}>
+        <planeGeometry args={[0.76, 1.6]} />
+        <meshStandardMaterial map={plasterTexture([1, 1])} color="#fbe7c8" roughness={0.9} />
+      </mesh>
+      {[-0.85, 0, 0.85].map((x) => (
+        <mesh key={x} position={[x, 1, 0.95]} castShadow>
+          <cylinderGeometry args={[0.03, 0.03, 2, 6]} />
+          <meshStandardMaterial color="#b68a4c" />
+        </mesh>
+      ))}
+      {[0.55, 1.35].map((y) => (
+        <mesh key={y} position={[0, y, 0.95]} castShadow>
+          <boxGeometry args={[1.8, 0.04, 0.25]} />
+          <meshStandardMaterial color="#a0703a" />
+        </mesh>
+      ))}
+      <group position={[0.25, 0.57, 0.9]} rotation={[0, Math.PI, 0]}>
+        <Person provider tint={NAVY} />
+      </group>
+      <group ref={brush} position={[0.1, 1.15, 0.6]}>
+        <mesh>
+          <boxGeometry args={[0.18, 0.08, 0.05]} />
+          <meshStandardMaterial color={ORANGE} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/** A new house under construction: concrete frame with rebar still showing. */
+function ConstructionSite({ position }: { position: V3 }) {
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.6, 0.2, 1.3]} />
+        <meshStandardMaterial map={concreteTexture([1, 1])} />
+      </mesh>
+      {[-0.7, 0.7].flatMap((x) =>
+        [-0.55, 0.55].map((z) => (
+          <group key={`${x}${z}`}>
+            <mesh position={[x, 0.75, z]} castShadow>
+              <boxGeometry args={[0.14, 1.3, 0.14]} />
+              <meshStandardMaterial map={concreteTexture([1, 2])} />
+            </mesh>
+            <mesh position={[x, 1.55, z]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.3, 4]} />
+              <meshStandardMaterial color="#5b5f63" metalness={0.6} />
+            </mesh>
+          </group>
+        )),
+      )}
+      <mesh position={[0, 1.38, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.7, 0.1, 1.4]} />
+        <meshStandardMaterial map={concreteTexture([1, 1])} color="#b8bcc2" />
+      </mesh>
+      <mesh position={[0.45, 0.42, 0]} castShadow>
+        <boxGeometry args={[0.5, 0.45, 1]} />
+        <meshStandardMaterial map={brickTexture([1, 1])} />
+      </mesh>
+    </group>
+  );
+}
+
+/** A small backhoe loader (the "JCB" every Indian site knows). */
+function Backhoe({ position }: { position: V3 }) {
+  const arm = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (arm.current) arm.current.rotation.z = -0.5 + Math.sin(clock.elapsedTime * 0.9) * 0.25;
+  });
+  const YELLOW = '#f2b705';
+  return (
+    <group position={position} rotation={[0, 0.5, 0]} scale={0.8}>
+      <mesh position={[0, 0.45, 0]} castShadow>
+        <boxGeometry args={[1.4, 0.45, 0.8]} />
+        <meshStandardMaterial color={YELLOW} roughness={0.5} metalness={0.2} />
+      </mesh>
+      <mesh position={[-0.2, 0.95, 0]} castShadow>
+        <boxGeometry args={[0.6, 0.55, 0.7]} />
+        <meshStandardMaterial color="#2b2f33" roughness={0.3} metalness={0.4} />
+      </mesh>
+      {[-0.45, 0.45].flatMap((x) =>
+        [-0.42, 0.42].map((z) => (
+          <mesh key={`${x}${z}`} position={[x, 0.22, z]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.22, 0.22, 0.14, 14]} />
+            <meshStandardMaterial color="#1d1f21" roughness={0.9} />
+          </mesh>
+        )),
+      )}
+      <group ref={arm} position={[0.7, 0.7, 0]}>
+        <mesh position={[0.45, 0, 0]} castShadow>
+          <boxGeometry args={[0.9, 0.12, 0.12]} />
+          <meshStandardMaterial color={YELLOW} />
+        </mesh>
+        <mesh position={[0.95, -0.15, 0]} castShadow>
+          <boxGeometry args={[0.22, 0.3, 0.4]} />
+          <meshStandardMaterial color="#2b2f33" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/** Providers' side: a workshop, a materials yard, a backhoe and pros waiting for work. */
 function ProviderBank() {
   return (
     <group>
       <group position={[-8.6, BANK_TOP, -2.4]}>
         <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
           <boxGeometry args={[2.2, 1.4, 1.6]} />
-          <meshStandardMaterial color={NAVY} roughness={0.8} />
+          <meshStandardMaterial map={brickTexture([2, 1])} roughness={0.9} />
         </mesh>
         <mesh position={[0, 1.5, 0]} castShadow>
-          <boxGeometry args={[2.4, 0.18, 1.8]} />
+          <boxGeometry args={[2.4, 0.12, 1.8]} />
+          <meshStandardMaterial color={NAVY} metalness={0.4} roughness={0.5} />
+        </mesh>
+        <mesh position={[0, 0.5, 0.81]}>
+          <planeGeometry args={[0.9, 1]} />
           <meshStandardMaterial color={ORANGE} />
         </mesh>
       </group>
-      {/* materials: bags of cement and a brick stack */}
+      {/* materials yard: cement bags, a brick stack and a sand heap */}
       <group position={[-9.6, BANK_TOP, 1.8]}>
-        {[0, 1, 2].map((i) => (
-          <mesh key={i} position={[i * 0.45, 0.15, 0]} castShadow>
-            <boxGeometry args={[0.4, 0.3, 0.6]} />
-            <meshStandardMaterial color="#B9BEC6" />
-          </mesh>
-        ))}
+        {[0, 1, 2].flatMap((i) =>
+          [0, 1].map((j) => (
+            <mesh key={`${i}${j}`} position={[i * 0.42, 0.11 + j * 0.2, 0]} castShadow>
+              <boxGeometry args={[0.38, 0.18, 0.55]} />
+              <meshStandardMaterial color="#d9d4c7" roughness={0.95} />
+            </mesh>
+          )),
+        )}
         <mesh position={[1.6, 0.3, 0]} castShadow>
           <boxGeometry args={[0.7, 0.6, 0.7]} />
-          <meshStandardMaterial color="#C8643B" />
+          <meshStandardMaterial map={brickTexture([1, 1])} />
+        </mesh>
+        <mesh position={[0.6, 0.3, -1.1]} castShadow>
+          <coneGeometry args={[0.6, 0.6, 16]} />
+          <meshStandardMaterial color="#d8b57a" roughness={1} />
         </mesh>
       </group>
+      <Backhoe position={[-9.2, BANK_TOP, -0.2]} />
       {[
         [-7.4, -1.6],
-        [-8.2, 0.4],
         [-6.9, 2.2],
       ].map(([x, z], i) => (
         <group key={i} position={[x!, BANK_TOP, z!]} rotation={[0, Math.PI / 2, 0]}>
@@ -214,17 +385,17 @@ function ProviderBank() {
   );
 }
 
-/** Clients' side: homes and a society tower. */
+/** Clients' side: homes, a society tower, and Setu work in progress. */
 function ClientBank() {
   return (
     <group>
       <House position={[7.2, BANK_TOP, -2.6]} />
-      <House position={[9.1, BANK_TOP, -1.0]} />
-      <House position={[7.6, BANK_TOP, 2.4]} />
+      <RenovationSite position={[9.1, BANK_TOP, -0.6]} />
+      <ConstructionSite position={[7.4, BANK_TOP, 2.6]} />
       <House position={[9.7, BANK_TOP, 2.4]} tall />
       <House position={[9.6, BANK_TOP, -3.3]} tall />
       {[
-        [8.4, 0.6],
+        [8.4, 1.0],
         [6.6, -0.6],
       ].map(([x, z], i) => (
         <group key={i} position={[x!, BANK_TOP, z!]} rotation={[0, -Math.PI / 2, 0]}>
@@ -406,6 +577,28 @@ function Requests() {
   );
 }
 
+/** The river: slightly glossy water whose ripples catch the light. */
+function River() {
+  const geo = useMemo(() => new THREE.PlaneGeometry(10, 9, 40, 36), []);
+  const base = useMemo(() => Float32Array.from(geo.attributes.position!.array), [geo]);
+  useFrame(({ clock }) => {
+    const pos = geo.attributes.position!;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < pos.count; i++) {
+      const x = base[i * 3]!;
+      const y = base[i * 3 + 1]!;
+      pos.setZ(i, Math.sin(x * 1.3 + t * 1.2) * 0.04 + Math.cos(y * 1.7 + t) * 0.03);
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+  });
+  return (
+    <mesh geometry={geo} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.25, 0]} receiveShadow>
+      <meshStandardMaterial color="#6f97b3" roughness={0.12} metalness={0.35} />
+    </mesh>
+  );
+}
+
 /** Half the scene's width, in world units, that must stay in frame. */
 const HALF_WIDTH = 11.4;
 
@@ -448,22 +641,30 @@ export default function HeroScene({
       aria-label="3D illustration: a bridge connecting service providers on one bank to clients' homes on the other"
     >
       <fog attach="fog" args={['#F6EFE3', 42, 75]} />
-      <hemisphereLight args={['#FFF6E8', BANK, 0.95]} />
+      <hemisphereLight args={['#eef4ff', BANK, 0.6]} />
       <directionalLight
-        position={[6, 16, 10]}
-        intensity={1.6}
+        position={[8, 18, 10]}
+        intensity={2.1}
+        color="#fff1dc"
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.0004}
         shadow-camera-left={-15}
         shadow-camera-right={15}
         shadow-camera-top={15}
         shadow-camera-bottom={-15}
       />
-      {/* river */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow>
-        <planeGeometry args={[10, 9]} />
-        <meshStandardMaterial color="#ABC2D4" roughness={0.25} metalness={0.1} />
-      </mesh>
+      <Environment resolution={128}>
+        <Lightformer
+          intensity={1.2}
+          position={[0, 10, 0]}
+          rotation-x={Math.PI / 2}
+          scale={[30, 30, 1]}
+          color="#fff6e8"
+        />
+        <Lightformer intensity={0.7} position={[-12, 4, 8]} scale={[14, 5, 1]} color="#dfeaff" />
+      </Environment>
+      <River />
       <ContactShadows position={[0, 0.03, 0]} opacity={0.25} scale={34} blur={2.4} far={8} />
       <Bank side={-1} />
       <Bank side={1} />

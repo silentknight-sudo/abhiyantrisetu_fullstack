@@ -28,17 +28,28 @@ export function FinalCta() {
         <span className="mx-auto grid w-fit place-items-center rounded-[28px] bg-white px-6 py-4 shadow-[0_20px_50px_-20px_rgba(10,24,35,0.5)]">
           <Image src="/logo.png" alt="" width={334} height={190} className="w-36" />
         </span>
+        {LAUNCHED ? null : (
+          <p className="mx-auto mt-8 w-fit rounded-full bg-orange-500 px-4 py-1.5 text-xs font-bold tracking-[0.2em] text-white uppercase">
+            App coming soon
+          </p>
+        )}
         <RevealHeading
-          className="mx-auto mt-8 max-w-3xl text-balance text-[clamp(2rem,5vw,3.8rem)] leading-[1.03]"
+          className="mx-auto mt-6 max-w-3xl text-balance text-[clamp(2rem,5vw,3.8rem)] leading-[1.03]"
           text="Tell us what you need."
           accent="We'll bring verified pros by tomorrow."
         />
+        {LAUNCHED ? null : (
+          <p className="mx-auto mt-6 max-w-xl text-lg text-navy-600">
+            The Abhiyantri Setu app for Android and iPhone is coming soon to Greater Noida. Get
+            early access and we will message you on WhatsApp the day it launches.
+          </p>
+        )}
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="/post"
             className="rounded-full bg-navy-700 px-8 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-navy-800"
           >
-            {LAUNCHED ? 'Post a requirement, free' : 'Get early access'}
+            {LAUNCHED ? 'Post a requirement, free' : 'Get a quote'}
           </Link>
           <Link
             href="/services"

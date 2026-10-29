@@ -1,3 +1,4 @@
+import { type AssistantTurn, offlineReply } from '@setu/domain';
 import type { AuthTokens, CreateRequirementInput, WaitlistSignupInput } from '@setu/schemas';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
@@ -67,3 +68,16 @@ export const api = {
   joinWaitlist: (input: WaitlistSignupInput) =>
     call<{ ok: true; id: string }>('/waitlist', { method: 'POST', body: JSON.stringify(input) }),
 };
+
+/** Setu AI: the API's reply, or the built-in rate-card reply when the API can't be reached. */
+export async function askSetuAi(messages: AssistantTurn[]): Promise<string> {
+  try {
+    const res = await call<{ reply: string }>('/assistant/chat', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
+    });
+    return res.reply;
+  } catch {
+    return offlineReply(messages);
+  }
+}

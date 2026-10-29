@@ -5,8 +5,11 @@ import { FinalCta } from '@/components/home/FinalCta';
 import { Flows } from '@/components/home/Flows';
 import { Hero } from '@/components/home/Hero';
 import { HowItWorks } from '@/components/home/HowItWorks';
-import { Manifesto } from '@/components/home/Manifesto';
 import { Marquee } from '@/components/home/Marquee';
+import { QuoteForm } from '@/components/home/QuoteForm';
+import { DreamHome } from '@/components/home/DreamHome';
+import { Projects } from '@/components/home/Projects';
+import { ServiceCards } from '@/components/home/ServiceCards';
 import { Partners } from '@/components/home/Partners';
 import { SetuAi } from '@/components/home/SetuAi';
 import { Societies } from '@/components/home/Societies';
@@ -43,10 +46,13 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
+      <ServiceCards />
+      <QuoteForm />
       <Marquee />
-      <Manifesto />
       <Flows />
       <Stats />
+      <DreamHome />
+      <Projects />
       <HowItWorks />
       <TrustStack />
       <BuildTracker />

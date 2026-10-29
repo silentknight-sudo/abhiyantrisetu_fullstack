@@ -8,4 +8,5 @@ export * from './quotes';
 export * from './admin';
 export * from './uploads';
 export * from './reviews';
+export * from './assistant';
 export * from './responses';

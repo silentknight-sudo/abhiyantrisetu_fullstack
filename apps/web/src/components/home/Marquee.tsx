@@ -56,7 +56,7 @@ export function Marquee() {
         {items.map((s, i) => (
           <span
             key={i}
-            className="flex items-center gap-10 font-display text-2xl italic text-navy-600"
+            className="flex items-center gap-10 font-display text-xl font-semibold text-navy-600"
             aria-hidden={i >= SECTORS.length}
           >
             {s.name}

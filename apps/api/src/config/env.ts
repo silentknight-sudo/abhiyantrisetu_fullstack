@@ -36,6 +36,8 @@ const envSchema = z
     S3_SECRET_ACCESS_KEY: z.string().optional(),
     /** Where this API is reachable, for local-storage upload links (dev only). */
     PUBLIC_API_URL: z.string().url().optional(),
+    /** Setu AI. Without a key the assistant answers from the built-in rate card. */
+    ANTHROPIC_API_KEY: z.string().optional(),
     RAZORPAY_KEY_ID: z.string().optional(),
     RAZORPAY_KEY_SECRET: z.string().optional(),
     RAZORPAY_WEBHOOK_SECRET: z.string().optional(),

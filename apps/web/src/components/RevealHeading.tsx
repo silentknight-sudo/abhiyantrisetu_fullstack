@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 
 /**
  * A section heading whose words flip up into place in 3D, one after another, when it
- * scrolls into view. `accent` is set in the italic orange style.
+ * scrolls into view. `accent` is set in orange.
  */
 export function RevealHeading({
   text,

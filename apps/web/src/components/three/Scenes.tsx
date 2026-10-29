@@ -7,6 +7,7 @@ import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
 /** Three.js only runs in the browser; load the scenes lazily so they never block first paint. */
 export const HeroScene = dynamic(() => import('./HeroScene'), { ssr: false });
 export const HouseScene = dynamic(() => import('./HouseScene'), { ssr: false });
+export const GlassHouseScene = dynamic(() => import('./GlassHouseScene'), { ssr: false });
 
 /** Shows `fallback` if WebGL is unavailable or the scene throws. */
 class SceneBoundary extends Component<

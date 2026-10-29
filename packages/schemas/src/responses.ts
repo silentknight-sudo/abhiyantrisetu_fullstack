@@ -468,3 +468,9 @@ export const reviewResponse = z.object({
 
 /** GET /jobs/{id}/review: wrapped so "no review yet" is `{ review: null }`. */
 export const jobReviewResponse = z.object({ review: reviewResponse.nullable() });
+
+export const assistantReplyResponse = z.object({
+  reply: z.string(),
+  /** `claude` when the model answered; `offline` for the rule-based reply. */
+  source: z.enum(['claude', 'offline']),
+});

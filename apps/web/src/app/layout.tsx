@@ -1,6 +1,6 @@
 import { cssStylesheet } from '@setu/ui-tokens';
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter, Noto_Sans_Devanagari } from 'next/font/google';
+import { Inter, Noto_Sans_Devanagari, Plus_Jakarta_Sans } from 'next/font/google';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { Analytics } from '@/components/Analytics';
@@ -11,11 +11,10 @@ import { SITE } from '@/lib/content';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const cormorant = Cormorant_Garamond({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
+  weight: ['600', '700', '800'],
+  variable: '--font-jakarta',
   display: 'swap',
 });
 const notoDeva = Noto_Sans_Devanagari({
@@ -43,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en-IN"
       data-theme="light"
-      className={`${inter.variable} ${cormorant.variable} ${notoDeva.variable}`}
+      className={`${inter.variable} ${jakarta.variable} ${notoDeva.variable}`}
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: cssStylesheet() }} />

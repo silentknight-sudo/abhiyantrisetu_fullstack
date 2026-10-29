@@ -5,10 +5,10 @@ export const SITE = {
   tagline: 'The bridge between your home and the people who build it.',
   city: 'Greater Noida',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
-  phone: '+91 120 000 0000',
-  email: 'hello@abhiyantrisetu.com',
-  /** WhatsApp number for launch updates (placeholder until the business number is live). */
-  whatsapp: '911200000000',
+  phone: '+91 92895 53069',
+  email: 'info@abhiyantrisetu.com',
+  /** WhatsApp business number: quote requests from the website go here. */
+  whatsapp: '919289553069',
   grievanceEmail: 'grievance@abhiyantrisetu.com',
 };
 

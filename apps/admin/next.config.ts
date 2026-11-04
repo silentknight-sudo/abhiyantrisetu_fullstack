@@ -16,6 +16,12 @@ const config: NextConfig = {
       },
     ];
   },
+  // Optional same-origin API: with API_PROXY_URL set (and NEXT_PUBLIC_API_URL empty),
+  // /v1/* is forwarded to the API, so the portal works where only its own port is reachable.
+  async rewrites() {
+    const api = process.env.API_PROXY_URL;
+    return api ? [{ source: '/v1/:path*', destination: `${api}/v1/:path*` }] : [];
+  },
 };
 
 export default config;

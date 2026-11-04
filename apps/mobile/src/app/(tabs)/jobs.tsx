@@ -4,13 +4,17 @@ import {
   Body,
   Card,
   Empty,
+  IconBadge,
   Loading,
   Notice,
   Row,
   Screen,
   Small,
   Title,
+  toneColor,
 } from '@/components/ui';
+import { View } from 'react-native';
+import { spacing, usePalette } from '@/lib/theme';
 import { $api } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { errorMessage } from '@/lib/errors';
@@ -19,6 +23,7 @@ import { useI18n } from '@/lib/i18n';
 
 export default function Jobs() {
   const { t, d } = useI18n();
+  const c = usePalette();
   const jobs = $api.useQuery('get', '/v1/jobs');
   const mine = (jobs.data ?? []).filter((j) =>
     IS_PARTNER ? j.viewerRole === 'partner' : j.viewerRole === 'customer',
@@ -38,12 +43,19 @@ export default function Jobs() {
         />
       ) : null}
       {mine.map((j) => (
-        <Card key={j.id} onPress={() => router.push(`/job/${j.id}`)}>
-          <Row>
-            <Body>{rupees(j.agreedTotalPaise)}</Body>
+        <Card
+          key={j.id}
+          accent={toneColor(jobTone(j.state), c)}
+          onPress={() => router.push(`/job/${j.id}`)}
+        >
+          <View style={{ flexDirection: 'row', gap: spacing[3], alignItems: 'center' }}>
+            <IconBadge name="briefcase" tone="light" />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Title>{j.title}</Title>
+              <Body>{rupees(j.agreedTotalPaise)}</Body>
+            </View>
             <Badge label={d.jobState[j.state]} tone={jobTone(j.state)} />
-          </Row>
-          <Title>{j.title}</Title>
+          </View>
           <Small>
             {j.slotStart
               ? t('Visit {when}', { when: when(j.slotStart) })

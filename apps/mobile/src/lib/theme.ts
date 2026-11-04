@@ -9,5 +9,21 @@ export function usePalette(): Palette {
 
 export { radius, spacing, typeScale };
 
-/** Headings use the platform serif to echo the website's Cormorant headings. */
-export const serif = { fontFamily: 'serif' } as const;
+/** Font families loaded in the root layout (same faces as the website). */
+export const font = {
+  heading: 'PlusJakartaSans_700Bold',
+  headingHeavy: 'PlusJakartaSans_800ExtraBold',
+  headingSemi: 'PlusJakartaSans_600SemiBold',
+  body: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+} as const;
+
+/** Soft card shadow; elevation for Android. */
+export const shadow = {
+  shadowColor: '#1A3A52',
+  shadowOpacity: 0.08,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: 6 },
+  elevation: 3,
+} as const;

@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Platform, Switch } from 'react-native';
 import {
+  Avatar,
   Badge,
   Body,
   Button,
@@ -16,6 +17,8 @@ import {
   Small,
   Title,
 } from '@/components/ui';
+import { View } from 'react-native';
+import { spacing } from '@/lib/theme';
 import { $api, client, queryClient } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { errorMessage } from '@/lib/errors';
@@ -62,8 +65,13 @@ export default function Account() {
   return (
     <Screen>
       <Card>
-        <Small>{t('Signed in as')}</Small>
-        <Title>{me.data?.phone ?? '…'}</Title>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
+          <Avatar name={me.data?.name || me.data?.phone || ''} />
+          <View style={{ flex: 1 }}>
+            <Small>{t('Signed in as')}</Small>
+            <Title>{me.data?.phone ?? '…'}</Title>
+          </View>
+        </View>
         <Field label={t('Your name')} value={name} onChangeText={setName} placeholder={t('Name')} />
         <Small>{t('Language')}</Small>
         <Chips>

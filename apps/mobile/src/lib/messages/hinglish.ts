@@ -337,4 +337,16 @@ export const hinglish: Record<MessageKey, string> = {
   'Cement, steel, sand, bricks, tiles': 'Cement, sariya, ret, eent, tiles',
   'JCB, mixer, scaffolding, with or without operator':
     'JCB, mixer, scaffolding, operator ke saath ya bina',
+  'Get a quote': 'Quote paayein',
+  'Greater Noida': 'Greater Noida',
+  'New leads: {n}': 'Nayi leads: {n}',
+  'Pay safely': 'Safe payment',
+  'Quick response': 'Jaldi jawab',
+  'Real reviews': 'Asli reviews',
+  'Home services': 'Home services',
+  'Build a house': 'Ghar banwayein',
+  'Verified pros at your door': 'Verified pros aapke darwaze par',
+  'Pay stage by stage': 'Stage by stage payment',
+  'Itemised quotes in 24 hours': '24 ghante mein itemised quotes',
+  'See all': 'Sab dekhein',
 };

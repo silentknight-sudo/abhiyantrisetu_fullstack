@@ -7,7 +7,7 @@ import { Loading } from '@/components/ui';
 import { $api } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { useI18n } from '@/lib/i18n';
-import { usePalette } from '@/lib/theme';
+import { font, usePalette } from '@/lib/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 const icon =
@@ -33,10 +33,19 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: c.primary,
+        tabBarActiveTintColor: c.accentHover,
         tabBarInactiveTintColor: c.textMuted,
-        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.border },
+        tabBarStyle: {
+          backgroundColor: c.surface,
+          borderTopColor: c.border,
+          height: 64,
+          paddingTop: 6,
+          paddingBottom: 8,
+        },
+        tabBarLabelStyle: { fontFamily: font.semibold, fontSize: 11 },
         headerStyle: { backgroundColor: c.background },
+        headerShadowVisible: false,
+        headerTitleStyle: { fontFamily: font.heading, fontSize: 18 },
         headerTintColor: c.text,
       }}
     >

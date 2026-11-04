@@ -334,6 +334,18 @@ export const hi = {
     'स्ट्रक्चरल, आर्किटेक्ट, इंटीरियर, खर्च का अनुमान',
   'Cement, steel, sand, bricks, tiles': 'सीमेंट, सरिया, रेत, ईंट, टाइल',
   'JCB, mixer, scaffolding, with or without operator': 'JCB, मिक्सर, मचान, ऑपरेटर के साथ या बिना',
+  'Get a quote': 'कोटेशन पाएं',
+  'Greater Noida': 'ग्रेटर नोएडा',
+  'New leads: {n}': 'नई लीड्स: {n}',
+  'Pay safely': 'सुरक्षित भुगतान',
+  'Quick response': 'तुरंत जवाब',
+  'Real reviews': 'असली रिव्यू',
+  'Home services': 'घरेलू सेवाएं',
+  'Build a house': 'मकान बनवाएं',
+  'Verified pros at your door': 'वेरिफ़ाइड प्रोफ़ेशनल आपके दरवाज़े पर',
+  'Pay stage by stage': 'हर चरण पर भुगतान करें',
+  'Itemised quotes in 24 hours': '24 घंटे में पूरा ब्योरा वाला कोटेशन',
+  'See all': 'सभी देखें',
 };
 
 export type MessageKey = keyof typeof hi;

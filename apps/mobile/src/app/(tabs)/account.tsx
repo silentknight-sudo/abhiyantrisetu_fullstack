@@ -11,12 +11,14 @@ import {
   Chip,
   Chips,
   Field,
+  MenuRow,
   Notice,
   Row,
   Screen,
   Small,
   Title,
 } from '@/components/ui';
+import { Linking } from 'react-native';
 import { View } from 'react-native';
 import { spacing } from '@/lib/theme';
 import { $api, client, queryClient } from '@/lib/api';
@@ -133,6 +135,37 @@ export default function Account() {
           />
         </Card>
       ) : null}
+
+      <Card>
+        <MenuRow
+          icon="notifications"
+          label={t('Notifications')}
+          onPress={() => router.push('/notifications')}
+        />
+        {IS_PARTNER ? (
+          <MenuRow icon="wallet" label={t('Earnings')} onPress={() => router.push('/earnings')} />
+        ) : (
+          <>
+            <MenuRow icon="sparkles" label="Setu AI" onPress={() => router.push('/assistant')} />
+            <MenuRow
+              icon="calculator"
+              label={t('Cost calculator')}
+              onPress={() => router.push('/calculator')}
+            />
+          </>
+        )}
+        <MenuRow
+          icon="logo-whatsapp"
+          label={t('Help on WhatsApp')}
+          onPress={() => void Linking.openURL('https://wa.me/919289553069')}
+        />
+        <MenuRow
+          icon="document-text"
+          label={t('Terms and privacy')}
+          onPress={() => void Linking.openURL('https://www.abhiyantrisetu.com/')}
+          last
+        />
+      </Card>
 
       <Button
         title={t('Sign out')}

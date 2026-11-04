@@ -246,5 +246,25 @@ describe('admin', () => {
       .set(bearer(finance.accessToken))
       .expect(200);
     expect(books.body.trialBalancePaise).toBe(0);
+
+    // The partner sees the same money from their side.
+    const mine = await ctx
+      .http()
+      .get('/v1/partner/earnings')
+      .set(bearer(partnerUser.accessToken))
+      .expect(200);
+    expect(mine.body).toMatchObject({
+      owedPaise: 0,
+      earnedPaise: 120_000,
+      paidOutPaise: 120_000,
+      thisWeekPaise: 120_000,
+    });
+    expect(mine.body.entries.map((e: { kind: string }) => e.kind)).toEqual([
+      'payout',
+      'payout',
+      'earning',
+    ]);
+    expect(mine.body.entries[0].reference).toBe('Payout UTR 4521 8890');
+    await ctx.http().get('/v1/partner/earnings').set(bearer(ops.accessToken)).expect(404);
   });
 });

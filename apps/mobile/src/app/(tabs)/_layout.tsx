@@ -52,7 +52,12 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen
         name="home"
-        options={{ title: t('Home'), href: show(false), tabBarIcon: icon('home-outline') }}
+        options={{
+          title: t('Home'),
+          href: show(false),
+          tabBarIcon: icon('home-outline'),
+          headerShown: false,
+        }}
       />
       <Tabs.Screen
         name="requests"

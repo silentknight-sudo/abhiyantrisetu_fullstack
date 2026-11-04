@@ -703,3 +703,77 @@ const styles = StyleSheet.create({
     padding: spacing[3],
   },
 });
+
+/** A small figure with a label, for dashboard rows. */
+export function Stat({
+  label,
+  value,
+  icon,
+  onPress,
+}: {
+  label: string;
+  value: string;
+  icon: IconName;
+  onPress?: () => void;
+}) {
+  const c = usePalette();
+  return (
+    <Pressable
+      accessibilityRole={onPress ? 'button' : undefined}
+      disabled={!onPress}
+      onPress={onPress}
+      style={[
+        shadow,
+        {
+          flex: 1,
+          gap: 4,
+          borderRadius: 18,
+          padding: spacing[3],
+          backgroundColor: c.surface,
+          borderWidth: 1,
+          borderColor: c.border,
+        },
+      ]}
+    >
+      <Ionicons name={icon} size={18} color={c.accentHover} />
+      <Text style={[typeScale.lg, { color: c.text, fontFamily: font.headingHeavy }]}>{value}</Text>
+      <Text style={[typeScale.xs, { color: c.textMuted, fontFamily: font.medium }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+/** A tappable settings-style row with an icon and a chevron. */
+export function MenuRow({
+  icon,
+  label,
+  onPress,
+  last,
+}: {
+  icon: IconName;
+  label: string;
+  onPress: () => void;
+  last?: boolean;
+}) {
+  const c = usePalette();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing[3],
+        paddingVertical: spacing[3],
+        borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
+        borderBottomColor: c.border,
+        opacity: pressed ? 0.7 : 1,
+      })}
+    >
+      <IconBadge name={icon} size={36} tone="light" />
+      <Text style={[typeScale.base, { flex: 1, color: c.text, fontFamily: font.medium }]}>
+        {label}
+      </Text>
+      <Ionicons name="chevron-forward" size={18} color={c.textMuted} />
+    </Pressable>
+  );
+}

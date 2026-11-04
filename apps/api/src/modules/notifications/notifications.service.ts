@@ -175,8 +175,12 @@ export class NotificationsService implements OnModuleDestroy {
       .where(eq(users.id, userId));
   }
 
-  inbox(userId: string) {
-    return this.db
+  async inbox(userId: string) {
+    const [user] = await this.db
+      .select({ locale: users.locale })
+      .from(users)
+      .where(eq(users.id, userId));
+    const rows = await this.db
       .select({
         id: notifications.id,
         channel: notifications.channel,
@@ -189,5 +193,13 @@ export class NotificationsService implements OnModuleDestroy {
       .where(and(eq(notifications.userId, userId), eq(notifications.channel, 'push')))
       .orderBy(desc(notifications.createdAt))
       .limit(50);
+    return rows.map((r) => {
+      const { title, body } = render(
+        r.template as TemplateKey,
+        r.params as never,
+        user?.locale ?? 'en',
+      ).push;
+      return { ...r, title, body };
+    });
   }
 }

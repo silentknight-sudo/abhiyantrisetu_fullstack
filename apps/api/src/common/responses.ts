@@ -1,5 +1,6 @@
 import {
   assistantReplyResponse,
+  partnerEarningsResponse,
   jobReviewResponse,
   reviewResponse,
   uploadSlotResponse,
@@ -75,3 +76,4 @@ export class UploadSlotDto extends createZodDto(uploadSlotResponse, { codec: tru
 export class ReviewDto extends createZodDto(reviewResponse, { codec: true }) {}
 export class JobReviewDto extends createZodDto(jobReviewResponse, { codec: true }) {}
 export class AssistantReplyDto extends createZodDto(assistantReplyResponse, { codec: true }) {}
+export class PartnerEarningsDto extends createZodDto(partnerEarningsResponse, { codec: true }) {}

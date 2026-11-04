@@ -11,6 +11,7 @@ import {
   Row,
   Screen,
   Small,
+  Stat,
   Title,
   toneColor,
 } from '@/components/ui';
@@ -28,6 +29,11 @@ export default function Leads() {
   const c = usePalette();
   const partner = $api.useQuery('get', '/v1/partners/me');
   const leads = $api.useQuery('get', '/v1/partner/leads');
+  const jobs = $api.useQuery('get', '/v1/jobs');
+  const earnings = $api.useQuery('get', '/v1/partner/earnings', {}, { retry: false });
+  const activeJobs = (jobs.data ?? []).filter(
+    (j) => j.viewerRole === 'partner' && !['closed', 'cancelled'].includes(j.state),
+  ).length;
   const verified = partner.data?.verificationStatus === 'verified';
 
   return (
@@ -41,6 +47,25 @@ export default function Leads() {
         })}
         body={t('New jobs near you will appear here and on WhatsApp.')}
       />
+      <View style={{ flexDirection: 'row', gap: spacing[3] }}>
+        <Stat
+          icon="star"
+          label={t('Rating')}
+          value={partner.data?.ratingAvg ? partner.data.ratingAvg.toFixed(1) : '–'}
+        />
+        <Stat
+          icon="briefcase"
+          label={t('Active jobs')}
+          value={String(activeJobs)}
+          onPress={() => router.push('/jobs')}
+        />
+        <Stat
+          icon="wallet"
+          label={t('Next payout')}
+          value={earnings.data ? rupees(earnings.data.owedPaise) : '–'}
+          onPress={() => router.push('/earnings')}
+        />
+      </View>
       {partner.data && !verified ? (
         <Notice tone="info">
           {t(

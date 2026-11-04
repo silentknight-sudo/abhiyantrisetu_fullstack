@@ -86,6 +86,10 @@ function Routes() {
         <Stack.Screen name="quote/[id]" options={{ title: t('Quote') }} />
         <Stack.Screen name="job/[id]" options={{ title: t('Job') }} />
         <Stack.Screen name="lead/[id]" options={{ title: t('Lead') }} />
+        <Stack.Screen name="assistant" options={{ title: 'Setu AI' }} />
+        <Stack.Screen name="calculator" options={{ title: t('Cost calculator') }} />
+        <Stack.Screen name="notifications" options={{ title: t('Notifications') }} />
+        <Stack.Screen name="earnings" options={{ title: t('Earnings') }} />
         <Stack.Screen
           name="onboarding"
           options={{

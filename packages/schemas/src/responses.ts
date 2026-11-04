@@ -347,6 +347,9 @@ export const notificationResponse = z.object({
   template: z.string(),
   params: json,
   status: z.enum(['queued', 'sent', 'failed', 'skipped']),
+  /** Rendered in the user's language, ready to show. */
+  title: z.string(),
+  body: z.string(),
   createdAt: timestamp,
 });
 
@@ -473,4 +476,23 @@ export const assistantReplyResponse = z.object({
   reply: z.string(),
   /** `claude` when the model answered; `offline` for the rule-based reply. */
   source: z.enum(['claude', 'offline']),
+});
+
+/** The signed-in partner's money: released earnings, payouts and what is still owed. */
+export const partnerEarningsResponse = z.object({
+  owedPaise: z.number().int(),
+  earnedPaise: z.number().int(),
+  paidOutPaise: z.number().int(),
+  thisWeekPaise: z.number().int(),
+  entries: z.array(
+    z.object({
+      id: z.string(),
+      kind: z.enum(['earning', 'payout']),
+      amountPaise: z.number().int(),
+      jobId: uuid.nullable(),
+      jobTitle: z.string().nullable(),
+      reference: z.string().nullable(),
+      createdAt: timestamp,
+    }),
+  ),
 });

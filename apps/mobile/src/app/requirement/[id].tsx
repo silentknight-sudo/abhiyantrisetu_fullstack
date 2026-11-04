@@ -5,7 +5,6 @@ import {
   Body,
   Button,
   Card,
-  Empty,
   Field,
   Loading,
   Notice,
@@ -15,6 +14,7 @@ import {
   Title,
 } from '@/components/ui';
 import { PhotoStrip } from '@/components/PhotoStrip';
+import { Radar } from '@/components/Radar';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import { ago, detailLines, QUOTE_STATUS_LABEL, requirementTone, rupees } from '@/lib/format';
@@ -80,7 +80,7 @@ export default function RequirementDetail() {
       <Title>{sent.length ? t('Quotes ({n})', { n: sent.length }) : t('Quotes')}</Title>
       {quotes.isPending ? <Loading /> : null}
       {quotes.data && sent.length === 0 && open ? (
-        <Empty
+        <Radar
           title={t('Waiting for quotes')}
           body={t(
             "We've told verified professionals near you. You'll get a notification when a quote arrives.",

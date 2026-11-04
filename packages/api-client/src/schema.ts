@@ -692,6 +692,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/partner/earnings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['PaymentsController_earnings_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/payments/orders': {
     parameters: {
       query?: never;
@@ -1603,8 +1619,28 @@ export interface components {
       params: unknown;
       /** @enum {string} */
       status: 'queued' | 'sent' | 'failed' | 'skipped';
+      title: string;
+      body: string;
       /** Format: date-time */
       createdAt: string;
+    };
+    PartnerEarningsDto: {
+      owedPaise: number;
+      earnedPaise: number;
+      paidOutPaise: number;
+      thisWeekPaise: number;
+      entries: {
+        id: string;
+        /** @enum {string} */
+        kind: 'earning' | 'payout';
+        amountPaise: number;
+        /** Format: uuid */
+        jobId: string | null;
+        jobTitle: string | null;
+        reference: string | null;
+        /** Format: date-time */
+        createdAt: string;
+      }[];
     };
     CreateOrderDto: {
       /** Format: uuid */
@@ -3580,6 +3616,34 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['NotificationDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PaymentsController_earnings_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerEarningsDto'];
         };
       };
       /** @description Error */

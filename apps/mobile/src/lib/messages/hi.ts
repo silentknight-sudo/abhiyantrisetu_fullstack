@@ -346,6 +346,66 @@ export const hi = {
   'Pay stage by stage': 'हर चरण पर भुगतान करें',
   'Itemised quotes in 24 hours': '24 घंटे में पूरा ब्योरा वाला कोटेशन',
   'See all': 'सभी देखें',
+  'Ask about costs, the right service or a problem at home, in English, Hindi or Hinglish.':
+    'खर्च, सही सेवा या घर की किसी समस्या के बारे में अंग्रेज़ी, हिंदी या हिंग्लिश में पूछें।',
+  'Ask in English, हिंदी or Hinglish…': 'अंग्रेज़ी, हिंदी या हिंग्लिश में पूछें…',
+  'Ask in Hinglish. Get a plan.': 'हिंग्लिश में पूछें, योजना पाएं।',
+  'Know the ballpark first': 'पहले अंदाज़ा लगाएं',
+  'Built-up area per floor (sq ft)': 'हर मंज़िल का बिल्ट-अप एरिया (वर्ग फ़ुट)',
+  'Carpet area (sq ft)': 'कार्पेट एरिया (वर्ग फ़ुट)',
+  'Change area': 'इलाका बदलें',
+  'Choose your area': 'अपना इलाका चुनें',
+  'Cost calculator': 'खर्च कैलकुलेटर',
+  'Describe the job in English, Hindi or Hinglish.':
+    'काम के बारे में अंग्रेज़ी, हिंदी या हिंग्लिश में बताएं।',
+  'Verified pros near you send itemised quotes.':
+    'पास के वेरिफ़ाइड प्रोफ़ेशनल पूरा ब्योरा वाला कोटेशन भेजते हैं।',
+  'Your money is held by Setu until you confirm the work.':
+    'काम की पुष्टि तक आपका पैसा Setu के पास सुरक्षित रहता है।',
+  Earnings: 'कमाई',
+  'Excludes GST, land and approval fees. Final price after a free site visit.':
+    'GST, ज़मीन और मंज़ूरी शुल्क शामिल नहीं। अंतिम कीमत मुफ़्त साइट विज़िट के बाद।',
+  'Finish quality': 'फ़िनिश की क्वालिटी',
+  Floors: 'मंज़िलें',
+  'Get exact quotes': 'सही कोटेशन पाएं',
+  'Help on WhatsApp': 'WhatsApp पर मदद',
+  History: 'इतिहास',
+  'House Painting': 'घर की पेंटिंग',
+  'House construction': 'मकान निर्माण',
+  'How Setu works': 'Setu कैसे काम करता है',
+  'Indicative estimate': 'अनुमानित खर्च',
+  'Indicative estimate. Final price after site visit.':
+    'अनुमानित खर्च। अंतिम कीमत साइट विज़िट के बाद।',
+  'Job payment': 'काम का भुगतान',
+  'Money from completed jobs appears here once the customer confirms.':
+    'ग्राहक की पुष्टि के बाद पूरे हुए कामों का पैसा यहाँ दिखेगा।',
+  'Next payout': 'अगला भुगतान',
+  'No earnings yet': 'अभी कोई कमाई नहीं',
+  'No notifications yet': 'अभी कोई सूचना नहीं',
+  'Not sure? Ask Setu AI and it will suggest the right service.':
+    'पक्का नहीं? Setu AI से पूछें, वह सही सेवा बताएगा।',
+  Notifications: 'सूचनाएं',
+  'Paid to your bank every week once customers confirm the work.':
+    'ग्राहक की पुष्टि के बाद हर हफ़्ते आपके बैंक में भेजा जाता है।',
+  'Post your requirement': 'अपनी ज़रूरत पोस्ट करें',
+  'Get 2+ quotes within 24 hours': '24 घंटे में 2+ कोटेशन पाएं',
+  'Payout to bank': 'बैंक में भुगतान',
+  'Quotes, job updates and new leads will show up here.':
+    'कोटेशन, काम के अपडेट और नई लीड्स यहाँ दिखेंगी।',
+  Rating: 'रेटिंग',
+  'Search for a service, e.g. plumber': 'सेवा खोजें, जैसे प्लंबर',
+  'Terms and privacy': 'शर्तें और प्राइवेसी',
+  'Total earned': 'कुल कमाई',
+  'Paid out': 'भुगतान हो चुका',
+  Basic: 'बेसिक',
+  Standard: 'स्टैंडर्ड',
+  Premium: 'प्रीमियम',
+  'Modular Kitchen': 'मॉड्यूलर किचन',
+  Materials: 'सामग्री',
+  Labour: 'मज़दूरी',
+  'Design, approvals & supervision': 'डिज़ाइन, मंज़ूरी और देखरेख',
+  'Paint & primer': 'पेंट और प्राइमर',
+  'Putty & prep': 'पुट्टी और तैयारी',
 };
 
 export type MessageKey = keyof typeof hi;

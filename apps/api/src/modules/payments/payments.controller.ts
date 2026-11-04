@@ -25,6 +25,7 @@ import {
   PaymentOrderDto,
   PaymentVerifiedDto,
   PayoutDueDto,
+  PartnerEarningsDto,
   PayoutRecordedDto,
 } from '../../common/responses';
 import { PaymentsService } from './payments.service';
@@ -47,6 +48,13 @@ class FakeCheckoutDto extends createZodDto(
 @Controller()
 export class PaymentsController {
   constructor(@Inject(PaymentsService) private readonly payments: PaymentsService) {}
+
+  @ZodResponse({ status: 200, type: PartnerEarningsDto })
+  @ApiBearerAuth()
+  @Get('partner/earnings')
+  earnings(@CurrentUser() user: AuthUser) {
+    return this.payments.partnerEarnings(user.id);
+  }
 
   @ZodResponse({ status: 201, type: PaymentOrderDto })
   @ApiBearerAuth()

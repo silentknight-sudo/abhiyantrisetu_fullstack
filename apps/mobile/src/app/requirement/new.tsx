@@ -2,7 +2,7 @@ import { SECTORS } from '@setu/domain';
 import { createRequirementSchema } from '@setu/schemas';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import {
   Body,
@@ -104,7 +104,7 @@ const toggle = <T,>(xs: T[], x: T) => (xs.includes(x) ? xs.filter((y) => y !== x
 
 export default function NewRequirement() {
   const { t, locale } = useI18n();
-  const params = useLocalSearchParams<{ type?: string }>();
+  const params = useLocalSearchParams<{ type?: string; category?: string }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
   );
@@ -134,6 +134,12 @@ export default function NewRequirement() {
   const [uploading, setUploading] = useState(false);
 
   const catalog = $api.useQuery('get', '/v1/catalog/categories');
+  // A shortcut from the home screen names the category by slug; pick it once loaded.
+  useEffect(() => {
+    if (!params.category || categoryId) return;
+    const hit = catalog.data?.find((x) => x.slug === params.category);
+    if (hit) setCategoryId(hit.id);
+  }, [catalog.data, params.category, categoryId]);
   const categories = (catalog.data ?? []).filter((c) => c.requirementType === kind);
   const create = $api.useMutation('post', '/v1/requirements', {
     onSuccess: (req) => {

@@ -288,7 +288,11 @@ describe('customer and partner updates through the job', () => {
       .get('/v1/me/notifications')
       .set(bearer(customer.accessToken))
       .expect(200);
-    expect(inboxCustomer.body[0]).toMatchObject({ template: 'quote_received', status: 'skipped' }); // no device yet
+    expect(inboxCustomer.body[0]).toMatchObject({
+      template: 'quote_received',
+      status: 'skipped', // no device yet
+      title: 'New quote received',
+    });
     // No WhatsApp opt-in: logged as skipped with the reason, never sent.
     const [waRow] = await ctx.db
       .select()

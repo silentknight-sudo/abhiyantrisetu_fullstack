@@ -581,6 +581,59 @@ export class PaymentsService {
   }
 
   /** Partners with released money not yet paid out, most owed first. */
+  /**
+   * What the signed-in partner has earned and been paid, from the ledger: money released
+   * after customers confirm (credits) and payouts sent to their bank (debits).
+   */
+  async partnerEarnings(userId: string) {
+    const [me] = await this.db
+      .select({ id: partners.id })
+      .from(partners)
+      .where(eq(partners.userId, userId));
+    if (!me)
+      throw new NotFoundException({ code: 'NO_PARTNER', message: 'Set up your business first' });
+    const rows = await this.db
+      .select({
+        id: ledgerEntries.id,
+        kind: ledgerEntries.kind,
+        creditPaise: ledgerEntries.creditPaise,
+        debitPaise: ledgerEntries.debitPaise,
+        jobId: ledgerEntries.jobId,
+        jobTitle: requirements.title,
+        memo: ledgerEntries.memo,
+        createdAt: ledgerEntries.createdAt,
+      })
+      .from(ledgerEntries)
+      .leftJoin(jobs, eq(jobs.id, ledgerEntries.jobId))
+      .leftJoin(requirements, eq(requirements.id, jobs.requirementId))
+      .where(eq(ledgerEntries.account, LedgerAccounts.partnerPayable(me.id)))
+      .orderBy(desc(ledgerEntries.createdAt));
+    const weekAgo = Date.now() - 7 * 24 * 3600_000;
+    let earned = 0;
+    let paid = 0;
+    let week = 0;
+    for (const r of rows) {
+      earned += Number(r.creditPaise);
+      paid += Number(r.debitPaise);
+      if (new Date(r.createdAt).getTime() >= weekAgo) week += Number(r.creditPaise);
+    }
+    return {
+      owedPaise: earned - paid,
+      earnedPaise: earned,
+      paidOutPaise: paid,
+      thisWeekPaise: week,
+      entries: rows.slice(0, 50).map((r) => ({
+        id: String(r.id),
+        kind: Number(r.debitPaise) > 0 ? ('payout' as const) : ('earning' as const),
+        amountPaise: Number(r.creditPaise) || Number(r.debitPaise),
+        jobId: r.jobId,
+        jobTitle: r.jobTitle,
+        reference: r.memo,
+        createdAt: r.createdAt,
+      })),
+    };
+  }
+
   async payoutsDue() {
     const rows = await this.db
       .select({

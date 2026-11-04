@@ -1,0 +1,108 @@
+# Render Blueprint: a complete TEST copy of Abhiyantri Setu.
+# Render dashboard → New → Blueprint → pick this repository and branch.
+#
+# Test mode on purpose: OTP codes are printed in the API's Render logs (no SMS),
+# payments use the fake gateway, WhatsApp and push are logged, photos are kept on the
+# service's disk. Do not put real customers on it. Production stays on AWS Mumbai
+# (docs/deploy-api.md).
+#
+# Service URLs: Render names them https://<name>.onrender.com. If a name is taken, Render
+# adds a suffix; then update CORS_ORIGINS and NEXT_PUBLIC_API_URL below to the real URLs.
+
+databases:
+  - name: setu-db
+    plan: free
+    region: singapore
+    databaseName: setu
+    user: setu
+    postgresMajorVersion: '16'
+
+services:
+  # Rate limits and queues.
+  - type: keyvalue
+    name: setu-redis
+    plan: free
+    region: singapore
+    ipAllowList: []
+
+  # NestJS API, built from apps/api/Dockerfile. Migrations and the catalog seed run on every start.
+  - type: web
+    name: setu-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    dockerCommand: sh -c "node dist/db/migrate.js && node dist/db/seed.js && node dist/main.js"
+    healthCheckPath: /v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: development
+      - key: PORT
+        value: '4000'
+      - key: DATABASE_URL
+        fromDatabase:
+          name: setu-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: setu-redis
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: OTP_HASH_SECRET
+        generateValue: true
+      - key: SMS_PROVIDER
+        value: console
+      - key: WHATSAPP_PROVIDER
+        value: console
+      - key: PUSH_PROVIDER
+        value: console
+      - key: PAYMENTS_PROVIDER
+        value: fake
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: NOTIFICATIONS_DELIVERY
+        value: inline
+      - key: THROTTLE_STORE
+        value: redis
+      - key: CORS_ORIGINS
+        value: https://setu-web.onrender.com,https://setu-admin.onrender.com
+      # Optional: a Claude API key makes Setu AI answer with Claude instead of the rate card.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  # Website (Next.js).
+  - type: web
+    name: setu-web
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter "@setu/web..." run build
+    startCommand: pnpm --filter @setu/web exec next start -p $PORT
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NEXT_PUBLIC_API_URL
+        value: https://setu-api.onrender.com
+      # Canonical links stay on the real domain, so the test site never competes in Google.
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://www.abhiyantrisetu.com
+
+  # Admin portal (Next.js).
+  - type: web
+    name: setu-admin
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter "@setu/admin..." run build
+    startCommand: pnpm --filter @setu/admin exec next start -p $PORT
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NEXT_PUBLIC_API_URL
+        value: https://setu-api.onrender.com

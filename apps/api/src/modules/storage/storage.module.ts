@@ -35,7 +35,8 @@ export const storageMode = (env: Env) =>
             .digest('hex');
           return new LocalStorageProvider(
             path.resolve(env.STORAGE_LOCAL_DIR),
-            env.PUBLIC_API_URL ?? `http://localhost:${env.PORT}`,
+            // Render sets RENDER_EXTERNAL_URL on every web service (test deployments).
+            env.PUBLIC_API_URL ?? process.env.RENDER_EXTERNAL_URL ?? `http://localhost:${env.PORT}`,
             secret,
           );
         }

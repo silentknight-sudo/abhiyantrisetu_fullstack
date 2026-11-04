@@ -120,6 +120,13 @@ POST /v1/payments/orders         POST /v1/payments/verify        GET /v1/jobs/:i
 POST /v1/webhooks/razorpay       GET /v1/admin/ledger/balances
 ```
 
+## Test builds
+
+- **Android APKs:** GitHub → Actions → **Build Android APK** → Run workflow. See
+  [docs/android-apk.md](docs/android-apk.md).
+- **Test environment on Render:** `render.yaml` deploys the API, website, admin portal,
+  Postgres and Redis. See [docs/testing-on-render.md](docs/testing-on-render.md).
+
 ## Rules this codebase holds to
 
 - **Only the Jobs module changes job state.** It locks the row, runs the guarded transition table from `@setu/domain`, and writes a `job_events` row in the same transaction. Requirements follow the same pattern with `requirement_events`.

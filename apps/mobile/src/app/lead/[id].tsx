@@ -16,7 +16,7 @@ import {
 } from '@/components/ui';
 import { $api, client, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { ago, detailLines, LEAD_STATUS, QUOTE_STATUS_LABEL, rupees, when } from '@/lib/format';
+import { ago, detailLines, leadBadge, QUOTE_STATUS_LABEL, rupees, when } from '@/lib/format';
 import { useI18n } from '@/lib/i18n';
 
 export default function LeadDetail() {
@@ -85,7 +85,7 @@ export default function LeadDetail() {
           <Small>
             {d.requirementType[r.type]} · {lead.distanceKm} km · {ago(lead.sentAt, t)}
           </Small>
-          <Badge label={t(LEAD_STATUS[lead.status][0])} tone={LEAD_STATUS[lead.status][1]} />
+          <Badge label={t(leadBadge(lead)[0])} tone={leadBadge(lead)[1]} />
         </Row>
         <Title>{r.title}</Title>
         {description ? <Body>{description}</Body> : null}

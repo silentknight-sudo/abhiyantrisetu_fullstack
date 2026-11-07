@@ -1,3 +1,4 @@
+import { AccessRevocation } from './revocation';
 import {
   type CanActivate,
   createParamDecorator,
@@ -50,6 +51,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     @Inject(JwtService) private readonly jwt: JwtService,
     @Inject(Reflector) private readonly reflector: Reflector,
+    @Inject(AccessRevocation) private readonly revocation: AccessRevocation,
   ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
@@ -66,6 +68,9 @@ export class AuthGuard implements CanActivate {
       payload = await this.jwt.verifyAsync<AccessTokenPayload>(token);
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
+    }
+    if (await this.revocation.isRevoked(payload.sub, (payload as { iat?: number }).iat)) {
+      throw new UnauthorizedException('Session ended. Please log in again.');
     }
     req.user = { id: payload.sub, roles: payload.roles };
 

@@ -885,6 +885,118 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/admin/services': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ManageController_services_v1'];
+    put?: never;
+    post: operations['ManageController_createService_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/services/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations['ManageController_updateService_v1'];
+    trace?: never;
+  };
+  '/v1/admin/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ManageController_users_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/users/{id}/suspend': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['ManageController_suspend_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/users/{id}/reactivate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['ManageController_reactivate_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/users/{id}/reset-device': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['ManageController_resetDevice_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/audit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ManageController_audit_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/uploads': {
     parameters: {
       query?: never;
@@ -1851,6 +1963,55 @@ export interface components {
       customerName: string | null;
       partnerName: string;
       partnerPhone: string;
+    };
+    AdminServiceDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      categoryId: string;
+      slug: string;
+      nameEn: string;
+      nameHi: string;
+      groupEn: string | null;
+      groupHi: string | null;
+      description: string | null;
+      unit: string;
+      durationMinutes: number | null;
+      pricePaise: number;
+      isActive: boolean;
+      sortOrder: number;
+      categorySlug: string;
+    };
+    AdminUserDto: {
+      /** Format: uuid */
+      id: string;
+      phone: string;
+      name: string | null;
+      roles: string[];
+      /** @enum {string} */
+      status: 'active' | 'suspended' | 'deleted';
+      phoneLocked: boolean;
+      /** Format: date-time */
+      lastLoginAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      partnerName: string | null;
+      jobCount: number;
+    };
+    UserActionDto: {
+      reason: string;
+    };
+    AdminAuditDto: {
+      id: number;
+      action: string;
+      entityType: string;
+      entityId: string;
+      actorPhone: string | null;
+      before: unknown;
+      after: unknown;
+      ip: string | null;
+      /** Format: date-time */
+      createdAt: string;
     };
     UploadRequestDto: {
       /** @enum {string} */
@@ -4080,6 +4241,288 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AdminJobDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_services_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminServiceDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_createService_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: uuid */
+          categoryId: string;
+          slug: string;
+          nameEn: string;
+          nameHi: string;
+          groupEn?: string | null;
+          groupHi?: string | null;
+          description?: string | null;
+          unit: string;
+          durationMinutes?: number | null;
+          pricePaise: number;
+          sortOrder?: number;
+          isActive?: boolean;
+        };
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminServiceDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_updateService_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          nameEn?: string;
+          nameHi?: string;
+          groupEn?: string | null;
+          groupHi?: string | null;
+          description?: string | null;
+          unit?: string;
+          durationMinutes?: number | null;
+          pricePaise?: number;
+          sortOrder?: number;
+          isActive?: boolean;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminServiceDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_users_v1: {
+    parameters: {
+      query?: {
+        q?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminUserDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_suspend_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserActionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminUserDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_reactivate_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserActionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminUserDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_resetDevice_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserActionDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminUserDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ManageController_audit_v1: {
+    parameters: {
+      query?: {
+        entityType?: string;
+        entityId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdminAuditDto'][];
         };
       };
       /** @description Error */

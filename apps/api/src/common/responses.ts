@@ -13,6 +13,9 @@ import {
   authSessionResponse,
   categoryResponse,
   catalogServiceResponse,
+  adminServiceResponse,
+  adminUserResponse,
+  adminAuditResponse,
   healthResponse,
   hireResponse,
   jobEventResponse,
@@ -46,6 +49,9 @@ export class TokenPairDto extends createZodDto(tokenPairResponse, { codec: true 
 export class AuthSessionDto extends createZodDto(authSessionResponse, { codec: true }) {}
 export class MeDto extends createZodDto(meResponse, { codec: true }) {}
 export class HealthDto extends createZodDto(healthResponse, { codec: true }) {}
+export class AdminServiceDto extends createZodDto(adminServiceResponse, { codec: true }) {}
+export class AdminUserDto extends createZodDto(adminUserResponse, { codec: true }) {}
+export class AdminAuditDto extends createZodDto(adminAuditResponse, { codec: true }) {}
 export class CatalogServiceDto extends createZodDto(catalogServiceResponse, { codec: true }) {}
 export class CategoryDto extends createZodDto(categoryResponse, { codec: true }) {}
 export class RequirementDto extends createZodDto(requirementResponse, { codec: true }) {}

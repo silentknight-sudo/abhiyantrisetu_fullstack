@@ -1,5 +1,6 @@
 import { formatINR } from '@setu/domain';
-import type { Translate } from './i18n';
+import type { MessageKey, Translate } from './i18n';
+
 
 export const rupees = (paise: number) => formatINR(paise, { decimals: false });
 
@@ -52,6 +53,16 @@ export const LEAD_STATUS = {
   declined: ['Declined', 'danger'],
   expired: ['Expired', 'danger'],
 } as const;
+
+/** A lead's badge: once the customer decides, say whether this partner won it. */
+export function leadBadge(lead: {
+  status: keyof typeof LEAD_STATUS;
+  quoteStatus?: string | null;
+}): readonly [MessageKey, Tone] {
+  if (lead.quoteStatus === 'accepted') return ['Won', 'success'];
+  if (lead.quoteStatus === 'rejected') return ['Not selected', 'neutral'];
+  return LEAD_STATUS[lead.status];
+}
 
 const pretty = (v: unknown) => String(v).replace(/_/g, ' ');
 const URGENCY_LABEL = {

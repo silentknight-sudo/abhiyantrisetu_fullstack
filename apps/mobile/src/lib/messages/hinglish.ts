@@ -468,4 +468,6 @@ export const hinglish: Record<MessageKey, string> = {
   'Book a fixed-price pro in minutes, or post a job and compare quotes.':
     'Minton mein fixed-price pro book karein, ya kaam post karke quotes compare karein.',
   '1 item': '1 item',
+  Won: 'Mila',
+  'Not selected': 'Select nahi hua',
 };

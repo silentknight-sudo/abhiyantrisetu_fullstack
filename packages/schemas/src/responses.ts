@@ -234,6 +234,8 @@ export const leadInboxItemResponse = z.object({
     photoUrls: true,
   }),
   area: z.object({ sector: text.nullable(), city: z.string(), pincode: z.string() }),
+  /** This partner's quote on the lead, if any: 'accepted' means they won the job. */
+  quoteStatus: z.enum(['draft', 'sent', 'withdrawn', 'expired', 'rejected', 'accepted']).nullable(),
   distanceKm: z.number(),
   quoteId: uuid.nullable(),
 });
@@ -510,4 +512,35 @@ export const partnerEarningsResponse = z.object({
       createdAt: timestamp,
     }),
   ),
+});
+
+export const adminServiceResponse = catalogServiceResponse.extend({
+  isActive: z.boolean(),
+  sortOrder: z.number().int(),
+  categorySlug: z.string(),
+});
+
+export const adminUserResponse = z.object({
+  id: uuid,
+  phone: z.string(),
+  name: text.nullable(),
+  roles: z.array(z.string()),
+  status: z.enum(['active', 'suspended', 'deleted']),
+  phoneLocked: z.boolean(),
+  lastLoginAt: timestamp.nullable(),
+  createdAt: timestamp,
+  partnerName: text.nullable(),
+  jobCount: z.number().int(),
+});
+
+export const adminAuditResponse = z.object({
+  id: z.number().int(),
+  action: z.string(),
+  entityType: z.string(),
+  entityId: z.string(),
+  actorPhone: text.nullable(),
+  before: z.unknown().nullable(),
+  after: z.unknown().nullable(),
+  ip: text.nullable(),
+  createdAt: timestamp,
 });

@@ -464,6 +464,8 @@ export const hi = {
   'Book a fixed-price pro in minutes, or post a job and compare quotes.':
     'मिनटों में तय दाम पर प्रोफ़ेशनल बुक करें, या काम पोस्ट करके कोटेशन की तुलना करें।',
   '1 item': '1 आइटम',
+  Won: 'मिला',
+  'Not selected': 'नहीं चुना गया',
 };
 
 export type MessageKey = keyof typeof hi;

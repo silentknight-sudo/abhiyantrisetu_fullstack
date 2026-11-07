@@ -20,6 +20,9 @@ export const NAV: { href: string; label: string; roles: Role[] }[] = [
   { href: '/refunds', label: 'Refunds', roles: ['ops', 'finance'] },
   { href: '/ledger', label: 'Ledger', roles: ['ops', 'finance'] },
   { href: '/waitlist', label: 'Waitlist', roles: ['ops', 'support'] },
+  { href: '/catalogue', label: 'Catalogue', roles: ['ops'] },
+  { href: '/users', label: 'Users', roles: ['ops', 'support'] },
+  { href: '/audit', label: 'Audit log', roles: ['ops', 'finance'] },
 ];
 
 export function Shell({ children }: { children: ReactNode }) {

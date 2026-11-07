@@ -24,6 +24,7 @@ import { QuotesModule } from './modules/quotes/quotes.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { RevocationModule } from './common/revocation';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 
@@ -31,6 +32,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
   imports: [
     ConfigModule,
     DbModule,
+    RevocationModule,
     EventEmitterModule.forRoot(),
     JwtModule.registerAsync({
       global: true,

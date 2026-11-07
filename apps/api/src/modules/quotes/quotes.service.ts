@@ -106,6 +106,7 @@ export class QuotesService {
             Number,
           ),
         quoteId: quotes.id,
+        quoteStatus: quotes.status,
       })
       .from(leads)
       .innerJoin(requirements, eq(requirements.id, leads.requirementId))

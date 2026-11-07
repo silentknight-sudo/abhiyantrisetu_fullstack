@@ -20,7 +20,7 @@ import { TYPE_ICON } from '@/lib/icons';
 import { spacing, usePalette } from '@/lib/theme';
 import { $api } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
-import { ago, LEAD_STATUS, rupees } from '@/lib/format';
+import { ago, leadBadge, rupees } from '@/lib/format';
 import { useI18n } from '@/lib/i18n';
 
 export default function Leads() {
@@ -79,7 +79,7 @@ export default function Leads() {
         />
       ) : null}
       {leads.data?.map((l) => {
-        const [label, tone] = LEAD_STATUS[l.status];
+        const [label, tone] = leadBadge(l);
         const budget = l.requirement.budgetMaxPaise;
         return (
           <Card key={l.id} accent={toneColor(tone, c)} onPress={() => router.push(`/lead/${l.id}`)}>

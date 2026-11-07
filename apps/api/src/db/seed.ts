@@ -143,7 +143,9 @@ export async function seed(url: string) {
       await db
         .insert(services)
         .values(values)
-        .onConflictDoUpdate({ target: services.slug, set: values });
+        // Only adds missing services: prices and names edited in the admin panel survive
+        // every deploy (start.ts runs this seed on each boot).
+        .onConflictDoNothing({ target: services.slug });
     }
   } finally {
     await sql.end();

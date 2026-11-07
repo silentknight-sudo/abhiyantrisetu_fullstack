@@ -29,7 +29,11 @@ export class RequirementsService {
     };
   }
 
-  async create(user: AuthUser, input: CreateRequirementInput) {
+  /** `fromBooking` is set only by BookingsService, which prices the booking itself. */
+  async create(user: AuthUser, input: CreateRequirementInput, fromBooking = false) {
+    if (!fromBooking && 'booking' in input.details && input.details.booking) {
+      throw new BadRequestException('Use /v1/bookings to book a fixed-price service');
+    }
     const photos = 'photos' in input.details ? input.details.photos : [];
     if (photos.length) this.storage.assertOwned(user.id, 'requirement_photo', photos);
     const created = await this.db.transaction(async (tx) => {

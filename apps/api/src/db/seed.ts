@@ -4,7 +4,8 @@
  */
 import type { RequirementType } from '@setu/domain';
 import { createDb } from './client';
-import { categories } from './schema';
+import { CATALOG_SERVICES } from './catalog-services';
+import { categories, services } from './schema';
 
 const CATEGORIES: { slug: string; type: RequirementType; en: string; hi: string; icon: string }[] =
   [
@@ -119,6 +120,30 @@ export async function seed(url: string) {
           target: categories.slug,
           set: { nameEn: c.en, nameHi: c.hi, icon: c.icon, sortOrder: i, requirementType: c.type },
         });
+    }
+    const cats = await db.select({ id: categories.id, slug: categories.slug }).from(categories);
+    for (const [i, row] of CATALOG_SERVICES.entries()) {
+      const [cat, groupEn, groupHi, slug, nameEn, nameHi, rupees, minutes, unit, description] = row;
+      const categoryId = cats.find((c) => c.slug === cat)?.id;
+      if (!categoryId) throw new Error(`Unknown category ${cat} for service ${slug}`);
+      const values = {
+        categoryId,
+        slug,
+        nameEn,
+        nameHi,
+        unit,
+        groupEn,
+        groupHi,
+        description,
+        durationMinutes: minutes,
+        basePricePaise: rupees * 100,
+        sortOrder: i,
+        isActive: true,
+      };
+      await db
+        .insert(services)
+        .values(values)
+        .onConflictDoUpdate({ target: services.slug, set: values });
     }
   } finally {
     await sql.end();

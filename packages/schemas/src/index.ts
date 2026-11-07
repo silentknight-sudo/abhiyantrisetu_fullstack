@@ -5,6 +5,7 @@ export * from './jobs';
 export * from './waitlist';
 export * from './partners';
 export * from './quotes';
+export * from './bookings';
 export * from './admin';
 export * from './uploads';
 export * from './reviews';

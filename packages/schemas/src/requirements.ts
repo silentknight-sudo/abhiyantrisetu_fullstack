@@ -1,3 +1,4 @@
+import { bookingDetailsSchema } from './bookings';
 import { z } from 'zod';
 import { addressInputSchema, fileKeySchema, paiseSchema } from './common';
 
@@ -9,6 +10,8 @@ export const serviceDetailsSchema = z.object({
   description,
   urgency: z.enum(['asap', 'today', 'this_week', 'flexible']).default('flexible'),
   photos,
+  /** Set only by POST /v1/bookings; rejected on a hand-posted requirement. */
+  booking: bookingDetailsSchema.optional(),
 });
 
 export const renovationDetailsSchema = z.object({

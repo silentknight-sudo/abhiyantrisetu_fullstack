@@ -24,6 +24,7 @@ import { QuotesModule } from './modules/quotes/quotes.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
@@ -62,6 +63,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     AdminModule,
     StorageModule,
     ReviewsModule,
+    BookingsModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

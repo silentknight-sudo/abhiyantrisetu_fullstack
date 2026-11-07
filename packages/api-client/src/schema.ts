@@ -36,6 +36,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/catalog/services': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['CatalogController_services_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/auth/otp/send': {
     parameters: {
       query?: never;
@@ -933,6 +949,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/bookings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['BookingsController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/partner/leads/{id}/accept-booking': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['BookingsController_accept_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -954,6 +1002,21 @@ export interface components {
       nameEn: string;
       nameHi: string;
       icon: string | null;
+    };
+    CatalogServiceDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      categoryId: string;
+      slug: string;
+      nameEn: string;
+      nameHi: string;
+      groupEn: string | null;
+      groupHi: string | null;
+      description: string | null;
+      unit: string;
+      durationMinutes: number | null;
+      pricePaise: number;
     };
     OtpSendDto: {
       phone: string;
@@ -1920,6 +1983,36 @@ export interface operations {
       };
     };
   };
+  CatalogController_services_v1: {
+    parameters: {
+      query?: {
+        category?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CatalogServiceDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
   AuthController_send_v1: {
     parameters: {
       query?: never;
@@ -2207,6 +2300,18 @@ export interface operations {
                 urgency?: 'asap' | 'today' | 'this_week' | 'flexible';
                 /** @default [] */
                 photos?: string[];
+                booking?: {
+                  items: {
+                    /** Format: uuid */
+                    serviceId: string;
+                    name: string;
+                    quantity: number;
+                    unitPricePaise: number;
+                  }[];
+                  /** Format: date-time */
+                  slotStart: string;
+                  totalPaise: number;
+                };
               };
             }
           | {
@@ -4135,6 +4240,95 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ReviewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  BookingsController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: uuid */
+          categoryId: string;
+          items: {
+            /** Format: uuid */
+            serviceId: string;
+            quantity: number;
+          }[];
+          /** Format: date-time */
+          slotStart: string;
+          /** Format: uuid */
+          addressId?: string;
+          address?: {
+            label?: string;
+            line1: string;
+            line2?: string;
+            sector?: string;
+            tower?: string;
+            flat?: string;
+            city: string;
+            pincode: string;
+            location: {
+              lat: number;
+              lng: number;
+            };
+          };
+          notes?: string;
+        };
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['RequirementDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  BookingsController_accept_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobViewDto'];
         };
       };
       /** @description Error */

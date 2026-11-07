@@ -72,6 +72,21 @@ export const categoryResponse = z.object({
   icon: text.nullable(),
 });
 
+/** A fixed-price service on the instant-booking menu. */
+export const catalogServiceResponse = z.object({
+  id: uuid,
+  categoryId: uuid,
+  slug: z.string(),
+  nameEn: z.string(),
+  nameHi: z.string(),
+  groupEn: text.nullable(),
+  groupHi: text.nullable(),
+  description: text.nullable(),
+  unit: z.string(),
+  durationMinutes: z.number().int().nullable(),
+  pricePaise: z.number().int(),
+});
+
 // ---------- requirements & jobs ----------
 
 export const requirementResponse = z.object({

@@ -292,6 +292,12 @@ export const services = pgTable(
     nameHi: text('name_hi').notNull(),
     /** e.g. "per visit", "per sqft", "per point" */
     unit: text('unit').notNull(),
+    /** Sub-group on the booking menu, e.g. "Tap & mixer". */
+    groupEn: text('group_en'),
+    groupHi: text('group_hi'),
+    description: text('description'),
+    durationMinutes: integer('duration_minutes'),
+    sortOrder: integer('sort_order').notNull().default(0),
     basePricePaise: money('base_price_paise').notNull(),
     gstRate: smallint('gst_rate').notNull().default(18),
     isActive: boolean('is_active').notNull().default(true),

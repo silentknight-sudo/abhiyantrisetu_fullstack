@@ -53,7 +53,10 @@ export default function LeadDetail() {
     );
   const r = lead.requirement;
   const details = detailLines(r.details, t);
-  const description = typeof r.details.description === 'string' ? r.details.description : null;
+  const booking = r.details.booking as { totalPaise: number } | undefined;
+  // A booking's description just repeats its items, which the detail lines already show.
+  const description =
+    !booking && typeof r.details.description === 'string' ? r.details.description : null;
   const canQuote =
     ['sent', 'seen'].includes(lead.status) && ['requested', 'matched', 'quoted'].includes(r.status);
   const done = async () => {
@@ -101,7 +104,51 @@ export default function LeadDetail() {
         </Small>
       </Card>
 
-      {canQuote ? (
+      {canQuote && booking ? (
+        <Card>
+          <Title>{t('Instant booking: {amount}', { amount: rupees(booking.totalPaise) })}</Title>
+          <Small>
+            {t(
+              'The customer has booked at the listed price for the slot above. Accept to be assigned; the first professional to accept gets the job.',
+            )}
+          </Small>
+          {error ? <Notice>{error}</Notice> : null}
+          <Button
+            testID="accept-booking"
+            title={t('Accept booking')}
+            kind="accent"
+            icon="checkmark-circle"
+            loading={busy}
+            onPress={async () => {
+              setBusy(true);
+              setError(null);
+              const res = await client.api.POST('/v1/partner/leads/{id}/accept-booking', {
+                params: { path: { id: lead.id } },
+              });
+              setBusy(false);
+              if (res.error) return setError(errorMessage(res.error));
+              void queryClient.invalidateQueries({ queryKey: ['get', '/v1/partner/leads'] });
+              void queryClient.invalidateQueries({ queryKey: ['get', '/v1/jobs'] });
+              router.replace(`/job/${res.data.id}`);
+            }}
+          />
+          <Button
+            title={t('Not interested')}
+            kind="outline"
+            onPress={() =>
+              run(async () => {
+                const res = await client.api.POST('/v1/partner/leads/{id}/decline', {
+                  params: { path: { id: lead.id } },
+                });
+                if (!res.error) router.back();
+                return res;
+              })
+            }
+          />
+        </Card>
+      ) : null}
+
+      {canQuote && !booking ? (
         <>
           <Title>{t('Your quote')}</Title>
           <QuoteBuilder

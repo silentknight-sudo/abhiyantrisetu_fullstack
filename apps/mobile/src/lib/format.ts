@@ -79,8 +79,23 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
     durationDays?: number;
     withOperator?: boolean;
     spec?: string;
+    booking?: {
+      items: { name: string; quantity: number; unitPricePaise: number }[];
+      slotStart: string;
+      totalPaise: number;
+    };
   };
   const lines: string[] = [];
+  if (d.booking) {
+    lines.push(t('Slot: {when}', { when: when(d.booking.slotStart) }));
+    for (const i of d.booking.items) {
+      lines.push(
+        `${i.name}${i.quantity > 1 ? ` × ${i.quantity}` : ''} · ${rupees(i.quantity * i.unitPricePaise)}`,
+      );
+    }
+    lines.push(t('Total {amount}', { amount: rupees(d.booking.totalPaise) }));
+    return lines;
+  }
   if (d.urgency) {
     const u = URGENCY_LABEL[d.urgency as keyof typeof URGENCY_LABEL];
     lines.push(t('When: {value}', { value: u ? t(u) : pretty(d.urgency) }));

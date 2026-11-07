@@ -90,6 +90,8 @@ function Routes() {
         <Stack.Screen name="calculator" options={{ title: t('Cost calculator') }} />
         <Stack.Screen name="notifications" options={{ title: t('Notifications') }} />
         <Stack.Screen name="earnings" options={{ title: t('Earnings') }} />
+        <Stack.Screen name="book/[category]" options={{ title: t('Book a service') }} />
+        <Stack.Screen name="book/checkout" options={{ title: t('Checkout') }} />
         <Stack.Screen
           name="onboarding"
           options={{

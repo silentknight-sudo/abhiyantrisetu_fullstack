@@ -409,4 +409,60 @@ export const hinglish: Record<MessageKey, string> = {
   'Design, approvals & supervision': 'Design, approvals aur supervision',
   'Paint & primer': 'Paint aur primer',
   'Putty & prep': 'Putty aur taiyaari',
+  '30-day warranty': '30 din ki warranty',
+  ADD: 'ADD',
+  'Accept booking': 'Booking accept karein',
+  'Add more services': 'Aur services jodein',
+  'Add one more {name}': 'Ek aur {name} jodein',
+  'Add services from the menu to book a slot.': 'Slot book karne ke liye menu se services jodein.',
+  'Add {name}': '{name} jodein',
+  Address: 'Address',
+  All: 'Sab',
+  'Anything the professional should know? (optional)':
+    'Professional ko kuch batana hai? (optional)',
+  'Book a service': 'Service book karein',
+  'Book now': 'Abhi book karein',
+  'Booking…': 'Book ho raha hai…',
+  Checkout: 'Checkout',
+  'Describe it and compare quotes from verified professionals.':
+    'Kaam bataiye aur verified professionals ke quotes compare kijiye.',
+  'Describe the work and get quotes from verified professionals instead.':
+    'Iske bajaye kaam bataiye aur verified professionals se quotes lijiye.',
+  'Describe the work instead': 'Iske bajaye kaam batayein',
+  'Finding your professional': 'Aapke liye professional dhoondh rahe hain',
+  'Fixed prices · no haggling': 'Fixed daam · koi molbhav nahi',
+  'Flat, tower and society': 'Flat, tower aur society',
+  Free: 'Free',
+  'Instant booking: {amount}': 'Instant booking: {amount}',
+  'Item total': 'Item total',
+  'Log in to book': 'Book karne ke liye login karein',
+  'No fixed-price menu here yet': 'Yahan abhi fixed-price menu nahi hai',
+  'Pay by UPI or card once a professional is assigned. Setu holds the money until you confirm the work is done. Spare parts, if needed, are billed at fixed rates with your approval.':
+    'Professional assign hone par UPI ya card se pay karein. Kaam poora hone ki confirm karne tak paisa Setu ke paas safe rehta hai. Zaroorat ho to parts aapki manzoori se fixed rate par lagenge.',
+  'Payment summary': 'Payment summary',
+  'Pick a time slot': 'Time slot chunein',
+  'Prices fixed upfront': 'Daam pehle se fixed',
+  'Remove one {name}': 'Ek {name} hatayein',
+  'Slot: {when}': 'Slot: {when}',
+  'Takes about {n} mins. The professional arrives within the hour you pick.':
+    'Lagbhag {n} min lagenge. Professional aapke chune hue ghante mein pahunchenge.',
+  'The customer has booked at the listed price for the slot above. Accept to be assigned; the first professional to accept gets the job.':
+    'Customer ne upar diye slot ke liye listed daam par book kiya hai. Accept karein; jo professional pehle accept karega, kaam usko milega.',
+  'The professional arrives within the hour you pick.':
+    'Professional aapke chune hue ghante mein pahunchenge.',
+  'Total {amount}': 'Total {amount}',
+  'Track your booking': 'Apni booking track karein',
+  'Verified professionals near you have been alerted. The first to accept is assigned to your slot, usually within minutes.':
+    'Aapke paas ke verified professionals ko alert bhej diya gaya hai. Jo pehle accept karega, wahi aapke slot ke liye assign hoga, aam taur par kuch hi minton mein.',
+  'Verified professionals near you. Your money is held safely until the work is done.':
+    'Aapke paas ke verified professionals. Kaam poora hone tak aapka paisa safe rehta hai.',
+  'Verified pros': 'Verified pros',
+  'Visit charge': 'Visit charge',
+  'When should the professional come?': 'Professional kab aayein?',
+  'Your cart is empty': 'Aapka cart khaali hai',
+  'e.g. B-1203, Ansal Golf Links': 'Jaise B-1203, Ansal Golf Links',
+  'e.g. Kitchen tap is dripping, parking at gate 2':
+    'Jaise kitchen ka nal tapak raha hai, parking gate 2 par',
+  '{n} mins': '{n} min',
+  "Can't find your problem?": 'Aapki problem nahi mili?',
 };

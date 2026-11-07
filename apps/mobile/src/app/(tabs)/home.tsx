@@ -33,6 +33,7 @@ import {
 } from '@/components/ui';
 import { $api } from '@/lib/api';
 import { BANNERS } from '@/lib/banners';
+import { BOOKABLE } from '@/lib/cart';
 import { jobTone, rupees } from '@/lib/format';
 import { type MessageKey, useI18n } from '@/lib/i18n';
 import { secureStorage } from '@/lib/storage';
@@ -91,11 +92,14 @@ const STARTS: { type: Type; icon: IconName; title: MessageKey; body: MessageKey 
 const BANNER_W = 320;
 const SECTOR_KEY = 'setu.sector';
 
+/** Fixed-price trades open the booking menu; everything else goes to the quote form. */
 const post = (type: Type, category?: string) =>
-  router.push({
-    pathname: '/requirement/new',
-    params: { type, ...(category ? { category } : {}) },
-  });
+  category && BOOKABLE[category]
+    ? router.push({ pathname: '/book/[category]', params: { category } })
+    : router.push({
+        pathname: '/requirement/new',
+        params: { type, ...(category ? { category } : {}) },
+      });
 
 export default function Home() {
   const { t, d } = useI18n();

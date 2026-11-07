@@ -406,6 +406,61 @@ export const hi = {
   'Design, approvals & supervision': 'डिज़ाइन, मंज़ूरी और देखरेख',
   'Paint & primer': 'पेंट और प्राइमर',
   'Putty & prep': 'पुट्टी और तैयारी',
+  '30-day warranty': '30 दिन की वारंटी',
+  ADD: 'जोड़ें',
+  'Accept booking': 'बुकिंग स्वीकार करें',
+  'Add more services': 'और सर्विस जोड़ें',
+  'Add one more {name}': 'एक और {name} जोड़ें',
+  'Add services from the menu to book a slot.': 'स्लॉट बुक करने के लिए मेन्यू से सर्विस जोड़ें।',
+  'Add {name}': '{name} जोड़ें',
+  Address: 'पता',
+  All: 'सभी',
+  'Anything the professional should know? (optional)': 'प्रोफ़ेशनल को कुछ बताना है? (वैकल्पिक)',
+  'Book a service': 'सर्विस बुक करें',
+  'Book now': 'अभी बुक करें',
+  'Booking…': 'बुक हो रहा है…',
+  Checkout: 'चेकआउट',
+  'Describe it and compare quotes from verified professionals.':
+    'काम बताइए और वेरिफ़ाइड प्रोफ़ेशनल के कोटेशन की तुलना कीजिए।',
+  'Describe the work and get quotes from verified professionals instead.':
+    'इसके बजाय काम बताइए और वेरिफ़ाइड प्रोफ़ेशनल से कोटेशन लीजिए।',
+  'Describe the work instead': 'इसके बजाय काम बताएं',
+  'Finding your professional': 'आपके लिए प्रोफ़ेशनल ढूंढ रहे हैं',
+  'Fixed prices · no haggling': 'तय दाम · कोई मोलभाव नहीं',
+  'Flat, tower and society': 'फ़्लैट, टावर और सोसाइटी',
+  Free: 'मुफ़्त',
+  'Instant booking: {amount}': 'इंस्टेंट बुकिंग: {amount}',
+  'Item total': 'आइटम का कुल',
+  'Log in to book': 'बुक करने के लिए लॉग इन करें',
+  'No fixed-price menu here yet': 'यहाँ अभी तय दाम वाला मेन्यू नहीं है',
+  'Pay by UPI or card once a professional is assigned. Setu holds the money until you confirm the work is done. Spare parts, if needed, are billed at fixed rates with your approval.':
+    'प्रोफ़ेशनल तय होने पर UPI या कार्ड से भुगतान करें। काम पूरा होने की पुष्टि करने तक पैसा Setu के पास सुरक्षित रहता है। ज़रूरत पड़ने पर पार्ट्स आपकी मंज़ूरी से तय दाम पर लगेंगे।',
+  'Payment summary': 'भुगतान सारांश',
+  'Pick a time slot': 'समय का स्लॉट चुनें',
+  'Prices fixed upfront': 'दाम पहले से तय',
+  'Remove one {name}': 'एक {name} हटाएं',
+  'Slot: {when}': 'स्लॉट: {when}',
+  'Takes about {n} mins. The professional arrives within the hour you pick.':
+    'लगभग {n} मिनट लगेंगे। प्रोफ़ेशनल आपके चुने हुए घंटे में पहुंचेंगे।',
+  'The customer has booked at the listed price for the slot above. Accept to be assigned; the first professional to accept gets the job.':
+    'ग्राहक ने ऊपर दिए स्लॉट के लिए लिस्टेड दाम पर बुक किया है। स्वीकार करें; जो प्रोफ़ेशनल पहले स्वीकार करेगा, काम उसे मिलेगा।',
+  'The professional arrives within the hour you pick.':
+    'प्रोफ़ेशनल आपके चुने हुए घंटे में पहुंचेंगे।',
+  'Total {amount}': 'कुल {amount}',
+  'Track your booking': 'अपनी बुकिंग ट्रैक करें',
+  'Verified professionals near you have been alerted. The first to accept is assigned to your slot, usually within minutes.':
+    'आपके पास के वेरिफ़ाइड प्रोफ़ेशनल को सूचना भेज दी गई है। जो पहले स्वीकार करेगा, वह आपके स्लॉट के लिए तय होगा, आमतौर पर कुछ ही मिनटों में।',
+  'Verified professionals near you. Your money is held safely until the work is done.':
+    'आपके पास के वेरिफ़ाइड प्रोफ़ेशनल। काम पूरा होने तक आपका पैसा सुरक्षित रहता है।',
+  'Verified pros': 'वेरिफ़ाइड प्रोफ़ेशनल',
+  'Visit charge': 'विज़िट चार्ज',
+  'When should the professional come?': 'प्रोफ़ेशनल कब आएं?',
+  'Your cart is empty': 'आपका कार्ट खाली है',
+  'e.g. B-1203, Ansal Golf Links': 'जैसे B-1203, अंसल गोल्फ़ लिंक्स',
+  'e.g. Kitchen tap is dripping, parking at gate 2':
+    'जैसे किचन का नल टपक रहा है, पार्किंग गेट 2 पर',
+  '{n} mins': '{n} मिनट',
+  "Can't find your problem?": 'आपकी समस्या नहीं मिली?',
 };
 
 export type MessageKey = keyof typeof hi;

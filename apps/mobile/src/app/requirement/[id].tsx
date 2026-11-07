@@ -48,7 +48,10 @@ export default function RequirementDetail() {
   const job = jobs.data?.find((j) => j.requirementId === r.id);
   const open = ['requested', 'matched', 'quoted'].includes(r.status);
   const sent = (quotes.data ?? []).filter((q) => q.status !== 'withdrawn');
-  const description = typeof r.details.description === 'string' ? r.details.description : null;
+  const booking = Boolean(r.details.booking);
+  // A booking's description just repeats its items, which the detail lines already show.
+  const description =
+    !booking && typeof r.details.description === 'string' ? r.details.description : null;
 
   return (
     <Screen
@@ -75,45 +78,65 @@ export default function RequirementDetail() {
         ) : null}
       </Card>
 
-      {job ? <Button title={t('Open job')} onPress={() => router.push(`/job/${job.id}`)} /> : null}
-
-      <Title>{sent.length ? t('Quotes ({n})', { n: sent.length }) : t('Quotes')}</Title>
-      {quotes.isPending ? <Loading /> : null}
-      {quotes.data && sent.length === 0 && open ? (
-        <Radar
-          title={t('Waiting for quotes')}
-          body={t(
-            "We've told verified professionals near you. You'll get a notification when a quote arrives.",
-          )}
+      {job ? (
+        <Button
+          title={booking ? t('Track your booking') : t('Open job')}
+          kind={booking ? 'accent' : 'primary'}
+          icon={booking ? 'navigate' : undefined}
+          onPress={() => router.push(`/job/${job.id}`)}
         />
       ) : null}
-      {sent.map((q) => (
-        <Card key={q.id} onPress={() => router.push(`/quote/${q.id}`)}>
-          <Row>
-            <Title>{q.partner?.displayName ?? t('Professional')}</Title>
-            <Title>{rupees(q.totalPaise)}</Title>
-          </Row>
-          <Row>
-            <Small>
-              {q.partner?.ratingAvg
-                ? `★ ${q.partner.ratingAvg.toFixed(1)} (${q.partner.ratingCount})`
-                : t('New on Setu')}
-              {q.partner?.verificationStatus === 'verified' ? ` · ${t('Verified')}` : ''}
-              {q.gstPaise > 0 ? ` · ${t('GST invoice')}` : ''}
-            </Small>
-            {q.status !== 'sent' ? (
-              <Badge
-                label={t(QUOTE_STATUS_LABEL[q.status])}
-                tone={q.status === 'accepted' ? 'success' : 'neutral'}
-              />
-            ) : null}
-          </Row>
-          <Small>
-            {t('{n} items', { n: q.items.length })}
-            {q.version > 1 ? ` · ${t('revised (v{n})', { n: q.version })}` : ''}
-          </Small>
-        </Card>
-      ))}
+
+      {booking ? (
+        open ? (
+          <Radar
+            title={t('Finding your professional')}
+            body={t(
+              'Verified professionals near you have been alerted. The first to accept is assigned to your slot, usually within minutes.',
+            )}
+          />
+        ) : null
+      ) : (
+        <>
+          <Title>{sent.length ? t('Quotes ({n})', { n: sent.length }) : t('Quotes')}</Title>
+          {quotes.isPending ? <Loading /> : null}
+          {quotes.data && sent.length === 0 && open ? (
+            <Radar
+              title={t('Waiting for quotes')}
+              body={t(
+                "We've told verified professionals near you. You'll get a notification when a quote arrives.",
+              )}
+            />
+          ) : null}
+          {sent.map((q) => (
+            <Card key={q.id} onPress={() => router.push(`/quote/${q.id}`)}>
+              <Row>
+                <Title>{q.partner?.displayName ?? t('Professional')}</Title>
+                <Title>{rupees(q.totalPaise)}</Title>
+              </Row>
+              <Row>
+                <Small>
+                  {q.partner?.ratingAvg
+                    ? `★ ${q.partner.ratingAvg.toFixed(1)} (${q.partner.ratingCount})`
+                    : t('New on Setu')}
+                  {q.partner?.verificationStatus === 'verified' ? ` · ${t('Verified')}` : ''}
+                  {q.gstPaise > 0 ? ` · ${t('GST invoice')}` : ''}
+                </Small>
+                {q.status !== 'sent' ? (
+                  <Badge
+                    label={t(QUOTE_STATUS_LABEL[q.status])}
+                    tone={q.status === 'accepted' ? 'success' : 'neutral'}
+                  />
+                ) : null}
+              </Row>
+              <Small>
+                {t('{n} items', { n: q.items.length })}
+                {q.version > 1 ? ` · ${t('revised (v{n})', { n: q.version })}` : ''}
+              </Small>
+            </Card>
+          ))}
+        </>
+      )}
 
       {open && !cancelling ? (
         <Button title={t('Cancel request')} kind="outline" onPress={() => setCancelling(true)} />

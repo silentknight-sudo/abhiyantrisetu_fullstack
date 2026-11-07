@@ -1,3 +1,4 @@
+import { CraftHeader } from '@/components/craft';
 import { LOCALES } from '@setu/domain';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -66,14 +67,21 @@ export default function Account() {
 
   return (
     <Screen>
-      <Card>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[3] }}>
-          <Avatar name={me.data?.name || me.data?.phone || ''} />
-          <View style={{ flex: 1 }}>
-            <Small>{t('Signed in as')}</Small>
-            <Title>{me.data?.phone ?? '…'}</Title>
-          </View>
+      <CraftHeader
+        eyebrow={t('Signed in as')}
+        title={
+          (IS_PARTNER ? partner.data?.displayName : undefined) ||
+          me.data?.name ||
+          me.data?.phone ||
+          '…'
+        }
+        body={me.data?.name || (IS_PARTNER && partner.data) ? (me.data?.phone ?? '') : undefined}
+      >
+        <View style={{ position: 'absolute', right: spacing[5], top: spacing[5] }}>
+          <Avatar name={me.data?.name || me.data?.phone || ''} size={52} />
         </View>
+      </CraftHeader>
+      <Card>
         <Field label={t('Your name')} value={name} onChangeText={setName} placeholder={t('Name')} />
         <Small>{t('Language')}</Small>
         <Chips>

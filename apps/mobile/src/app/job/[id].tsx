@@ -1,3 +1,4 @@
+import { JobProgress } from '@/components/craft';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
 import { useState } from 'react';
@@ -93,6 +94,16 @@ export default function JobDetail() {
           <Title>{rupees(j.agreedTotalPaise)}</Title>
           <Badge label={d.jobState[j.state]} tone={jobTone(j.state)} />
         </Row>
+        <JobProgress
+          state={j.state}
+          labels={{
+            hired: d.jobState.hired,
+            scheduled: d.jobState.scheduled,
+            in_progress: d.jobState.in_progress,
+            completed: d.jobState.completed,
+            closed: d.jobState.closed,
+          }}
+        />
         <Small>
           {j.slotStart
             ? t('Visit: {when}', { when: when(j.slotStart) })

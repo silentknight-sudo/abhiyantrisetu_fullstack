@@ -1,7 +1,7 @@
+import { CraftHeader } from '@/components/craft';
 import { router } from 'expo-router';
 import {
   Badge,
-  Banner,
   Body,
   Card,
   Empty,
@@ -16,7 +16,6 @@ import {
   toneColor,
 } from '@/components/ui';
 import { View } from 'react-native';
-import { BANNERS } from '@/lib/banners';
 import { TYPE_ICON } from '@/lib/icons';
 import { spacing, usePalette } from '@/lib/theme';
 import { $api } from '@/lib/api';
@@ -38,9 +37,7 @@ export default function Leads() {
 
   return (
     <Screen refreshing={leads.isRefetching} onRefresh={() => void leads.refetch()}>
-      <Banner
-        image={BANNERS.loginPartner}
-        height={150}
+      <CraftHeader
         eyebrow={partner.data?.displayName ?? t('Your business')}
         title={t('New leads: {n}', {
           n: (leads.data ?? []).filter((l) => l.status === 'sent').length,

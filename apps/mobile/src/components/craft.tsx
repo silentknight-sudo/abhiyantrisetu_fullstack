@@ -1,6 +1,8 @@
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import type { ReactNode } from 'react';
+import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, G, Path, Pattern, Rect } from 'react-native-svg';
-import { craft, usePalette } from '@/lib/theme';
+import { craft, font, spacing, stamp, typeScale, usePalette } from '@/lib/theme';
 
 /**
  * The apps' signature texture: a jaali (carved lattice) of small rangoli flowers, drawn
@@ -78,5 +80,156 @@ export function Scallop({ color, height = 14 }: { color: string; height?: number
     <Svg width="100%" height={height} viewBox={`0 0 ${n * w} ${height}`} preserveAspectRatio="none">
       <Path d={`M0 0 ${d} Z`} fill={color} />
     </Svg>
+  );
+}
+
+/** An indigo hero card with the jaali texture: dashboards and profile headers. */
+export function CraftHeader({
+  eyebrow,
+  title,
+  body,
+  children,
+}: {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <View
+      style={[
+        stamp,
+        {
+          borderRadius: 26,
+          backgroundColor: craft.indigo[800],
+          padding: spacing[5],
+          gap: spacing[2],
+          overflow: 'hidden',
+        },
+      ]}
+    >
+      <Jaali opacity={0.18} />
+      <View
+        style={{
+          position: 'absolute',
+          right: -40,
+          top: -40,
+          width: 140,
+          height: 140,
+          borderRadius: 70,
+          backgroundColor: craft.saffron[500],
+          opacity: 0.22,
+        }}
+      />
+      {eyebrow ? (
+        <Text
+          style={[
+            typeScale.xs,
+            { color: craft.saffron[300], fontFamily: font.semibold, letterSpacing: 1.4 },
+          ]}
+        >
+          {eyebrow.toUpperCase()}
+        </Text>
+      ) : null}
+      <Text style={[typeScale['2xl'], { color: '#fff', fontFamily: font.headingHeavy }]}>
+        {title}
+      </Text>
+      {body ? (
+        <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.8)', fontFamily: font.body }]}>
+          {body}
+        </Text>
+      ) : null}
+      {children}
+    </View>
+  );
+}
+
+const STEPS = ['hired', 'scheduled', 'in_progress', 'completed', 'closed'] as const;
+const STEP_ICON = {
+  hired: 'people',
+  scheduled: 'calendar',
+  in_progress: 'construct',
+  completed: 'checkmark-done',
+  closed: 'ribbon',
+} as const;
+
+/**
+ * Where a job is, as five beads on a thread: done steps filled in terracotta, the current
+ * one ringed in saffron. Cancelled and disputed jobs show their state instead.
+ */
+export function JobProgress({
+  state,
+  labels,
+}: {
+  state: string;
+  labels: Record<(typeof STEPS)[number], string>;
+}) {
+  const c = usePalette();
+  const at = STEPS.indexOf(state as (typeof STEPS)[number]);
+  if (at < 0) return null;
+  return (
+    <View
+      accessibilityRole="progressbar"
+      accessibilityLabel={labels[STEPS[at]!]}
+      accessibilityValue={{ min: 1, max: STEPS.length, now: at + 1 }}
+      style={{ flexDirection: 'row', alignItems: 'flex-start', paddingTop: spacing[1] }}
+    >
+      {STEPS.map((s, i) => {
+        const done = i < at || state === 'closed';
+        const current = i === at && state !== 'closed';
+        return (
+          <View key={s} style={{ flex: 1, alignItems: 'center', gap: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' }}>
+              <View
+                style={{
+                  flex: 1,
+                  height: 3,
+                  backgroundColor: i === 0 ? 'transparent' : i <= at ? c.accent : c.border,
+                }}
+              />
+              <View
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: done || current ? c.accent : c.surfaceMuted,
+                  borderWidth: current ? 3 : 0,
+                  borderColor: c.highlight,
+                }}
+              >
+                <Ionicons
+                  name={done ? 'checkmark' : (STEP_ICON[s] as 'calendar')}
+                  size={15}
+                  color={done || current ? '#fff' : c.textMuted}
+                />
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  height: 3,
+                  backgroundColor:
+                    i === STEPS.length - 1 ? 'transparent' : i < at ? c.accent : c.border,
+                }}
+              />
+            </View>
+            <Text
+              numberOfLines={2}
+              style={[
+                typeScale.xs,
+                {
+                  textAlign: 'center',
+                  color: current ? c.text : c.textMuted,
+                  fontFamily: current ? font.semibold : font.body,
+                },
+              ]}
+            >
+              {labels[s]}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
   );
 }

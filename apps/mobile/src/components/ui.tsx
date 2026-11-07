@@ -16,7 +16,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { font, radius, shadow, spacing, typeScale, usePalette } from '@/lib/theme';
+import { font, radius, shadow, spacing, stamp, typeScale, usePalette } from '@/lib/theme';
+import { Jaali } from './craft';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -181,7 +182,7 @@ export function Button({
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: bg, borderColor: kind === 'outline' ? c.border : bg },
-        kind === 'accent' || kind === 'primary' ? shadow : null,
+        kind === 'accent' || kind === 'primary' ? stamp : null,
         { opacity: off ? 0.55 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
       ]}
     >
@@ -389,11 +390,12 @@ export function Banner({
     <View style={{ height, borderRadius: rounded ? 24 : 0, overflow: 'hidden' }}>
       <Image source={image} resizeMode="cover" style={fill} />
       <LinearGradient
-        colors={['rgba(16,36,52,0.92)', 'rgba(16,36,52,0.55)', 'rgba(16,36,52,0)']}
+        colors={['rgba(20,18,58,0.94)', 'rgba(20,18,58,0.6)', 'rgba(20,18,58,0.05)']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={StyleSheet.absoluteFill}
       />
+      <Jaali opacity={0.12} style={{ right: '45%' }} />
       <View style={{ flex: 1, justifyContent: 'flex-end', padding: spacing[5], gap: spacing[1] }}>
         {eyebrow ? <Eyebrow color={c.accent}>{eyebrow}</Eyebrow> : null}
         <Text
@@ -651,12 +653,12 @@ const styles = StyleSheet.create({
     fontFamily: font.body,
     ...typeScale.base,
   },
-  card: { borderWidth: 1, borderRadius: 20, padding: spacing[4], gap: spacing[2] },
+  card: { borderWidth: 1.5, borderRadius: 22, padding: spacing[4], gap: spacing[2] },
   tile: {
     flexBasis: '47%',
     flexGrow: 1,
-    borderWidth: 1,
-    borderRadius: 20,
+    borderWidth: 1.5,
+    borderRadius: 22,
     padding: spacing[4],
     gap: spacing[2],
     minHeight: 150,

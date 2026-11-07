@@ -133,7 +133,7 @@ export function CartBar({
           <Text
             style={[typeScale.xs, { color: 'rgba(255,255,255,0.75)', fontFamily: font.medium }]}
           >
-            {t('{n} items', { n: count })}
+            {count === 1 ? t('1 item') : t('{n} items', { n: count })}
           </Text>
           <Text style={[typeScale.lg, { color: '#fff', fontFamily: font.headingHeavy }]}>
             {rupees(totalPaise)}

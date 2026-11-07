@@ -461,6 +461,9 @@ export const hi = {
     'जैसे किचन का नल टपक रहा है, पार्किंग गेट 2 पर',
   '{n} mins': '{n} मिनट',
   "Can't find your problem?": 'आपकी समस्या नहीं मिली?',
+  'Book a fixed-price pro in minutes, or post a job and compare quotes.':
+    'मिनटों में तय दाम पर प्रोफ़ेशनल बुक करें, या काम पोस्ट करके कोटेशन की तुलना करें।',
+  '1 item': '1 आइटम',
 };
 
 export type MessageKey = keyof typeof hi;

@@ -34,10 +34,11 @@ import {
 import { $api } from '@/lib/api';
 import { BANNERS } from '@/lib/banners';
 import { BOOKABLE } from '@/lib/cart';
+import { Jaali } from '@/components/craft';
 import { jobTone, rupees } from '@/lib/format';
 import { type MessageKey, useI18n } from '@/lib/i18n';
 import { secureStorage } from '@/lib/storage';
-import { font, shadow, spacing, typeScale, usePalette } from '@/lib/theme';
+import { craft, font, shadow, spacing, typeScale, usePalette } from '@/lib/theme';
 
 type Type = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
@@ -55,6 +56,14 @@ const CATEGORIES: { slug: string; type: Type; icon: IconName; label: MessageKey 
   { slug: 'cement-steel', type: 'material_rfq', icon: 'cube', label: 'Buy materials' },
   { slug: 'earthmoving', type: 'equipment', icon: 'car', label: 'Equipment rental' },
 ];
+
+/** Shortcut tiles cycle through clay, saffron, indigo and leaf tints like painted tiles. */
+const TILE_TINTS = [
+  [craft.terracotta[100], craft.terracotta[300]],
+  [craft.saffron[100], craft.saffron[300]],
+  [craft.indigo[100], craft.indigo[300]],
+  ['#E3F4EA', '#9BD6B8'],
+] as const;
 
 const STARTS: { type: Type; icon: IconName; title: MessageKey; body: MessageKey }[] = [
   {
@@ -158,11 +167,13 @@ export default function Home() {
           paddingTop: insets.top + spacing[3],
           paddingHorizontal: spacing[4],
           paddingBottom: spacing[8],
-          borderBottomLeftRadius: 28,
-          borderBottomRightRadius: 28,
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
           gap: spacing[4],
+          overflow: 'hidden',
         }}
       >
+        <Jaali opacity={0.14} />
         <Row>
           <Pressable
             accessibilityRole="button"
@@ -219,7 +230,7 @@ export default function Home() {
             {firstName ? t('Namaste, {name}', { name: firstName }) : t('Namaste')}
           </Text>
           <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.8)', fontFamily: font.body }]}>
-            {t('What do you need done? Post once and verified professionals nearby send quotes.')}
+            {t('Book a fixed-price pro in minutes, or post a job and compare quotes.')}
           </Text>
         </View>
 
@@ -321,7 +332,7 @@ export default function Home() {
           paddingTop: spacing[2],
         }}
       >
-        {CATEGORIES.map((x) => (
+        {CATEGORIES.map((x, i) => (
           <Pressable
             key={x.slug}
             accessibilityRole="button"
@@ -332,18 +343,18 @@ export default function Home() {
               style={[
                 shadow,
                 {
-                  width: 60,
-                  height: 60,
-                  borderRadius: 20,
-                  backgroundColor: c.surface,
-                  borderWidth: 1,
-                  borderColor: c.border,
+                  width: 62,
+                  height: 62,
+                  borderRadius: 22,
+                  backgroundColor: TILE_TINTS[i % TILE_TINTS.length]![0],
+                  borderWidth: 1.5,
+                  borderColor: TILE_TINTS[i % TILE_TINTS.length]![1],
                   alignItems: 'center',
                   justifyContent: 'center',
                 },
               ]}
             >
-              <Ionicons name={x.icon} size={26} color={c.primary} />
+              <Ionicons name={x.icon} size={26} color={craft.indigo[800]} />
             </View>
             <Text
               numberOfLines={2}

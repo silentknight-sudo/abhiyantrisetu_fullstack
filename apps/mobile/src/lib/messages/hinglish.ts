@@ -465,4 +465,7 @@ export const hinglish: Record<MessageKey, string> = {
     'Jaise kitchen ka nal tapak raha hai, parking gate 2 par',
   '{n} mins': '{n} min',
   "Can't find your problem?": 'Aapki problem nahi mili?',
+  'Book a fixed-price pro in minutes, or post a job and compare quotes.':
+    'Minton mein fixed-price pro book karein, ya kaam post karke quotes compare karein.',
+  '1 item': '1 item',
 };

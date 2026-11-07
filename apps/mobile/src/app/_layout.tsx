@@ -1,10 +1,9 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import {
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-} from '@expo-google-fonts/plus-jakarta-sans';
-import { colors } from '@setu/ui-tokens';
+  Baloo2_600SemiBold,
+  Baloo2_700Bold,
+  Baloo2_800ExtraBold,
+} from '@expo-google-fonts/baloo-2';
 import { useFonts } from 'expo-font';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
@@ -16,13 +15,14 @@ import { queryClient } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { I18nProvider, useI18n } from '@/lib/i18n';
 import { SessionProvider, useSession } from '@/lib/session';
+import { usePalette } from '@/lib/theme';
 import { font } from '@/lib/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const scheme = useColorScheme();
-  const c = scheme === 'dark' ? colors.dark : colors.light;
+  const c = usePalette();
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const theme = {
     ...base,
@@ -52,14 +52,14 @@ export default function RootLayout() {
 function Routes() {
   const { status } = useSession();
   const { t } = useI18n();
-  // The website's faces: Plus Jakarta Sans for headings, Inter for text.
+  // Baloo 2 for headings (reads well in Hindi too), Inter for text.
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
-    PlusJakartaSans_600SemiBold,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
+    Baloo2_600SemiBold,
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
   });
   const ready = status !== 'loading' && (fontsLoaded || Boolean(fontError));
   useEffect(() => {

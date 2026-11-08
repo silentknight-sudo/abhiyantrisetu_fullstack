@@ -1,7 +1,6 @@
 import { formatINR } from '@setu/domain';
 import type { MessageKey, Translate } from './i18n';
 
-
 export const rupees = (paise: number) => formatINR(paise, { decimals: false });
 
 export function when(iso: string | null | undefined): string {

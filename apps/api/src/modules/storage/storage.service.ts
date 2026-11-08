@@ -59,7 +59,12 @@ export class StorageService {
     const fileKey = `u/${user.id}/${input.purpose}/${randomUUID()}.${IMAGE_TYPES[input.contentType]}`;
     return {
       fileKey,
-      upload: this.provider().presignUpload(fileKey, input.contentType, UPLOAD_TTL),
+      upload: this.provider().presignUpload(
+        fileKey,
+        input.contentType,
+        UPLOAD_TTL,
+        input.sizeBytes,
+      ),
       expiresInSeconds: UPLOAD_TTL,
     };
   }

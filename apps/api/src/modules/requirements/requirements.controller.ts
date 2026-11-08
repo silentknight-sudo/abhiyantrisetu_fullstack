@@ -1,3 +1,4 @@
+import { Throttle } from '@nestjs/throttler';
 import {
   Body,
   Controller,
@@ -24,6 +25,7 @@ export class RequirementsController {
   constructor(@Inject(RequirementsService) private readonly requirements: RequirementsService) {}
 
   @Post()
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   // A discriminated union cannot be a DTO class, so validate and document it explicitly.
   @ZodResponse({ status: 201, type: RequirementDto })
   @ApiBody({ schema: z.toJSONSchema(createRequirementSchema, { io: 'input' }) as object })

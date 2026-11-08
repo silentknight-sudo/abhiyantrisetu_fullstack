@@ -7,15 +7,22 @@ import { cleanupOpenApiDoc } from 'nestjs-zod';
 import type { Env } from './config/env';
 
 /** Shared by main.ts and the e2e tests so tests exercise the real HTTP setup. */
-export function configureApp(app: INestApplication, env: Pick<Env, 'CORS_ORIGINS'>) {
+export function configureApp(
+  app: INestApplication,
+  env: Pick<Env, 'CORS_ORIGINS'> & Partial<Pick<Env, 'TRUST_PROXY_HOPS'>>,
+) {
   app.use(helmet());
   // Photo bytes for the local (development) upload store; JSON stays the default elsewhere.
   (app as NestExpressApplication).useBodyParser('raw', { type: 'image/*', limit: '10mb' });
   app.enableCors({ origin: env.CORS_ORIGINS, credentials: true });
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.enableShutdownHooks();
-  // Behind Cloudflare/ALB: trust X-Forwarded-For for per-IP limits.
-  app.getHttpAdapter().getInstance().set('trust proxy', true);
+  // Believe only as many X-Forwarded-For hops as there are proxies of ours; a client's own
+  // entries (to the left) are ignored, so per-IP rate limits cannot be dodged.
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .set('trust proxy', env.TRUST_PROXY_HOPS ?? 1);
   return app;
 }
 

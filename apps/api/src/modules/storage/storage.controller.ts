@@ -51,10 +51,13 @@ export class StorageController {
   async put(@Query() q: Record<string, string>, @Req() req: Request) {
     const local = this.local();
     const type = String(req.headers['content-type'] ?? '');
-    if (!local.verify('PUT', q.key ?? '', Number(q.exp), q.sig ?? '', type))
-      throw new ForbiddenException('Bad or expired link');
     if (!Buffer.isBuffer(req.body) || req.body.length === 0)
       throw new ForbiddenException('Empty upload');
+    // Type and exact size are part of the signature, as with S3.
+    if (
+      !local.verify('PUT', q.key ?? '', Number(q.exp), q.sig ?? '', `${type}\n${req.body.length}`)
+    )
+      throw new ForbiddenException('Bad or expired link');
     await local.write(q.key!, req.body, type);
     return { ok: true };
   }

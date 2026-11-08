@@ -14,7 +14,13 @@ export interface UploadTarget {
 
 /** Where photos live. Clients upload and download directly with short-lived signed URLs. */
 export interface StorageProvider {
-  presignUpload(key: string, contentType: string, expiresIn: number): UploadTarget;
+  /** `sizeBytes` is signed in: the store refuses a body of any other length. */
+  presignUpload(
+    key: string,
+    contentType: string,
+    expiresIn: number,
+    sizeBytes: number,
+  ): UploadTarget;
   presignDownload(key: string, expiresIn: number): string;
 }
 
@@ -30,9 +36,17 @@ export class S3StorageProvider implements StorageProvider {
     this.host = `${bucket}.s3.${region}.amazonaws.com`;
   }
 
-  presignUpload(key: string, contentType: string, expiresIn: number): UploadTarget {
+  presignUpload(
+    key: string,
+    contentType: string,
+    expiresIn: number,
+    sizeBytes: number,
+  ): UploadTarget {
     const headers = { 'Content-Type': contentType };
-    return { method: 'PUT', headers, url: this.sign('PUT', key, expiresIn, headers) };
+    // Content-Length is signed but not returned: clients cannot set it (browsers forbid it);
+    // they send it automatically from the body, and S3 rejects any other size.
+    const signed = { ...headers, 'Content-Length': String(sizeBytes) };
+    return { method: 'PUT', headers, url: this.sign('PUT', key, expiresIn, signed) };
   }
 
   presignDownload(key: string, expiresIn: number) {
@@ -80,11 +94,16 @@ export class LocalStorageProvider implements StorageProvider {
     return hmac(this.secret, `${method}\n${key}\n${exp}\n${contentType}`);
   }
 
-  presignUpload(key: string, contentType: string, expiresIn: number): UploadTarget {
+  presignUpload(
+    key: string,
+    contentType: string,
+    expiresIn: number,
+    sizeBytes: number,
+  ): UploadTarget {
     return {
       method: 'PUT',
       headers: { 'Content-Type': contentType },
-      url: this.link('PUT', key, expiresIn, contentType),
+      url: this.link('PUT', key, expiresIn, `${contentType}\n${sizeBytes}`),
     };
   }
 

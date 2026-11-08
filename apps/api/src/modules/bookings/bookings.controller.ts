@@ -1,3 +1,4 @@
+import { Throttle } from '@nestjs/throttler';
 import { Body, Controller, HttpCode, Inject, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { type CreateBookingInput, createBookingSchema } from '@setu/schemas';
@@ -15,6 +16,7 @@ export class BookingsController {
 
   /** Book fixed-price services for a slot. Returns the requirement partners are alerted about. */
   @Post('bookings')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   // A refined schema cannot be a DTO class, so validate and document it explicitly.
   @ZodResponse({ status: 201, type: RequirementDto })
   @ApiBody({ schema: z.toJSONSchema(createBookingSchema, { io: 'input' }) as object })

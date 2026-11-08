@@ -48,7 +48,7 @@ export function PhotoPicker({
       : 'image/jpeg';
     const blob = await (await fetch(asset.uri)).blob();
     const slot = await client.api.POST('/v1/uploads', {
-      body: { purpose: 'requirement_photo', contentType, sizeBytes: asset.fileSize ?? blob.size },
+      body: { purpose: 'requirement_photo', contentType, sizeBytes: blob.size },
     });
     if (!slot.data) throw slot.error;
     const res = await fetch(slot.data.upload.url, {

@@ -47,6 +47,12 @@ const envSchema = z
     NOTIFICATIONS_DELIVERY: z.enum(['inline', 'queue']).default('inline'),
     /** Where rate-limit counters live; `redis` is required to run more than one API task. */
     THROTTLE_STORE: z.enum(['memory', 'redis']).optional(),
+    /**
+     * Proxies in front of the API (Render, Cloudflare, a load balancer). Only that many
+     * X-Forwarded-For entries are believed, so clients cannot fake their IP to dodge the
+     * per-IP limits. 0 when the API is reached directly.
+     */
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
     CORS_ORIGINS: z
       .string()
       .default('')

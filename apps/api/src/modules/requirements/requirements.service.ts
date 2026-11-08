@@ -1,13 +1,30 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { isStaff, requirementMachine, type RequirementEvent } from '@setu/domain';
 import type { CreateRequirementInput } from '@setu/schemas';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq, inArray } from 'drizzle-orm';
 import type { AuthUser } from '../../common/auth';
 import { assertTransition } from '../../common/transition-error';
 import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
-import { addresses, categories, events, requirementEvents, requirements } from '../../db/schema';
+import {
+  addresses,
+  categories,
+  events,
+  requirementEvents,
+  requirements,
+  users,
+} from '../../db/schema';
+
+/** Open (unhired, uncancelled) requests one customer may have at a time. */
+export const MAX_OPEN_REQUESTS = 5;
 import { StorageService } from '../storage/storage.service';
 
 /** Emitted after a requirement is committed. Payload: { requirementId }. */
@@ -37,6 +54,27 @@ export class RequirementsService {
     const photos = 'photos' in input.details ? input.details.photos : [];
     if (photos.length) this.storage.assertOwned(user.id, 'requirement_photo', photos);
     const created = await this.db.transaction(async (tx) => {
+      // Each post alerts every nearby partner, so cap how many can be open at once.
+      // Locking the user row serialises concurrent posts from the same account.
+      await tx.select({ id: users.id }).from(users).where(eq(users.id, user.id)).for('update');
+      const [{ n } = { n: 0 }] = await tx
+        .select({ n: count() })
+        .from(requirements)
+        .where(
+          and(
+            eq(requirements.customerId, user.id),
+            inArray(requirements.status, ['requested', 'matched', 'quoted']),
+          ),
+        );
+      if (n >= MAX_OPEN_REQUESTS && !isStaff(user.roles)) {
+        throw new HttpException(
+          {
+            code: 'TOO_MANY_OPEN_REQUESTS',
+            message: `You already have ${MAX_OPEN_REQUESTS} open requests. Hire someone or cancel one first.`,
+          },
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
       let addressId = input.addressId;
       if (addressId) {
         const [owned] = await tx

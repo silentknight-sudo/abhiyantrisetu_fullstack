@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { categories, jobs, partners, users } from '../src/db/schema';
 import { JobsService } from '../src/modules/jobs/jobs.service';
 import { RequirementsService } from '../src/modules/requirements/requirements.service';
-import { bearer, createTestApp, login, type TestContext } from './setup';
+import { bearer, createTestApp, freshIp, login, type TestContext } from './setup';
 
 let ctx: TestContext;
 let customer: Awaited<ReturnType<typeof login>>;
@@ -70,6 +70,7 @@ async function postRequirement() {
     .http()
     .post('/v1/requirements')
     .set(bearer(customer.accessToken))
+    .set('x-forwarded-for', freshIp()) // many posts in one run; stay under the per-IP limit
     .send({
       type: 'service',
       title: 'Kitchen tap leaking',

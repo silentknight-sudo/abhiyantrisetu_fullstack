@@ -43,7 +43,10 @@ export default function Earnings() {
         }}
       >
         <Text
-          style={[typeScale.xs, { color: c.highlight, fontFamily: font.semibold, letterSpacing: 1.4 }]}
+          style={[
+            typeScale.xs,
+            { color: c.highlight, fontFamily: font.semibold, letterSpacing: 1.4 },
+          ]}
         >
           {t('Next payout').toUpperCase()}
         </Text>

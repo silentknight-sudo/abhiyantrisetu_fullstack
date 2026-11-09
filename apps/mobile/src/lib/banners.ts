@@ -8,3 +8,12 @@ export const BANNERS = {
   buildHome: require('../../assets/banners/build-home.jpg') as ImageSourcePropType,
   renovation: require('../../assets/banners/renovation.jpg') as ImageSourcePropType,
 };
+
+/** Category photos for the home shortcuts (generated with Canva). */
+export const CATEGORY_IMAGES: Record<string, ImageSourcePropType> = {
+  plumbing: require('../../assets/categories/plumbing.jpg') as ImageSourcePropType,
+  electrical: require('../../assets/categories/electrical.jpg') as ImageSourcePropType,
+  'ac-repair': require('../../assets/categories/ac-repair.jpg') as ImageSourcePropType,
+  carpentry: require('../../assets/categories/carpentry.jpg') as ImageSourcePropType,
+  painting: require('../../assets/categories/painting.jpg') as ImageSourcePropType,
+};

@@ -4,23 +4,23 @@ import { useColorScheme } from 'react-native';
 export { radius, spacing, typeScale };
 
 /**
- * "Craft" palette for the apps: deep indigo like hand-block print, terracotta and saffron
- * like a clay diya, on warm handmade-paper backgrounds. The website keeps the shared
- * navy/orange brand tokens; only the apps use this.
+ * Premium palette for the apps: ink black and clean white like a luxury brand, with a
+ * champagne-gold accent used sparingly for highlights. Calls to action are solid black.
+ * (The `craft` name is kept so existing imports keep working.)
  */
 export const craft = {
   indigo: {
-    900: '#14123A',
-    800: '#1E1B4F',
-    700: '#2A2668',
-    600: '#3B3790',
-    300: '#A7A3E8',
-    100: '#E7E5FA',
+    900: '#0B0B0D',
+    800: '#141416',
+    700: '#1F1F23',
+    600: '#2E2E34',
+    300: '#B9B9C3',
+    100: '#EDEDF1',
   },
-  terracotta: { 700: '#9E3A16', 600: '#C2491D', 500: '#D9572B', 300: '#F29B76', 100: '#FCE4D8' },
-  saffron: { 600: '#D98B06', 500: '#F4A62A', 300: '#FAD07F', 100: '#FEF1D6' },
-  paper: { 50: '#FFFBF4', 100: '#FBF3E6', 200: '#F3E6D1', 300: '#E8D5B8', 600: '#7A6650' },
-  leaf: '#1F8A5B',
+  terracotta: { 700: '#8A6A22', 600: '#A07C2C', 500: '#B8913A', 300: '#DCC48E', 100: '#F6EEDC' },
+  saffron: { 600: '#A07C2C', 500: '#C9A24B', 300: '#E3CF9E', 100: '#F8F2E3' },
+  paper: { 50: '#FFFFFF', 100: '#F6F6F7', 200: '#EFEFF2', 300: '#E3E3E8', 600: '#6B6B76' },
+  leaf: '#0F8A5F',
 };
 
 type SemanticKey =
@@ -48,53 +48,54 @@ type SemanticKey =
   | 'infoBg';
 
 const light: Record<SemanticKey, string> = {
-  primary: craft.indigo[800],
-  primaryHover: craft.indigo[900],
+  primary: '#111113',
+  primaryHover: '#000000',
   onPrimary: '#FFFFFF',
-  accent: craft.terracotta[500],
-  accentHover: craft.terracotta[600],
+  // Main buttons are black like premium brands; gold marks highlights and selections.
+  accent: '#111113',
+  accentHover: '#000000',
   onAccent: '#FFFFFF',
   highlight: craft.saffron[500],
   highlightBg: craft.saffron[100],
-  background: craft.paper[100],
-  surface: craft.paper[50],
-  surfaceMuted: craft.paper[200],
+  background: '#FFFFFF',
+  surface: '#FFFFFF',
+  surfaceMuted: craft.paper[100],
   border: craft.paper[300],
-  text: craft.indigo[900],
+  text: '#111113',
   textMuted: craft.paper[600],
   success: craft.leaf,
-  successBg: '#E3F4EA',
-  danger: '#C0362C',
-  dangerBg: '#FBE7E4',
-  warning: craft.saffron[600],
-  warningBg: craft.saffron[100],
-  info: craft.indigo[600],
-  infoBg: craft.indigo[100],
+  successBg: '#E6F5EF',
+  danger: '#D1343A',
+  dangerBg: '#FCEBEC',
+  warning: '#B7791F',
+  warningBg: '#FDF4E3',
+  info: '#2F5BEA',
+  infoBg: '#EAF0FE',
 };
 
 const dark: Record<SemanticKey, string> = {
-  primary: craft.indigo[300],
-  primaryHover: craft.indigo[100],
-  onPrimary: craft.indigo[900],
-  accent: '#E8693D',
-  accentHover: craft.terracotta[300],
-  onAccent: '#FFFFFF',
+  primary: '#FFFFFF',
+  primaryHover: '#F2F2F2',
+  onPrimary: '#0B0B0D',
+  accent: '#FFFFFF',
+  accentHover: '#F2F2F2',
+  onAccent: '#0B0B0D',
   highlight: craft.saffron[500],
-  highlightBg: '#3A2A08',
-  background: '#110F2E',
-  surface: '#1B1842',
-  surfaceMuted: '#262257',
-  border: '#34306E',
-  text: '#FBF3E6',
-  textMuted: '#BDB6D9',
-  success: '#3DBE83',
-  successBg: '#0F2E21',
-  danger: '#F06A5E',
-  dangerBg: '#3A1714',
-  warning: craft.saffron[500],
-  warningBg: '#3A2A08',
-  info: craft.indigo[300],
-  infoBg: '#1E1B4F',
+  highlightBg: '#2A2414',
+  background: '#0B0B0D',
+  surface: '#151518',
+  surfaceMuted: '#1E1E22',
+  border: '#2A2A30',
+  text: '#F5F5F7',
+  textMuted: '#A0A0AB',
+  success: '#34C38F',
+  successBg: '#0F2A20',
+  danger: '#F2555B',
+  dangerBg: '#3A1517',
+  warning: '#E0A23B',
+  warningBg: '#33260D',
+  info: '#6F8FF5',
+  infoBg: '#152045',
 };
 
 export type Palette = Record<SemanticKey, string>;
@@ -103,33 +104,30 @@ export function usePalette(): Palette {
   return useColorScheme() === 'dark' ? dark : light;
 }
 
-/**
- * Baloo 2 for headings (Indian-designed, rounded, strong in Devanagari too); Inter for
- * body text. Loaded in the root layout.
- */
+/** Plus Jakarta Sans for headings, Inter for body text. Loaded in the root layout. */
 export const font = {
-  heading: 'Baloo2_700Bold',
-  headingHeavy: 'Baloo2_800ExtraBold',
-  headingSemi: 'Baloo2_600SemiBold',
+  heading: 'PlusJakartaSans_700Bold',
+  headingHeavy: 'PlusJakartaSans_800ExtraBold',
+  headingSemi: 'PlusJakartaSans_600SemiBold',
   body: 'Inter_400Regular',
   medium: 'Inter_500Medium',
   semibold: 'Inter_600SemiBold',
 } as const;
 
-/** Warm, slightly offset shadow, like paper cut-outs; elevation for Android. */
+/** Soft, neutral shadow; elevation for Android. */
 export const shadow = {
-  shadowColor: '#5A3A1A',
-  shadowOpacity: 0.12,
+  shadowColor: '#000000',
+  shadowOpacity: 0.07,
   shadowRadius: 14,
   shadowOffset: { width: 0, height: 6 },
   elevation: 3,
 } as const;
 
-/** A harder "stamp" shadow for hero cards and primary buttons. */
+/** A slightly deeper shadow for hero cards and primary buttons. */
 export const stamp = {
-  shadowColor: craft.indigo[900],
-  shadowOpacity: 0.9,
-  shadowRadius: 0,
-  shadowOffset: { width: 3, height: 4 },
+  shadowColor: '#000000',
+  shadowOpacity: 0.14,
+  shadowRadius: 18,
+  shadowOffset: { width: 0, height: 8 },
   elevation: 5,
 } as const;

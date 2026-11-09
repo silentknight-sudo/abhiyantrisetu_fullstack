@@ -104,7 +104,7 @@ export default function Calculator() {
         }}
       >
         <Text
-          style={[typeScale.xs, { color: c.accent, fontFamily: font.semibold, letterSpacing: 1.4 }]}
+          style={[typeScale.xs, { color: c.highlight, fontFamily: font.semibold, letterSpacing: 1.4 }]}
         >
           {t('Indicative estimate').toUpperCase()}
         </Text>
@@ -129,7 +129,7 @@ export default function Calculator() {
                   height: 6,
                   borderRadius: 3,
                   width: `${s.share * 100}%`,
-                  backgroundColor: c.accent,
+                  backgroundColor: c.highlight,
                 }}
               />
             </View>

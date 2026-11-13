@@ -795,6 +795,24 @@ export const hi = {
   'Above the customer’s budget of {amount}. Explain why in the note.':
     'ग्राहक के बजट {amount} से ज़्यादा। नोट में कारण बताएं।',
   'Within the customer’s budget of {amount} ✓': 'ग्राहक के बजट {amount} के अंदर ✓',
+  'Report a professional': 'किसी प्रोफ़ेशनल की शिकायत करें',
+  'Report this professional': 'इस प्रोफ़ेशनल की शिकायत करें',
+  'Report {name}': '{name} की शिकायत करें',
+  'Did not turn up': 'नहीं आए',
+  'Rude or made me feel unsafe': 'बदतमीज़ी की या असुरक्षित महसूस कराया',
+  'Asked me to pay outside the app': 'ऐप के बाहर पैसे माँगे',
+  'Poor quality work': 'काम की क्वालिटी ख़राब',
+  'Not the person in the profile': 'प्रोफ़ाइल वाला व्यक्ति नहीं था',
+  'Something else': 'कुछ और',
+  'Thank you. Our team will look into it and may call you.':
+    'धन्यवाद। हमारी टीम इसे देखेगी और आपको कॉल कर सकती है।',
+  'Only Setu sees this report. The professional is not told who reported them.':
+    'यह शिकायत सिर्फ़ सेतु देखता है। प्रोफ़ेशनल को नहीं बताया जाता कि शिकायत किसने की।',
+  'What happened? (optional)': 'क्या हुआ? (वैकल्पिक)',
+  'Send report': 'शिकायत भेजें',
+  'If you are in danger, call 112 first.': 'अगर आप ख़तरे में हैं, तो पहले 112 पर कॉल करें।',
+  'Setu is not fully live in {sector} yet. You can still post; quotes may take longer.':
+    'सेतु अभी {sector} में पूरी तरह शुरू नहीं हुआ है। आप फिर भी पोस्ट कर सकते हैं; कोटेशन आने में देर लग सकती है।',
 };
 
 export type MessageKey = keyof typeof hi;

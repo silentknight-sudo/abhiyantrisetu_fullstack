@@ -915,3 +915,44 @@ export const amcSubscriptions = pgTable(
   },
   (t) => [index('amc_user_idx').on(t.userId)],
 );
+
+// ---------- operations ----------
+
+export const reportStatusEnum = pgEnum('report_status', ['open', 'actioned', 'dismissed']);
+
+/** Trust & safety: a customer's report about a professional. */
+export const reports = pgTable(
+  'reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    reporterId: uuid('reporter_id')
+      .notNull()
+      .references(() => users.id),
+    partnerId: uuid('partner_id')
+      .notNull()
+      .references(() => partners.id),
+    jobId: uuid('job_id').references(() => jobs.id),
+    reason: text('reason').notNull(),
+    details: text('details'),
+    status: reportStatusEnum('status').notNull().default('open'),
+    resolutionNote: text('resolution_note'),
+    resolvedById: uuid('resolved_by_id').references(() => users.id),
+    resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    index('reports_status_idx').on(t.status, t.createdAt),
+    index('reports_partner_idx').on(t.partnerId),
+  ],
+);
+
+export const sectorStatusEnum = pgEnum('sector_status', ['live', 'waitlist']);
+
+/** Pilot rollout: which sectors Setu serves now and which are on the waitlist. */
+export const pilotSectors = pgTable('pilot_sectors', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  /** Normalised lower-case name, e.g. "sector 150", "gaur city 2". */
+  name: text('name').notNull().unique(),
+  status: sectorStatusEnum('status').notNull().default('waitlist'),
+  ...timestamps,
+});

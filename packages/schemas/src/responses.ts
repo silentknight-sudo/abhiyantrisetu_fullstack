@@ -682,3 +682,63 @@ export const expiringDocumentResponse = partnerDocumentResponse.extend({
   partnerName: z.string(),
   phone: z.string(),
 });
+
+// ---------- operations ----------
+
+export const matchingQueueItemResponse = z.object({
+  id: uuid,
+  title: z.string(),
+  type: z.string(),
+  status: z.string(),
+  sector: text.nullable(),
+  customerPhone: z.string(),
+  createdAt: timestamp,
+  ageHours: z.number().int(),
+  leadsSent: z.number().int(),
+  quotes: z.number().int(),
+  /** Older than 24 hours with fewer than 2 quotes. */
+  atRisk: z.boolean(),
+});
+export const rescueResponse = z.object({ leadsSent: z.number().int() });
+
+export const reportResponse = z.object({
+  id: uuid,
+  reason: z.string(),
+  details: text.nullable(),
+  status: z.string(),
+  resolutionNote: text.nullable(),
+  partnerId: uuid,
+  partnerName: z.string(),
+  jobId: uuid.nullable(),
+  reporterPhone: z.string(),
+  /** Open reports against the same partner, this one included. */
+  openAgainstPartner: z.number().int(),
+  createdAt: timestamp,
+});
+
+export const funnelResponse = z.object({
+  days: z.number().int(),
+  steps: z.array(z.object({ key: z.string(), n: z.number().int() })),
+  medianHoursToFirstQuote: z.number().meta({ format: 'double' }).nullable(),
+  supply: z.array(
+    z.object({
+      trade: z.string(),
+      verifiedPartners: z.number().int(),
+      onlinePartners: z.number().int(),
+      openRequests: z.number().int(),
+    }),
+  ),
+  noMatch: z.number().int(),
+});
+
+export const sectorResponse = z.object({
+  id: uuid,
+  name: z.string(),
+  status: z.enum(['live', 'waitlist']),
+  customers: z.number().int(),
+  openRequests: z.number().int(),
+});
+export const coverageResponse = z.object({
+  sector: z.string(),
+  status: z.enum(['live', 'waitlist', 'unknown']),
+});

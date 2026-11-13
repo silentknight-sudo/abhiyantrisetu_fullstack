@@ -42,7 +42,16 @@ export class MatchingService {
     }
   }
 
-  async matchRequirement(requirementId: string): Promise<{ leadCount: number }> {
+  /**
+   * Sends leads for a requirement. `rescue` (staff) tops up a request that is short of
+   * quotes: it reaches partners not yet asked, up to 1.5x their radius, and ignores the
+   * customer's shortlist.
+   */
+  async matchRequirement(
+    requirementId: string,
+    opts: { rescue?: boolean } = {},
+  ): Promise<{ leadCount: number }> {
+    const rescue = !!opts.rescue;
     const [req] = await this.db
       .select({
         id: requirements.id,
@@ -57,7 +66,11 @@ export class MatchingService {
       .from(requirements)
       .leftJoin(categories, eq(categories.id, requirements.categoryId))
       .where(eq(requirements.id, requirementId));
-    if (!req || req.status !== 'requested') return { leadCount: 0 };
+    if (!req) return { leadCount: 0 };
+    if (
+      rescue ? !['requested', 'matched', 'quoted'].includes(req.status) : req.status !== 'requested'
+    )
+      return { leadCount: 0 };
 
     const trades = tradesFor(req.type, req.categorySlug);
     const tradeArray = sql`ARRAY[${sql.join(
@@ -68,7 +81,8 @@ export class MatchingService {
     // A booking where the customer chose their professional goes to that partner only.
     const booked = (req.details as { booking?: { preferredPartnerId?: string } }).booking
       ?.preferredPartnerId;
-    const preferred = booked ? [booked] : (req.preferredPartnerIds ?? []);
+    const preferred = rescue ? [] : booked ? [booked] : (req.preferredPartnerIds ?? []);
+    const reach = rescue ? 1.5 : 1;
     const candidates = (await this.db.execute(sql`
       SELECT p.id, p.service_radius_km, p.rating_avg, p.rating_count, p.avg_response_minutes,
              p.acceptance_rate, p.tier,
@@ -82,7 +96,8 @@ export class MatchingService {
         AND p.user_id <> ${req.customerId}
         AND p.base_location IS NOT NULL
         AND p.trades && ${tradeArray}
-        AND ST_DWithin(p.base_location, a.location, p.service_radius_km * 1000)
+        AND ST_DWithin(p.base_location, a.location, p.service_radius_km * 1000 * ${reach}::float8)
+        AND NOT EXISTS (SELECT 1 FROM leads l WHERE l.requirement_id = ${requirementId} AND l.partner_id = p.id)
         ${
           preferred.length
             ? sql`AND p.id IN (${sql.join(
@@ -128,12 +143,14 @@ export class MatchingService {
         )
         .onConflictDoNothing()
         .returning({ id: leads.id });
-      await this.requirements.transition(
-        tx,
-        requirementId,
-        { type: 'match', leadCount: ranked.length },
-        { type: 'system' },
-      );
+      if (req.status === 'requested') {
+        await this.requirements.transition(
+          tx,
+          requirementId,
+          { type: 'match', leadCount: ranked.length },
+          { type: 'system' },
+        );
+      }
       return inserted.map((l) => l.id);
     });
     const event: LeadsCreatedEvent = { requirementId, leadIds };

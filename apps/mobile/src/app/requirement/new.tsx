@@ -129,6 +129,9 @@ export default function NewRequirement() {
   const [topic, setTopic] = useState<(typeof TOPICS)[number][0]>('structural');
   const [budget, setBudget] = useState('');
   const [sector, setSector] = useState<(typeof SECTORS)[number]>(SECTORS[0]);
+  const coverage = $api.useQuery('get', '/v1/catalog/coverage', {
+    params: { query: { sector: sector.name } },
+  });
   const [line1, setLine1] = useState('');
   const [gps, setGps] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
@@ -662,6 +665,14 @@ export default function NewRequirement() {
           loading={locating}
           onPress={locate}
         />
+        {coverage.data && coverage.data.status !== 'live' ? (
+          <Notice tone="info">
+            {t(
+              'Setu is not fully live in {sector} yet. You can still post; quotes may take longer.',
+              { sector: sector.name },
+            )}
+          </Notice>
+        ) : null}
         <Small>{t('Professionals only see your sector until you hire them.')}</Small>
       </Card>
 

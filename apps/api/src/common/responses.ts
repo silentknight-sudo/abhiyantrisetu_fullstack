@@ -1,4 +1,10 @@
 import {
+  matchingQueueItemResponse,
+  rescueResponse,
+  reportResponse,
+  funnelResponse,
+  sectorResponse,
+  coverageResponse,
   assistantReplyResponse,
   partnerEarningsResponse,
   jobReviewResponse,
@@ -103,3 +109,11 @@ export class ReviewDto extends createZodDto(reviewResponse, { codec: true }) {}
 export class JobReviewDto extends createZodDto(jobReviewResponse, { codec: true }) {}
 export class AssistantReplyDto extends createZodDto(assistantReplyResponse, { codec: true }) {}
 export class PartnerEarningsDto extends createZodDto(partnerEarningsResponse, { codec: true }) {}
+export class MatchingQueueItemDto extends createZodDto(matchingQueueItemResponse, {
+  codec: true,
+}) {}
+export class RescueDto extends createZodDto(rescueResponse, { codec: true }) {}
+export class ReportDto extends createZodDto(reportResponse, { codec: true }) {}
+export class FunnelDto extends createZodDto(funnelResponse, { codec: true }) {}
+export class SectorDto extends createZodDto(sectorResponse, { codec: true }) {}
+export class CoverageDto extends createZodDto(coverageResponse, { codec: true }) {}

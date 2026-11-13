@@ -17,7 +17,7 @@ const slug = z
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Use lowercase letters, numbers and hyphens');
 
 export const adminServiceInputSchema = z.object({
-  categoryId: z.string().uuid(),
+  categoryId: z.uuid(),
   slug,
   nameEn: z.string().trim().min(2).max(120),
   nameHi: z.string().trim().min(1).max(120),
@@ -56,4 +56,33 @@ export const adminUserActionSchema = z.object({
 export const adminAuditQuerySchema = z.object({
   entityType: z.string().trim().max(40).optional(),
   entityId: z.string().trim().max(80).optional(),
+});
+
+// ---------- operations ----------
+
+export const REPORT_REASONS = [
+  'no_show',
+  'rude_or_unsafe',
+  'asked_cash_outside_app',
+  'poor_work',
+  'fake_profile',
+  'other',
+] as const;
+export const REPORT_STATUSES = ['open', 'actioned', 'dismissed'] as const;
+
+export const createReportSchema = z.object({
+  partnerId: z.uuid(),
+  jobId: z.uuid().optional(),
+  reason: z.enum(REPORT_REASONS),
+  details: z.string().trim().max(1000).optional(),
+});
+export const resolveReportSchema = z.object({
+  status: z.enum(['actioned', 'dismissed']),
+  note: z.string().trim().min(3).max(500),
+});
+
+export const SECTOR_STATUSES = ['live', 'waitlist'] as const;
+export const upsertSectorSchema = z.object({
+  name: z.string().trim().min(2).max(60),
+  status: z.enum(SECTOR_STATUSES),
 });

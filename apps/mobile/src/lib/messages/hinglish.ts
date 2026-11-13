@@ -804,4 +804,22 @@ export const hinglish: Record<MessageKey, string> = {
   'Above the customer’s budget of {amount}. Explain why in the note.':
     'Customer ke budget {amount} se zyada. Note mein wajah batayein.',
   'Within the customer’s budget of {amount} ✓': 'Customer ke budget {amount} ke andar ✓',
+  'Report a professional': 'Professional ki report karein',
+  'Report this professional': 'Is professional ki report karein',
+  'Report {name}': '{name} ki report karein',
+  'Did not turn up': 'Aaye hi nahi',
+  'Rude or made me feel unsafe': 'Rude the ya unsafe feel karaya',
+  'Asked me to pay outside the app': 'App ke bahar payment maanga',
+  'Poor quality work': 'Kaam ki quality kharab',
+  'Not the person in the profile': 'Profile wala insaan nahi tha',
+  'Something else': 'Kuch aur',
+  'Thank you. Our team will look into it and may call you.':
+    'Thank you. Hamari team ise dekhegi aur aapko call kar sakti hai.',
+  'Only Setu sees this report. The professional is not told who reported them.':
+    'Yeh report sirf Setu dekhta hai. Professional ko nahi bataya jaata ki report kisne ki.',
+  'What happened? (optional)': 'Kya hua? (optional)',
+  'Send report': 'Report bhejein',
+  'If you are in danger, call 112 first.': 'Agar aap khatre mein hain, toh pehle 112 call karein.',
+  'Setu is not fully live in {sector} yet. You can still post; quotes may take longer.':
+    'Setu abhi {sector} mein poori tarah live nahi hai. Aap phir bhi post kar sakte hain; quotes aane mein der lag sakti hai.',
 };

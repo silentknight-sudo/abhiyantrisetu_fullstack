@@ -1,6 +1,6 @@
 import { IS_PARTNER } from '@/lib/config';
 import { JobProgress } from '@/components/craft';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
 import { useState } from 'react';
 import { PaySection } from '@/components/PaySection';
@@ -310,6 +310,20 @@ export default function JobDetail() {
       ) : null}
 
       <JobReview jobId={j.id} viewer={j.viewerRole} closed={j.state === 'closed'} />
+
+      {isCustomer ? (
+        <Button
+          testID="report-pro"
+          title={t('Report this professional')}
+          kind="outline"
+          onPress={() =>
+            router.push({
+              pathname: '/report',
+              params: { partnerId: j.partnerId, jobId: j.id, name: j.contact?.name ?? '' },
+            })
+          }
+        />
+      ) : null}
 
       {history.data?.length ? (
         <Card>

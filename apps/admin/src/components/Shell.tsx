@@ -13,12 +13,16 @@ type Role = Me['roles'][number];
 /** Navigation, each item shown to the roles the API lets use it. */
 export const NAV: { href: string; label: string; roles: Role[] }[] = [
   { href: '/', label: 'Overview', roles: ['ops', 'verification', 'support', 'finance'] },
+  { href: '/matching', label: 'Matching', roles: ['ops'] },
   { href: '/partners', label: 'Partners', roles: ['ops', 'verification'] },
+  { href: '/reports', label: 'Trust & safety', roles: ['ops', 'support'] },
   { href: '/disputes', label: 'Disputes', roles: ['ops', 'support'] },
   { href: '/jobs', label: 'Jobs', roles: ['ops', 'support', 'finance'] },
   { href: '/payouts', label: 'Payouts', roles: ['ops', 'finance'] },
   { href: '/refunds', label: 'Refunds', roles: ['ops', 'finance'] },
   { href: '/ledger', label: 'Ledger', roles: ['ops', 'finance'] },
+  { href: '/funnel', label: 'Funnel & supply', roles: ['ops'] },
+  { href: '/sectors', label: 'Pilot sectors', roles: ['ops'] },
   { href: '/waitlist', label: 'Waitlist', roles: ['ops', 'support'] },
   { href: '/catalogue', label: 'Catalogue', roles: ['ops'] },
   { href: '/users', label: 'Users', roles: ['ops', 'support'] },

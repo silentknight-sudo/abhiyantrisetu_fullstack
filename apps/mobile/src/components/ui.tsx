@@ -486,14 +486,17 @@ export function Chip({
   label,
   selected,
   onPress,
+  testID,
 }: {
   label: string;
   selected?: boolean;
   onPress: () => void;
+  testID?: string;
 }) {
   const c = usePalette();
   return (
     <Pressable
+      testID={testID}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: Boolean(selected) }}
       onPress={onPress}

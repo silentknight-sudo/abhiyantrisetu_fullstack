@@ -30,6 +30,7 @@ import { ProsModule } from './modules/pros/pros.module';
 import { GrowthModule } from './modules/growth/growth.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { OpsModule } from './modules/ops/ops.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     AdminModule,
     StorageModule,
     ReviewsModule,
+    OpsModule,
     BookingsModule,
     GrowthModule,
     ProsModule,

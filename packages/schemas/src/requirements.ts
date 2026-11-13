@@ -132,3 +132,16 @@ export type CreateRequirementInput = z.infer<typeof createRequirementSchema>;
 export const cancelRequirementSchema = z.object({
   reason: z.string().trim().min(3).max(500),
 });
+
+export const applyReferralSchema = z.object({
+  code: z.string().trim().toUpperCase().min(4).max(16),
+});
+
+export const subscribeCarePlanSchema = z
+  .object({
+    planKey: z.string().min(2).max(40),
+    addressId: z.string().uuid().optional(),
+    address: addressInputSchema.optional(),
+  })
+  .refine((b) => b.addressId || b.address, { message: 'Add an address', path: ['address'] });
+export type SubscribeCarePlanInput = z.infer<typeof subscribeCarePlanSchema>;

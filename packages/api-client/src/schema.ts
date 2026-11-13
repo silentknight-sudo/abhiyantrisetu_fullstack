@@ -1157,6 +1157,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/me/referral': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GrowthController_referral_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/me/referral/apply': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['GrowthController_apply_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/catalog/care-plans': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GrowthController_plans_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/care-plans': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GrowthController_subscriptions_v1'];
+    put?: never;
+    post: operations['GrowthController_subscribe_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/care-plans/{id}/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['GrowthController_cancel_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/jobs/{id}/work': {
     parameters: {
       query?: never;
@@ -2309,6 +2389,43 @@ export interface components {
     };
     ReviewReplyDto: {
       reply: string;
+    };
+    ReferralDto: {
+      code: string;
+      rewardPaise: number;
+      earnedPaise: number;
+      canApply: boolean;
+      referred: {
+        firstName: string | null;
+        /** @enum {string} */
+        status: 'signed_up' | 'first_job_done';
+        /** Format: date-time */
+        joinedAt: string;
+      }[];
+    };
+    ApplyReferralDto: {
+      code: string;
+    };
+    CarePlanDto: {
+      key: string;
+      name: string;
+      pricePaise: number;
+      visitsPerYear: number;
+      includes: string[];
+    };
+    AmcSubscriptionDto: {
+      /** Format: uuid */
+      id: string;
+      planKey: string;
+      planName: string;
+      /** @enum {string} */
+      status: 'active' | 'cancelled';
+      pricePaise: number;
+      startsOn: string;
+      visits: string[];
+      nextVisit: string | null;
+      /** Format: date-time */
+      createdAt: string;
     };
     JobWorkDto: {
       extras: {
@@ -5214,6 +5331,202 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_referral_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReferralDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_apply_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ApplyReferralDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReferralDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_plans_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CarePlanDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_subscriptions_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AmcSubscriptionDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_subscribe_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          planKey: string;
+          /** Format: uuid */
+          addressId?: string;
+          address?: {
+            label?: string;
+            line1: string;
+            line2?: string;
+            sector?: string;
+            tower?: string;
+            flat?: string;
+            city: string;
+            pincode: string;
+            location: {
+              lat: number;
+              lng: number;
+            };
+          };
+        };
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AmcSubscriptionDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  GrowthController_cancel_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AmcSubscriptionDto'];
         };
       };
       /** @description Error */

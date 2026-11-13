@@ -25,3 +25,16 @@ describe('equipmentEstimate', () => {
     expect(equipmentEstimate('jcb', { quantity: 0, duration: 1 })).toBeNull();
   });
 });
+
+describe('careVisits', () => {
+  it('spreads visits evenly over the year', async () => {
+    const { careVisits } = await import('../src/care');
+    expect(careVisits('2026-01-15', 4)).toEqual([
+      '2026-01-15',
+      '2026-04-15',
+      '2026-07-15',
+      '2026-10-15',
+    ]);
+    expect(careVisits('2026-03-01', 1)).toEqual(['2026-03-01']);
+  });
+});

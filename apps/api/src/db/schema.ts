@@ -13,6 +13,7 @@ import {
   bigserial,
   type AnyPgColumn,
   boolean,
+  date,
   check,
   customType,
   index,
@@ -876,4 +877,39 @@ export const jobMilestones = pgTable(
     ...timestamps,
   },
   (t) => [uniqueIndex('job_milestones_job_seq_uq').on(t.jobId, t.seq)],
+);
+
+/** Referral codes: one per user. `referredById` is set once, before the first booking. */
+export const referrals = pgTable('referrals', {
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id),
+  code: text('code').notNull().unique(),
+  referredById: uuid('referred_by_id').references(() => users.id),
+  /** When the referred user's first job closed; both sides earn the reward then. */
+  rewardedAt: timestamp('rewarded_at', { withTimezone: true }),
+  ...timestamps,
+});
+
+/** Care plans (AMC): a yearly plan with visits Setu books. */
+export const amcStatusEnum = pgEnum('amc_status', ['active', 'cancelled']);
+export const amcSubscriptions = pgTable(
+  'amc_subscriptions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    planKey: text('plan_key').notNull(),
+    addressId: uuid('address_id')
+      .notNull()
+      .references(() => addresses.id),
+    status: amcStatusEnum('status').notNull().default('active'),
+    pricePaise: money('price_paise').notNull(),
+    startsOn: date('starts_on').notNull(),
+    /** Visit dates (ISO yyyy-mm-dd) for the plan year. */
+    visits: jsonb('visits').$type<string[]>().notNull().default([]),
+    ...timestamps,
+  },
+  (t) => [index('amc_user_idx').on(t.userId)],
 );

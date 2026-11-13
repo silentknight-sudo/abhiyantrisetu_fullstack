@@ -27,6 +27,7 @@ import { StorageModule } from './modules/storage/storage.module';
 import { RevocationModule } from './common/revocation';
 import { JobWorkModule } from './modules/job-work/job-work.module';
 import { ProsModule } from './modules/pros/pros.module';
+import { GrowthModule } from './modules/growth/growth.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 
@@ -68,6 +69,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     StorageModule,
     ReviewsModule,
     BookingsModule,
+    GrowthModule,
     ProsModule,
     JobWorkModule,
   ],

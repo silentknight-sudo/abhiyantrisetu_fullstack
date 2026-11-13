@@ -13,3 +13,4 @@ export * from './sectors';
 export * from './assistant';
 export * from './estimates';
 export * from './market';
+export * from './care';

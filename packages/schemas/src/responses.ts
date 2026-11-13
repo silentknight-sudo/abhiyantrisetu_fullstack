@@ -610,3 +610,38 @@ export const categoryReviewsResponse = z.object({
     }),
   ),
 });
+
+export const referralResponse = z.object({
+  code: z.string(),
+  rewardPaise: z.number().int(),
+  earnedPaise: z.number().int(),
+  /** Whether this user can still enter a friend's code (no code yet, no bookings yet). */
+  canApply: z.boolean(),
+  referred: z.array(
+    z.object({
+      firstName: text.nullable(),
+      status: z.enum(['signed_up', 'first_job_done']),
+      joinedAt: timestamp,
+    }),
+  ),
+});
+
+export const carePlanResponse = z.object({
+  key: z.string(),
+  name: z.string(),
+  pricePaise: z.number().int(),
+  visitsPerYear: z.number().int(),
+  includes: z.array(z.string()),
+});
+
+export const amcSubscriptionResponse = z.object({
+  id: uuid,
+  planKey: z.string(),
+  planName: z.string(),
+  status: z.enum(['active', 'cancelled']),
+  pricePaise: z.number().int(),
+  startsOn: z.string(),
+  visits: z.array(z.string()),
+  nextVisit: text.nullable(),
+  createdAt: timestamp,
+});

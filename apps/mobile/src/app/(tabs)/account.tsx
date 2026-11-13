@@ -160,6 +160,21 @@ export default function Account() {
               label={t('Cost calculator')}
               onPress={() => router.push('/calculator')}
             />
+            <MenuRow
+              icon="gift"
+              label={t('Refer and earn')}
+              onPress={() => router.push('/refer')}
+            />
+            <MenuRow
+              icon="shield-checkmark"
+              label={t('Care plans')}
+              onPress={() => router.push('/care-plans')}
+            />
+            <MenuRow
+              icon="business"
+              label={t('Societies and builders')}
+              onPress={() => router.push('/society')}
+            />
           </>
         )}
         <MenuRow

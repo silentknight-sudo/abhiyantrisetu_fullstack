@@ -613,6 +613,29 @@ export const hi = {
     'स्टैंडर्ड फ़िनिश, ग्रेटर नोएडा के रेट। साइट विज़िट के बाद असली कोटेशन अलग हो सकते हैं।',
   'Typical cost for your answers': 'आपके जवाबों के हिसाब से आम खर्च',
   '{n} selected · only they get your request': '{n} चुने · सिर्फ़ उन्हें आपकी रिक्वेस्ट मिलेगी',
+  'Add from the market list': 'मार्केट लिस्ट से जोड़ें',
+  'Estimate at market rates: {amount}': 'मार्केट रेट पर अनुमान: {amount}',
+  'Estimate: {amount}': 'अनुमान: {amount}',
+  'Fuel included': 'डीज़ल शामिल',
+  'GST invoice needed': 'GST बिल चाहिए',
+  Hourly: 'घंटे के हिसाब से',
+  Daily: 'रोज़ के हिसाब से',
+  Monthly: 'महीने के हिसाब से',
+  'Per trip': 'प्रति चक्कर',
+  'Hours per day': 'रोज़ कितने घंटे',
+  'Needed by': 'कब तक चाहिए',
+  'Pay only for approved hours. Owners quote rate, diesel and transport.':
+    'सिर्फ़ मंज़ूर घंटों का भुगतान। मालिक रेट, डीज़ल और ट्रांसपोर्ट का कोटेशन देंगे।',
+  'Pick a machine': 'मशीन चुनें',
+  'Rent by': 'किराया',
+  'Road access': 'सड़क तक पहुँच',
+  'Sample rates. Suppliers quote their live prices and delivery.':
+    'नमूना रेट। सप्लायर अपने असली दाम और डिलीवरी बताएंगे।',
+  'Transport to site': 'साइट तक ट्रांसपोर्ट',
+  'Wide road, trailer can reach': 'चौड़ी सड़क, ट्रेलर आ सकता है',
+  'Narrow lane': 'संकरी गली',
+  'Tight site': 'तंग साइट',
+  '{n} hours a day': 'रोज़ {n} घंटे',
 };
 
 export type MessageKey = keyof typeof hi;

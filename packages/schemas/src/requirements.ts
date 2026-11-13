@@ -54,6 +54,8 @@ export const materialRfqDetailsSchema = z
     boqFileKey: fileKeySchema.optional(),
     deliveryBy: z.iso.date().optional(),
     needsUnloading: z.boolean().default(false),
+    /** A GST invoice is needed (businesses, builders). */
+    gstInvoice: z.boolean().default(false),
   })
   .refine((d) => d.items.length > 0 || d.boqFileKey, {
     message: 'Add at least one item or upload a BOQ',
@@ -69,6 +71,13 @@ export const equipmentDetailsSchema = z.object({
     .positive('Enter the number of days')
     .max(365),
   withOperator: z.boolean().default(true),
+  /** How it is billed; durationDays counts days (or trips, or months). */
+  rentBy: z.enum(['hour', 'day', 'month', 'trip']).default('day'),
+  hoursPerDay: z.number().int().min(1).max(24).optional(),
+  fuelIncluded: z.boolean().default(false),
+  transportNeeded: z.boolean().default(true),
+  roadAccess: z.enum(['wide', 'narrow', 'tight']).optional(),
+  workType: z.string().trim().max(60).optional(),
   startDate: z.iso.date({ error: 'Pick a start date' }),
   spec: z.string().trim().max(500).optional(),
 });

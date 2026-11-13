@@ -1,4 +1,11 @@
-import { SECTORS } from '@setu/domain';
+import {
+  EQUIPMENT_RATES,
+  equipmentEstimate,
+  MATERIAL_RATES,
+  materialsEstimate,
+  type RentBy,
+  SECTORS,
+} from '@setu/domain';
 import { createRequirementSchema } from '@setu/schemas';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -21,6 +28,8 @@ import { ChooseWhoQuotes, CostRange } from '@/components/RequestHelpers';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import { type MessageKey, useI18n } from '@/lib/i18n';
+import { rupees } from '@/lib/format';
+import { usePalette } from '@/lib/theme';
 
 type Kind = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
@@ -105,6 +114,7 @@ const toggle = <T,>(xs: T[], x: T) => (xs.includes(x) ? xs.filter((y) => y !== x
 
 export default function NewRequirement() {
   const { t, locale } = useI18n();
+  const c = usePalette();
   const params = useLocalSearchParams<{ type?: string; category?: string }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
@@ -131,6 +141,14 @@ export default function NewRequirement() {
   const [startDate, setStartDate] = useState('');
   const [durationDays, setDurationDays] = useState('3');
   const [withOperator, setWithOperator] = useState(true);
+  const [gstInvoice, setGstInvoice] = useState(false);
+  const [deliveryBy, setDeliveryBy] = useState('');
+  const [equipKey, setEquipKey] = useState<string | null>(null);
+  const [rentBy, setRentBy] = useState<RentBy>('day');
+  const [hoursPerDay, setHoursPerDay] = useState('8');
+  const [fuelIncluded, setFuelIncluded] = useState(false);
+  const [transportNeeded, setTransportNeeded] = useState(true);
+  const [roadAccess, setRoadAccess] = useState<'wide' | 'narrow' | 'tight'>('wide');
   const [photos, setPhotos] = useState<string[]>([]);
   const [partnerIds, setPartnerIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -193,12 +211,19 @@ export default function NewRequirement() {
                       unit: m.unit,
                     })),
                   needsUnloading,
+                  gstInvoice,
+                  deliveryBy: deliveryBy || undefined,
                 }
               : {
                   equipmentType,
                   startDate,
                   durationDays: Number(durationDays),
                   withOperator,
+                  rentBy,
+                  hoursPerDay: rentBy === 'hour' ? Number(hoursPerDay) || 8 : undefined,
+                  fuelIncluded,
+                  transportNeeded,
+                  roadAccess,
                   spec: description.trim() || undefined,
                 };
     const rupees = Number(budget.replace(/[^\d]/g, ''));
@@ -309,6 +334,24 @@ export default function NewRequirement() {
       {kind === 'material_rfq' ? (
         <Card>
           <Title>{t('What do you need?')}</Title>
+          <Small muted={false}>{t('Add from the market list')}</Small>
+          <Chips>
+            {MATERIAL_RATES.map((rate) => (
+              <Chip
+                key={rate.key}
+                label={rate.name}
+                onPress={() => {
+                  const row = { name: rate.name, quantity: '', unit: rate.unit };
+                  const empty = materials.findIndex((m) => !m.name.trim());
+                  setMaterials(
+                    empty >= 0
+                      ? materials.map((m, j) => (j === empty ? row : m))
+                      : [...materials, row],
+                  );
+                }}
+              />
+            ))}
+          </Chips>
           {materials.map((m, i) => (
             <View key={i} style={{ gap: 8 }}>
               <Field
@@ -348,6 +391,41 @@ export default function NewRequirement() {
             kind="outline"
             onPress={() => setMaterials([...materials, { name: '', quantity: '', unit: 'bag' }])}
           />
+          {(() => {
+            const e = materialsEstimate(
+              materials.map((m) => ({ name: m.name, quantity: Number(m.quantity) || 0 })),
+            );
+            return e.pricedItems ? (
+              <View
+                style={{ borderRadius: 14, backgroundColor: c.surfaceMuted, padding: 12, gap: 2 }}
+              >
+                <Small muted={false}>
+                  {t('Estimate at market rates: {amount}', { amount: rupees(e.totalPaise) })}
+                </Small>
+                <Small>{t('Sample rates. Suppliers quote their live prices and delivery.')}</Small>
+              </View>
+            ) : null;
+          })()}
+          <Small muted={false}>{t('Needed by')}</Small>
+          <Chips>
+            {nextDays(locale === 'hi' ? 'hi-IN' : 'en-IN')
+              .slice(1, 8)
+              .map((d) => (
+                <Chip
+                  key={d.iso}
+                  label={d.label}
+                  selected={deliveryBy === d.iso}
+                  onPress={() => setDeliveryBy(deliveryBy === d.iso ? '' : d.iso)}
+                />
+              ))}
+          </Chips>
+          <Chips>
+            <Chip
+              label={t('GST invoice needed')}
+              selected={gstInvoice}
+              onPress={() => setGstInvoice(!gstInvoice)}
+            />
+          </Chips>
           <Chips>
             <Chip
               label={t('We will unload')}
@@ -365,6 +443,21 @@ export default function NewRequirement() {
 
       {kind === 'equipment' ? (
         <Card>
+          <Small muted={false}>{t('Pick a machine')}</Small>
+          <Chips>
+            {EQUIPMENT_RATES.map((e) => (
+              <Chip
+                key={e.key}
+                label={e.name}
+                selected={equipKey === e.key}
+                onPress={() => {
+                  setEquipKey(e.key);
+                  setEquipmentType(e.name);
+                  setRentBy(e.rentBy);
+                }}
+              />
+            ))}
+          </Chips>
           <Field
             label={t('Equipment')}
             testID="equipment-type"
@@ -390,6 +483,75 @@ export default function NewRequirement() {
             onChangeText={setDurationDays}
             keyboardType="number-pad"
           />
+          <Small muted={false}>{t('Rent by')}</Small>
+          <Chips>
+            {(
+              [
+                ['hour', 'Hourly'],
+                ['day', 'Daily'],
+                ['month', 'Monthly'],
+                ['trip', 'Per trip'],
+              ] as const
+            ).map(([v, l]) => (
+              <Chip key={v} label={t(l)} selected={rentBy === v} onPress={() => setRentBy(v)} />
+            ))}
+          </Chips>
+          {rentBy === 'hour' ? (
+            <Field
+              label={t('Hours per day')}
+              value={hoursPerDay}
+              onChangeText={setHoursPerDay}
+              keyboardType="number-pad"
+            />
+          ) : null}
+          <Chips>
+            <Chip
+              label={t('Fuel included')}
+              selected={fuelIncluded}
+              onPress={() => setFuelIncluded(!fuelIncluded)}
+            />
+            <Chip
+              label={t('Transport to site')}
+              selected={transportNeeded}
+              onPress={() => setTransportNeeded(!transportNeeded)}
+            />
+          </Chips>
+          <Small muted={false}>{t('Road access')}</Small>
+          <Chips>
+            {(
+              [
+                ['wide', 'Wide road, trailer can reach'],
+                ['narrow', 'Narrow lane'],
+                ['tight', 'Tight site'],
+              ] as const
+            ).map(([v, l]) => (
+              <Chip
+                key={v}
+                label={t(l)}
+                selected={roadAccess === v}
+                onPress={() => setRoadAccess(v)}
+              />
+            ))}
+          </Chips>
+          {(() => {
+            const est = equipKey
+              ? equipmentEstimate(equipKey, {
+                  quantity: 1,
+                  duration: Number(durationDays) || 0,
+                  hoursPerDay: Number(hoursPerDay) || 8,
+                })
+              : null;
+            return est ? (
+              <View
+                style={{ borderRadius: 14, backgroundColor: c.surfaceMuted, padding: 12, gap: 2 }}
+              >
+                <Small muted={false}>{t('Estimate: {amount}', { amount: rupees(est) })}</Small>
+                <Small>
+                  {t('Pay only for approved hours. Owners quote rate, diesel and transport.')}
+                </Small>
+              </View>
+            ) : null;
+          })()}
           <Chips>
             <Chip
               label={t('With operator')}

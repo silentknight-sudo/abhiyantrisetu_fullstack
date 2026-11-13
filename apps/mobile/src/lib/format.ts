@@ -89,6 +89,12 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
     durationDays?: number;
     withOperator?: boolean;
     spec?: string;
+    gstInvoice?: boolean;
+    rentBy?: 'hour' | 'day' | 'month' | 'trip';
+    hoursPerDay?: number;
+    fuelIncluded?: boolean;
+    transportNeeded?: boolean;
+    roadAccess?: 'wide' | 'narrow' | 'tight';
     booking?: {
       items: { name: string; quantity: number; unitPricePaise: number }[];
       slotStart: string;
@@ -120,12 +126,31 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
   }
   if (d.items?.length) lines.push(d.needsUnloading ? t('Supplier unloads') : t('Customer unloads'));
   if (d.deliveryBy) lines.push(t('Deliver by {date}', { date: d.deliveryBy }));
+  if (d.gstInvoice) lines.push(t('GST invoice needed'));
   if (d.equipmentType) {
     lines.push(`${d.quantity && d.quantity > 1 ? `${d.quantity} × ` : ''}${d.equipmentType}`);
     if (d.startDate) {
       lines.push(t('From {date} for {n} days', { date: d.startDate, n: d.durationDays ?? 1 }));
     }
     lines.push(d.withOperator ? t('With operator') : t('Machine only'));
+    if (d.rentBy) {
+      const by = { hour: 'Hourly', day: 'Daily', month: 'Monthly', trip: 'Per trip' } as const;
+      lines.push(
+        d.rentBy === 'hour' && d.hoursPerDay
+          ? `${t(by[d.rentBy])} · ${t('{n} hours a day', { n: d.hoursPerDay })}`
+          : t(by[d.rentBy]),
+      );
+    }
+    if (d.fuelIncluded) lines.push(t('Fuel included'));
+    if (d.transportNeeded) lines.push(t('Transport to site'));
+    if (d.roadAccess) {
+      const road = {
+        wide: 'Wide road, trailer can reach',
+        narrow: 'Narrow lane',
+        tight: 'Tight site',
+      } as const;
+      lines.push(t(road[d.roadAccess]));
+    }
   }
   if (d.spec) lines.push(d.spec);
   return lines;

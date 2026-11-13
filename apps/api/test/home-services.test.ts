@@ -242,3 +242,64 @@ describe('choose who quotes on a requirement', () => {
     await post({ categoryId: undefined, partnerIds: [ids.near] }).expect(400);
   });
 });
+
+describe('materials and equipment requests', () => {
+  const post = (body: object) =>
+    ctx
+      .http()
+      .post('/v1/requirements')
+      .set(as(customer))
+      .set('x-forwarded-for', freshIp())
+      .send({ address, ...body });
+
+  it('keeps rental terms and delivery needs, and rejects bad values', async () => {
+    const eq = await post({
+      type: 'equipment',
+      title: 'JCB for foundation digging',
+      details: {
+        equipmentType: 'JCB / backhoe loader',
+        durationDays: 2,
+        startDate: new Date(Date.now() + 86_400_000).toISOString().slice(0, 10),
+        rentBy: 'hour',
+        hoursPerDay: 6,
+        fuelIncluded: true,
+        roadAccess: 'narrow',
+      },
+    }).expect(201);
+    expect(eq.body.details).toMatchObject({
+      rentBy: 'hour',
+      hoursPerDay: 6,
+      fuelIncluded: true,
+      transportNeeded: true,
+      roadAccess: 'narrow',
+    });
+    await ctx
+      .http()
+      .post(`/v1/requirements/${eq.body.id}/cancel`)
+      .set(as(customer))
+      .send({ reason: 'Testing only' })
+      .expect(200);
+
+    const mat = await post({
+      type: 'material_rfq',
+      title: 'Cement for slab',
+      details: {
+        items: [{ name: 'OPC 53 grade cement', quantity: 100, unit: 'bag', brand: 'UltraTech' }],
+        gstInvoice: true,
+      },
+    }).expect(201);
+    expect(mat.body.details).toMatchObject({ gstInvoice: true, needsUnloading: false });
+    await ctx
+      .http()
+      .post(`/v1/requirements/${mat.body.id}/cancel`)
+      .set(as(customer))
+      .send({ reason: 'Testing only' })
+      .expect(200);
+
+    await post({
+      type: 'equipment',
+      title: 'Bad rental',
+      details: { equipmentType: 'JCB', durationDays: 1, startDate: '2030-01-01', rentBy: 'week' },
+    }).expect(400);
+  });
+});

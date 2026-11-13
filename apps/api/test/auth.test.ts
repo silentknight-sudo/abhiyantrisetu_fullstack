@@ -112,6 +112,30 @@ describe('partner device binding', () => {
   });
 });
 
+describe('consent choices', () => {
+  it('records the notice version and the optional offers consent separately', async () => {
+    const { accessToken } = await login(ctx, '9844444442');
+    const fresh = await ctx.http().get('/v1/me').set(bearer(accessToken)).expect(200);
+    expect(fresh.body).toMatchObject({ consentVersion: null, marketingOptInAt: null });
+    const on = await ctx
+      .http()
+      .patch('/v1/me')
+      .set(bearer(accessToken))
+      .send({ consentVersion: '2026-11', marketingOptIn: true })
+      .expect(200);
+    expect(on.body.consentVersion).toBe('2026-11');
+    expect(on.body.marketingOptInAt).toBeTruthy();
+    const off = await ctx
+      .http()
+      .patch('/v1/me')
+      .set(bearer(accessToken))
+      .send({ marketingOptIn: false })
+      .expect(200);
+    expect(off.body.marketingOptInAt).toBeNull();
+    expect(off.body.consentVersion).toBe('2026-11');
+  });
+});
+
 describe('account deletion', () => {
   it('anonymises the user and frees the phone number', async () => {
     const { accessToken, refreshToken, user } = await login(ctx, '9844444441');
@@ -124,7 +148,13 @@ describe('account deletion', () => {
     await ctx.http().delete('/v1/me').set(bearer(accessToken)).expect(204);
 
     const [row] = await ctx.db.select().from(users).where(eq(users.id, user.id));
-    expect(row).toMatchObject({ status: 'deleted', phone: `deleted:${user.id}`, name: null });
+    expect(row).toMatchObject({
+      status: 'deleted',
+      phone: `deleted:${user.id}`,
+      name: null,
+      whatsappOptInAt: null,
+      marketingOptInAt: null,
+    });
     await ctx.http().post('/v1/auth/refresh').send({ refreshToken }).expect(401);
 
     const fresh = await login(ctx, '9844444441');

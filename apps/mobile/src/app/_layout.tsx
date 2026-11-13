@@ -99,6 +99,10 @@ function Routes() {
         <Stack.Screen name="care-plans" options={{ title: t('Care plans') }} />
         <Stack.Screen name="society" options={{ title: t('Societies and builders') }} />
         <Stack.Screen
+          name="consent"
+          options={{ title: t('Before you continue'), gestureEnabled: false }}
+        />
+        <Stack.Screen
           name="onboarding"
           options={{
             title: IS_PARTNER ? t('Your business') : t('Profile'),

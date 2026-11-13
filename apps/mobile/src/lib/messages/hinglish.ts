@@ -734,4 +734,34 @@ export const hinglish: Record<MessageKey, string> = {
   'e.g. Ace City, Greater Noida West': 'Jaise Ace City, Greater Noida West',
   '{amount} /yr': '{amount} /saal',
   '{n} visits a year': 'Saal mein {n} visits',
+  'Agree and continue': 'Agree karke aage badhein',
+  'Before you continue': 'Aage badhne se pehle',
+  'Compare quotes from verified pros': 'Verified pros ke quotes compare karein',
+  'Construction, home services, materials, equipment and experts across Greater Noida.':
+    'Poore Greater Noida mein construction, home services, materials, equipment aur experts.',
+  'Every professional is ID-checked. Get 3–5 written quotes and pick the best.':
+    'Har professional ki ID check hoti hai. 3–5 likhit quotes lein aur best chunein.',
+  'Get started': 'Shuru karein',
+  'Needed to run your bookings, payments and safety messages.':
+    'Aapki booking, payment aur safety messages ke liye zaroori.',
+  'Occasional offers. Off unless you turn it on.':
+    'Kabhi-kabhaar offers. Jab tak aap on na karein, band rahega.',
+  'Offers and construction tips': 'Offers aur construction tips',
+  'One platform to build, repair and maintain': 'Banane, repair aur maintain ke liye ek platform',
+  'Pay safely, stage by stage': 'Safe payment, stage by stage',
+  'Required: account, address, job and payment data':
+    'Zaroori: account, address, kaam aur payment data',
+  'Service messages only. Reply STOP to stop.':
+    'Sirf service messages. Band karne ke liye STOP likhein.',
+  'Setu holds your money and releases it only when you approve the work.':
+    'Setu aapka paisa rakhta hai aur aapki manzoori par hi release karta hai.',
+  Skip: 'Skip',
+  'We show professionals and prices for your area.':
+    'Hum aapke area ke professionals aur daam dikhate hain.',
+  'WhatsApp updates on quotes, bookings and payments':
+    'Quotes, booking aur payment ke WhatsApp updates',
+  'Where is your home or site?': 'Aapka ghar ya site kahan hai?',
+  'Your data, your choice': 'Aapka data, aapki marzi',
+  "Setu needs your consent to process your data under India's DPDP Act. You can change the optional choices anytime in Account.":
+    'India ke DPDP Act ke tahat aapka data process karne ke liye Setu ko aapki consent chahiye. Optional choices aap kabhi bhi Account mein badal sakte hain.',
 };

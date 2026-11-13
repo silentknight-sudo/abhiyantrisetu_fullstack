@@ -2,7 +2,9 @@ import { LOCALES, normalizeIndianMobile } from '@setu/domain';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Welcome, WELCOMED_KEY } from '@/components/Welcome';
+import { secureStorage } from '@/lib/storage';
 import { Button, Chip, Chips, Field, fill, Notice, Screen, Small, TrustRow } from '@/components/ui';
 import { client } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
@@ -23,6 +25,15 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  // First run on a customer device: the welcome slides come before login.
+  const [welcomed, setWelcomed] = useState<boolean | null>(IS_PARTNER ? true : null);
+  useEffect(() => {
+    if (IS_PARTNER) return;
+    secureStorage
+      .get(WELCOMED_KEY)
+      .then((v) => setWelcomed(v === '1'))
+      .catch(() => setWelcomed(true));
+  }, []);
 
   async function sendCode() {
     setError(null);
@@ -56,6 +67,9 @@ export default function Login() {
       setBusy(false);
     }
   }
+
+  if (welcomed === null) return null;
+  if (!welcomed) return <Welcome onDone={() => setWelcomed(true)} />;
 
   return (
     <Screen padded={false}>

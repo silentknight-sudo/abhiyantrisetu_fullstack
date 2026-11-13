@@ -1468,6 +1468,8 @@ export interface components {
       /** Format: date-time */
       whatsappOptInAt: string | null;
       /** Format: date-time */
+      marketingOptInAt: string | null;
+      /** Format: date-time */
       createdAt: string;
     };
     UpdateMeDto: {
@@ -1477,6 +1479,7 @@ export interface components {
       /** @enum {string} */
       locale?: 'en' | 'hi' | 'hinglish';
       consentVersion?: string;
+      marketingOptIn?: boolean;
     };
     RequirementDto: {
       /** Format: uuid */

@@ -174,6 +174,8 @@ export const users = pgTable('users', {
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
   /** WhatsApp Business rules: messages only after an explicit opt-in. */
   whatsappOptInAt: timestamp('whatsapp_opt_in_at', { withTimezone: true }),
+  /** Optional consent to offers and tips (separate from service messages). */
+  marketingOptInAt: timestamp('marketing_opt_in_at', { withTimezone: true }),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
   ...timestamps,
 });

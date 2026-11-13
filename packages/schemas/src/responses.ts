@@ -57,6 +57,7 @@ export const meResponse = z.object({
   roles: z.array(z.enum(ROLES)),
   consentVersion: text.nullable(),
   whatsappOptInAt: timestamp.nullable(),
+  marketingOptInAt: timestamp.nullable(),
   createdAt: timestamp,
 });
 

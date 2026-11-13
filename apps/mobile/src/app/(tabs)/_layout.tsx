@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router/js-tabs';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { Loading } from '@/components/ui';
+import { CONSENT_VERSION } from '../consent';
 import { $api } from '@/lib/api';
 import { IS_PARTNER } from '@/lib/config';
 import { useI18n } from '@/lib/i18n';
@@ -26,6 +27,10 @@ export default function TabsLayout() {
     {},
     { enabled: IS_PARTNER, retry: false },
   );
+  // Everyone accepts the current data notice (DPDP) before using the app.
+  const me = $api.useQuery('get', '/v1/me');
+  if (me.isPending) return <Loading />;
+  if (me.data && me.data.consentVersion !== CONSENT_VERSION) return <Redirect href="/consent" />;
   if (IS_PARTNER && partner.isPending) return <Loading />;
   if (IS_PARTNER && partner.error) return <Redirect href="/onboarding" />;
 

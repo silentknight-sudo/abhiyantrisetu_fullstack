@@ -27,6 +27,8 @@ class UpdateMeDto extends createZodDto(
     locale: localeSchema.optional(),
     /** DPDP consent notice version the user just accepted. */
     consentVersion: z.string().trim().min(1).max(20).optional(),
+    /** Offers and construction tips; separate from service and payment messages. */
+    marketingOptIn: z.boolean().optional(),
   }),
 ) {}
 
@@ -39,6 +41,7 @@ const publicColumns = {
   roles: users.roles,
   consentVersion: users.consentVersion,
   whatsappOptInAt: users.whatsappOptInAt,
+  marketingOptInAt: users.marketingOptInAt,
   createdAt: users.createdAt,
 };
 
@@ -62,10 +65,16 @@ export class MeController {
   @ZodResponse({ status: 200, type: MeDto })
   @Patch()
   async update(@CurrentUser() me: AuthUser, @Body() body: UpdateMeDto) {
-    const { consentVersion, ...rest } = body;
+    const { consentVersion, marketingOptIn, ...rest } = body;
     const [user] = await this.db
       .update(users)
-      .set({ ...rest, ...(consentVersion ? { consentVersion, consentedAt: new Date() } : {}) })
+      .set({
+        ...rest,
+        ...(consentVersion ? { consentVersion, consentedAt: new Date() } : {}),
+        ...(marketingOptIn === undefined
+          ? {}
+          : { marketingOptInAt: marketingOptIn ? new Date() : null }),
+      })
       .where(eq(users.id, me.id))
       .returning(publicColumns);
     return user!;
@@ -86,6 +95,9 @@ export class MeController {
         name: null,
         email: null,
         boundDeviceId: null,
+        // Consents end with the account.
+        whatsappOptInAt: null,
+        marketingOptInAt: null,
         deletedAt: new Date(),
       })
       .where(eq(users.id, me.id));

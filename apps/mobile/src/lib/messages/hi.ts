@@ -728,6 +728,33 @@ export const hi = {
   'e.g. Ace City, Greater Noida West': 'जैसे Ace City, ग्रेटर नोएडा वेस्ट',
   '{amount} /yr': '{amount} /साल',
   '{n} visits a year': 'साल में {n} विज़िट',
+  'Agree and continue': 'सहमत हूँ, आगे बढ़ें',
+  'Before you continue': 'आगे बढ़ने से पहले',
+  'Compare quotes from verified pros': 'वेरिफ़ाइड प्रोफ़ेशनल के कोटेशन की तुलना करें',
+  'Construction, home services, materials, equipment and experts across Greater Noida.':
+    'पूरे ग्रेटर नोएडा में निर्माण, घर की सेवाएं, सामग्री, उपकरण और विशेषज्ञ।',
+  'Every professional is ID-checked. Get 3–5 written quotes and pick the best.':
+    'हर प्रोफ़ेशनल की ID जाँची जाती है। 3–5 लिखित कोटेशन लें और सबसे अच्छा चुनें।',
+  'Get started': 'शुरू करें',
+  'Needed to run your bookings, payments and safety messages.':
+    'आपकी बुकिंग, भुगतान और सुरक्षा संदेशों के लिए ज़रूरी।',
+  'Occasional offers. Off unless you turn it on.':
+    'कभी-कभार ऑफ़र। जब तक आप चालू न करें, बंद रहेगा।',
+  'Offers and construction tips': 'ऑफ़र और निर्माण के सुझाव',
+  'One platform to build, repair and maintain': 'बनाने, मरम्मत और रखरखाव के लिए एक प्लेटफ़ॉर्म',
+  'Pay safely, stage by stage': 'सुरक्षित भुगतान, चरण दर चरण',
+  'Required: account, address, job and payment data': 'ज़रूरी: खाता, पता, काम और भुगतान की जानकारी',
+  'Service messages only. Reply STOP to stop.': 'सिर्फ़ सेवा संदेश। बंद करने के लिए STOP लिखें।',
+  'Setu holds your money and releases it only when you approve the work.':
+    'Setu आपका पैसा रखता है और आपकी मंज़ूरी पर ही जारी करता है।',
+  Skip: 'छोड़ें',
+  'We show professionals and prices for your area.':
+    'हम आपके इलाके के प्रोफ़ेशनल और दाम दिखाते हैं।',
+  'WhatsApp updates on quotes, bookings and payments': 'कोटेशन, बुकिंग और भुगतान के WhatsApp अपडेट',
+  'Where is your home or site?': 'आपका घर या साइट कहाँ है?',
+  'Your data, your choice': 'आपका डेटा, आपकी मर्ज़ी',
+  "Setu needs your consent to process your data under India's DPDP Act. You can change the optional choices anytime in Account.":
+    'भारत के DPDP अधिनियम के तहत आपका डेटा प्रोसेस करने के लिए Setu को आपकी सहमति चाहिए। वैकल्पिक विकल्प आप कभी भी खाते में बदल सकते हैं।',
 };
 
 export type MessageKey = keyof typeof hi;

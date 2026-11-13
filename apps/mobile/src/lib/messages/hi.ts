@@ -568,6 +568,21 @@ export const hi = {
   '{n} reviews': '{n} रिव्यू',
   "I'll choose my professional": 'मैं अपना प्रोफ़ेशनल चुनूँगा',
   "I'm on the way": 'मैं रास्ते में हूँ',
+  'Build & renovate': 'बनाना और रिनोवेशन',
+  Done: 'पूरा',
+  Hired: 'हायर किया',
+  'In progress': 'चल रहा है',
+  'Next: check the work and confirm': 'अगला: काम जाँचें और कन्फ़र्म करें',
+  'Next: compare and hire': 'अगला: तुलना करें और हायर करें',
+  'Next: quotes from verified pros': 'अगला: वेरिफ़ाइड प्रोफ़ेशनल के कोटेशन',
+  'Next: the visit or start of work': 'अगला: विज़िट या काम की शुरुआत',
+  Posted: 'पोस्ट किया',
+  Professionals: 'प्रोफ़ेशनल',
+  'Active ({n})': 'चालू ({n})',
+  'Completed ({n})': 'पूरे ({n})',
+  'My projects': 'मेरे प्रोजेक्ट',
+  'No active projects': 'कोई चालू प्रोजेक्ट नहीं',
+  'Nothing completed yet': 'अभी कुछ पूरा नहीं हुआ',
 };
 
 export type MessageKey = keyof typeof hi;

@@ -62,7 +62,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="requests"
         options={{
-          title: t('My requests'),
+          title: t('My projects'),
           href: show(false),
           tabBarIcon: icon('document-text-outline'),
         }}

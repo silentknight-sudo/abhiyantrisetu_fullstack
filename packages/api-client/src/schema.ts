@@ -356,6 +356,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/jobs/{id}/on-the-way': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobsController_onTheWay_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/jobs/{id}/start-code': {
     parameters: {
       query?: never;
@@ -1109,6 +1125,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/catalog/pros': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ProsController_list_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/catalog/reviews': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['ProsController_reviews_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/jobs/{id}/work': {
     parameters: {
       query?: never;
@@ -1356,6 +1404,8 @@ export interface components {
       agreedTotalPaise: number;
       /** Format: date-time */
       slotStart: string | null;
+      /** Format: date-time */
+      onTheWayAt: string | null;
       /** Format: date-time */
       startedAt: string | null;
       /** Format: date-time */
@@ -1861,6 +1911,8 @@ export interface components {
         /** Format: date-time */
         slotStart: string | null;
         /** Format: date-time */
+        onTheWayAt: string | null;
+        /** Format: date-time */
         startedAt: string | null;
         /** Format: date-time */
         completedAt: string | null;
@@ -2048,6 +2100,8 @@ export interface components {
       /** Format: date-time */
       slotStart: string | null;
       /** Format: date-time */
+      onTheWayAt: string | null;
+      /** Format: date-time */
       startedAt: string | null;
       /** Format: date-time */
       completedAt: string | null;
@@ -2171,6 +2225,37 @@ export interface components {
     };
     ReviewReplyDto: {
       reply: string;
+    };
+    CatalogProDto: {
+      /** Format: uuid */
+      id: string;
+      displayName: string;
+      trades: string[];
+      /** Format: double */
+      ratingAvg: number | null;
+      ratingCount: number;
+      jobsDone: number;
+      distanceKm: number;
+      gstRegistered: boolean;
+    };
+    CategoryReviewsDto: {
+      /** Format: double */
+      average: number | null;
+      total: number;
+      stars: number[];
+      reviews: {
+        /** Format: uuid */
+        id: string;
+        rating: number;
+        comment: string | null;
+        partnerReply: string | null;
+        customerFirstName: string | null;
+        sector: string | null;
+        serviceTitle: string;
+        partnerName: string;
+        /** Format: date-time */
+        createdAt: string;
+      }[];
     };
     JobWorkDto: {
       extras: {
@@ -2601,6 +2686,8 @@ export interface operations {
                   /** Format: date-time */
                   slotStart: string;
                   totalPaise: number;
+                  /** Format: uuid */
+                  preferredPartnerId?: string;
                 };
               };
             }
@@ -3189,6 +3276,36 @@ export interface operations {
         'application/json': components['schemas']['ResolveDisputeDto'];
       };
     };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobsController_onTheWay_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
     responses: {
       200: {
         headers: {
@@ -4893,6 +5010,8 @@ export interface operations {
             };
           };
           notes?: string;
+          /** Format: uuid */
+          partnerId?: string;
         };
       };
     };
@@ -4933,6 +5052,70 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ProsController_list_v1: {
+    parameters: {
+      query: {
+        category: string;
+        lat: number;
+        lng: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CatalogProDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  ProsController_reviews_v1: {
+    parameters: {
+      query: {
+        category: string;
+        sort?: 'recent' | 'detailed';
+        sector?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CategoryReviewsDto'];
         };
       };
       /** @description Error */

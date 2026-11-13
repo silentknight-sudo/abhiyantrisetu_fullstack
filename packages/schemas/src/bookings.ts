@@ -20,6 +20,8 @@ export const bookingDetailsSchema = z.object({
   items: z.array(bookingItemSchema).min(1).max(20),
   slotStart: z.iso.datetime({ offset: true }),
   totalPaise: z.number().int().nonnegative(),
+  /** The professional the customer chose; only they get the lead. */
+  preferredPartnerId: z.string().uuid().optional(),
 });
 export type BookingDetails = z.infer<typeof bookingDetailsSchema>;
 
@@ -42,6 +44,8 @@ export const createBookingSchema = z
     addressId: z.string().uuid().optional(),
     address: addressInputSchema.optional(),
     notes: z.string().trim().max(500).optional(),
+    /** "I'll choose my professional": one from GET /v1/catalog/pros. Same price either way. */
+    partnerId: z.string().uuid().optional(),
   })
   .refine((b) => b.addressId || b.address, { message: 'Add an address', path: ['address'] });
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;

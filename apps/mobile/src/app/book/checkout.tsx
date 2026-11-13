@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { SECTORS } from '@setu/domain';
 import { createBookingSchema } from '@setu/schemas';
 import { router, Stack } from 'expo-router';
@@ -103,6 +104,7 @@ export default function Checkout() {
         location: { lat: sector.lat, lng: sector.lng },
       },
       notes: notes.trim() || undefined,
+      partnerId: cart.pro?.id,
     });
     if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? t('Check the form'));
     void secureStorage.set(SECTOR_KEY, sector.name);
@@ -142,6 +144,58 @@ export default function Checkout() {
               + {t('Add more services')}
             </Text>
           </Pressable>
+        </Card>
+
+        <Card>
+          <Title>{t('Who should do the job?')}</Title>
+          {(
+            [
+              [
+                false,
+                'Setu assigns the best available',
+                'Fastest. A verified, top-rated professional near you.',
+              ],
+              [true, "I'll choose my professional", 'See profiles, ratings and experience first.'],
+            ] as const
+          ).map(([choose, title, body]) => {
+            const on = choose ? Boolean(cart.pro) : !cart.pro;
+            return (
+              <Pressable
+                key={title}
+                testID={choose ? 'choose-own-pro' : 'setu-assigns'}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: on }}
+                onPress={() =>
+                  choose
+                    ? router.push({ pathname: '/book/pros', params: { sector: sector.name } })
+                    : cartStore.choosePro(null)
+                }
+                style={{
+                  flexDirection: 'row',
+                  gap: spacing[3],
+                  alignItems: 'center',
+                  padding: spacing[3],
+                  borderRadius: 14,
+                  borderWidth: on ? 1.5 : 1,
+                  borderColor: on ? c.highlight : c.border,
+                  backgroundColor: on ? c.highlightBg : c.surface,
+                }}
+              >
+                <Ionicons
+                  name={on ? 'radio-button-on' : 'radio-button-off'}
+                  size={20}
+                  color={on ? c.text : c.textMuted}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={[typeScale.base, { color: c.text, fontFamily: font.semibold }]}>
+                    {choose && cart.pro ? cart.pro.name : t(title)}
+                  </Text>
+                  <Small>{choose && cart.pro ? t('Tap to change') : t(body)}</Small>
+                </View>
+              </Pressable>
+            );
+          })}
+          <Small>{t('The price stays the same either way.')}</Small>
         </Card>
 
         <Card>

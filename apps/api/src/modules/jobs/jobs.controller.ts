@@ -120,6 +120,13 @@ export class JobsController {
     return this.jobs.resolve(user, id, body.outcome, body.note);
   }
 
+  @ZodResponse({ status: 200, type: JobViewDto })
+  @Post(':id/on-the-way')
+  @HttpCode(200)
+  onTheWay(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.jobs.onTheWay(user, id);
+  }
+
   @ZodResponse({ status: 200, type: StartCodeDto })
   @Post(':id/start-code')
   @HttpCode(200)

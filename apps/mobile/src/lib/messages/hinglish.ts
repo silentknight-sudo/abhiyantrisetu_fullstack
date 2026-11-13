@@ -532,4 +532,46 @@ export const hinglish: Record<MessageKey, string> = {
   'What is it?': 'Yeh kya hai?',
   'Your professional adds photos before and after the work.':
     'Aapke professional kaam se pehle aur baad mein photos jodenge.',
+  'Booking confirmed': 'Booking confirmed',
+  'Check the work, then confirm to release payment':
+    'Kaam check karein, phir payment release karne ke liye confirm karein',
+  'Choose your professional': 'Apna professional chunein',
+  Completed: 'Completed',
+  'Fastest. A verified, top-rated professional near you.':
+    'Sabse tez. Aapke paas ka verified, top-rated professional.',
+  'See profiles, ratings and experience first.': 'Pehle profile, rating aur experience dekhein.',
+  'In my area': 'Mere area mein',
+  'Job started': 'Kaam shuru hua',
+  'Let Setu assign: we alert every verified professional nearby.':
+    'Setu ko chunne dein: hum paas ke har verified professional ko alert bhejte hain.',
+  'Live status': 'Live status',
+  'Most detailed': 'Sabse detailed',
+  'Most recent': 'Sabse naye',
+  'No professional free near you right now': 'Abhi aapke paas koi professional free nahi hai',
+  'No reviews yet': 'Abhi koi review nahi',
+  'On the way': 'Raaste mein',
+  'Only customers with a completed booking can review.':
+    'Sirf poori booking wale customers hi review de sakte hain.',
+  'Professional: {name}': 'Professional: {name}',
+  'Reviews appear here after completed bookings.':
+    'Poori hui booking ke baad reviews yahan dikhte hain.',
+  Select: 'Select',
+  Selected: 'Selected',
+  'Setu assigns the best available': 'Setu best available professional chunega',
+  'Setu recommended': 'Setu recommended',
+  'Skip, let Setu assign': 'Skip, Setu ko chunne dein',
+  'Started after you shared the start code': 'Aapke start code batane ke baad shuru hua',
+  'Tap to change': 'Badalne ke liye tap karein',
+  'The customer can see you are on the way.': 'Customer dekh sakte hain ki aap raaste mein hain.',
+  'The price stays the same either way.': 'Dono tarah se daam wahi rahega.',
+  'Verified professionals near {area}. The price stays the same.':
+    '{area} ke paas verified professionals. Daam wahi rahega.',
+  'Who should do the job?': 'Kaam kaun kare?',
+  'Your professional accepted the booking': 'Aapke professional ne booking accept ki',
+  'Your professional has left for your address':
+    'Aapke professional aapke address ke liye nikal chuke hain',
+  '{n} jobs': '{n} kaam',
+  '{n} reviews': '{n} reviews',
+  "I'll choose my professional": 'Main apna professional chununga',
+  "I'm on the way": 'Main raaste mein hoon',
 };

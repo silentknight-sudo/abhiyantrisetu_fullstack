@@ -14,6 +14,7 @@ import { categories, leads, quotes, requirements, services } from '../../db/sche
 import { JobsService } from '../jobs/jobs.service';
 import { PartnersService } from '../partners/partners.service';
 import { QuotesService } from '../quotes/quotes.service';
+import { ProsService } from '../pros/pros.service';
 import { RequirementsService } from '../requirements/requirements.service';
 
 const rupees = (paise: number) => `₹${Math.round(paise / 100).toLocaleString('en-IN')}`;
@@ -31,6 +32,7 @@ export class BookingsService {
     @Inject(QuotesService) private readonly quotes: QuotesService,
     @Inject(JobsService) private readonly jobs: JobsService,
     @Inject(PartnersService) private readonly partners: PartnersService,
+    @Inject(ProsService) private readonly pros: ProsService,
   ) {}
 
   async create(user: AuthUser, input: CreateBookingInput) {
@@ -60,6 +62,10 @@ export class BookingsService {
         unitPricePaise: s.basePricePaise,
       };
     });
+    if (input.partnerId) {
+      const at = input.address?.location ?? (await this.pros.locationOf(input.addressId!, user.id));
+      await this.pros.assertBookable(input.partnerId, cat.id, at, user.id);
+    }
     const totalPaise = items.reduce((t, i) => t + i.quantity * i.unitPricePaise, 0);
     const summary = items.map((i) => (i.quantity > 1 ? `${i.name} × ${i.quantity}` : i.name));
     const description = [`Booked: ${summary.join(', ')}. Total ${rupees(totalPaise)}.`, input.notes]
@@ -78,7 +84,12 @@ export class BookingsService {
           description,
           urgency: 'flexible',
           photos: [],
-          booking: { items, slotStart: input.slotStart, totalPaise },
+          booking: {
+            items,
+            slotStart: input.slotStart,
+            totalPaise,
+            ...(input.partnerId ? { preferredPartnerId: input.partnerId } : {}),
+          },
         },
       },
       true,

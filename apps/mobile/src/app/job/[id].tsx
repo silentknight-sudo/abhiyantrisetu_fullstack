@@ -5,6 +5,7 @@ import { Linking } from 'react-native';
 import { useState } from 'react';
 import { PaySection } from '@/components/PaySection';
 import { JobWork } from '@/components/JobWork';
+import { LiveStatus } from '@/components/LiveStatus';
 import { JobReview } from '@/components/Reviews';
 import {
   Badge,
@@ -73,6 +74,9 @@ export default function JobDetail() {
   const confirm = $api.useMutation('post', '/v1/jobs/{id}/confirm', opts);
   const cancel = $api.useMutation('post', '/v1/jobs/{id}/cancel', opts);
   const dispute = $api.useMutation('post', '/v1/jobs/{id}/dispute', opts);
+  const onTheWay = $api.useMutation('post', '/v1/jobs/{id}/on-the-way', {
+    onSuccess: () => void refresh(),
+  });
   const newCode = $api.useMutation('post', '/v1/jobs/{id}/start-code', {
     onSuccess: (r) => setStartCode(r.startCode),
     onError: (e) => setError(errorMessage(e)),
@@ -116,6 +120,19 @@ export default function JobDetail() {
         </Small>
       </Card>
 
+      {isCustomer ? <LiveStatus job={j} /> : null}
+      {!isCustomer && j.viewerRole === 'partner' && j.state === 'scheduled' && !j.onTheWayAt ? (
+        <Button
+          testID="on-the-way"
+          title={t("I'm on the way")}
+          icon="navigate"
+          loading={onTheWay.isPending}
+          onPress={() => onTheWay.mutate(path)}
+        />
+      ) : null}
+      {j.viewerRole === 'partner' && j.state === 'scheduled' && j.onTheWayAt ? (
+        <Notice tone="success">{t('The customer can see you are on the way.')}</Notice>
+      ) : null}
       {j.contact ? (
         <Card>
           <Small>{isCustomer ? t('Your professional') : t('Customer')}</Small>

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpException,
   HttpStatus,
   Inject,
@@ -16,7 +17,7 @@ import {
   type TransitionResult,
 } from '@setu/domain';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { and, desc, eq, lte, or } from 'drizzle-orm';
+import { and, desc, eq, isNull, lte, or } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '../../common/auth';
 import { DomainEvents, type JobTransitionedEvent } from '../../common/events';
@@ -280,6 +281,20 @@ export class JobsService {
     };
     await this.bus.emitAsync(DomainEvents.JobTransitioned, event).catch(() => undefined);
     return this.present(row, outcome.actor!, await this.details(this.db, row, outcome.actor!));
+  }
+
+  /** Partner: "On the way" for a scheduled visit. The customer sees it on their tracker. */
+  async onTheWay(user: AuthUser, id: string) {
+    const view = await this.get(user, id);
+    if (view.viewerRole !== 'partner') throw new NotFoundException();
+    if (view.state !== 'scheduled') {
+      throw new ConflictException('Only a scheduled visit can be on the way');
+    }
+    await this.db
+      .update(jobs)
+      .set({ onTheWayAt: new Date() })
+      .where(and(eq(jobs.id, id), isNull(jobs.onTheWayAt)));
+    return this.get(user, id);
   }
 
   schedule(user: AuthUser, id: string, slotStart: Date) {

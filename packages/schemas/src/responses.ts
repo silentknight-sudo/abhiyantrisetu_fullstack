@@ -121,6 +121,7 @@ export const jobResponse = z.object({
   state: z.enum(JOB_STATES),
   agreedTotalPaise: paise,
   slotStart: timestamp.nullable(),
+  onTheWayAt: timestamp.nullable(),
   startedAt: timestamp.nullable(),
   completedAt: timestamp.nullable(),
   closedAt: timestamp.nullable(),
@@ -559,4 +560,36 @@ export const jobWorkResponse = z.object({
   photos: z.object({ before: z.array(z.string()), after: z.array(z.string()) }),
   /** The agreed total including approved extras. */
   totalPaise: z.number().int(),
+});
+
+/** A professional a customer can choose for a booking. */
+export const catalogProResponse = z.object({
+  id: uuid,
+  displayName: z.string(),
+  trades: z.array(z.string()),
+  ratingAvg: decimal.nullable(),
+  ratingCount: z.number().int(),
+  jobsDone: z.number().int(),
+  distanceKm: z.number(),
+  gstRegistered: z.boolean(),
+});
+
+export const categoryReviewsResponse = z.object({
+  average: z.number().meta({ format: 'double' }).nullable(),
+  total: z.number().int(),
+  /** Count of 5, 4, 3, 2 and 1 star reviews, in that order. */
+  stars: z.array(z.number().int()).length(5),
+  reviews: z.array(
+    z.object({
+      id: uuid,
+      rating: z.number().int(),
+      comment: text.nullable(),
+      partnerReply: text.nullable(),
+      customerFirstName: text.nullable(),
+      sector: text.nullable(),
+      serviceTitle: z.string(),
+      partnerName: z.string(),
+      createdAt: timestamp,
+    }),
+  ),
 });

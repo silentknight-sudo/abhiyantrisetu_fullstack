@@ -20,10 +20,12 @@ export type CartService = {
   pricePaise: number;
 };
 export type CartLine = { service: CartService; quantity: number };
-type Cart = { category: string | null; lines: CartLine[] };
+/** The professional the customer picked, or null for "Setu assigns". */
+export type ChosenPro = { id: string; name: string } | null;
+type Cart = { category: string | null; lines: CartLine[]; pro: ChosenPro };
 
 const MAX_QTY = 20;
-let cart: Cart = { category: null, lines: [] };
+let cart: Cart = { category: null, lines: [], pro: null };
 const listeners = new Set<() => void>();
 const set = (next: Cart) => {
   cart = next;
@@ -47,9 +49,11 @@ export const cartStore = {
         ? lines.map((l) => (l.service.id === service.id ? { ...l, quantity } : l))
         : [...rest, { service, quantity }]
       : rest;
-    set({ category: next.length ? category : null, lines: next });
+    const keep = cart.category === category ? cart.pro : null;
+    set({ category: next.length ? category : null, lines: next, pro: next.length ? keep : null });
   },
-  clear: () => set({ category: null, lines: [] }),
+  choosePro: (pro: ChosenPro) => set({ ...cart, pro }),
+  clear: () => set({ category: null, lines: [], pro: null }),
 };
 
 export function useCart() {

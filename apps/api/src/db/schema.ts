@@ -542,6 +542,8 @@ export const jobs = pgTable(
     startCodeHash: text('start_code_hash').notNull(),
     startCodeAttempts: smallint('start_code_attempts').notNull().default(0),
     slotStart: timestamp('slot_start', { withTimezone: true }),
+    /** Set when the partner taps "On the way" for a scheduled visit. */
+    onTheWayAt: timestamp('on_the_way_at', { withTimezone: true }),
     startedAt: timestamp('started_at', { withTimezone: true }),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     closedAt: timestamp('closed_at', { withTimezone: true }),

@@ -528,6 +528,46 @@ export const hi = {
   'What is it?': 'यह क्या है?',
   'Your professional adds photos before and after the work.':
     'आपके प्रोफ़ेशनल काम से पहले और बाद में फ़ोटो जोड़ेंगे।',
+  'Booking confirmed': 'बुकिंग कन्फ़र्म',
+  'Check the work, then confirm to release payment':
+    'काम जाँचें, फिर भुगतान जारी करने के लिए कन्फ़र्म करें',
+  'Choose your professional': 'अपना प्रोफ़ेशनल चुनें',
+  Completed: 'पूरा हुआ',
+  'Fastest. A verified, top-rated professional near you.':
+    'सबसे तेज़। आपके पास का वेरिफ़ाइड, टॉप रेटेड प्रोफ़ेशनल।',
+  'See profiles, ratings and experience first.': 'पहले प्रोफ़ाइल, रेटिंग और अनुभव देखें।',
+  'In my area': 'मेरे इलाके में',
+  'Job started': 'काम शुरू हुआ',
+  'Let Setu assign: we alert every verified professional nearby.':
+    'Setu को चुनने दें: हम पास के हर वेरिफ़ाइड प्रोफ़ेशनल को सूचना भेजते हैं।',
+  'Live status': 'लाइव स्थिति',
+  'Most detailed': 'सबसे विस्तृत',
+  'Most recent': 'सबसे नए',
+  'No professional free near you right now': 'अभी आपके पास कोई प्रोफ़ेशनल खाली नहीं है',
+  'No reviews yet': 'अभी कोई रिव्यू नहीं',
+  'On the way': 'रास्ते में',
+  'Only customers with a completed booking can review.':
+    'सिर्फ़ पूरी बुकिंग वाले ग्राहक ही रिव्यू दे सकते हैं।',
+  'Professional: {name}': 'प्रोफ़ेशनल: {name}',
+  'Reviews appear here after completed bookings.': 'पूरी हुई बुकिंग के बाद रिव्यू यहाँ दिखते हैं।',
+  Select: 'चुनें',
+  Selected: 'चुना गया',
+  'Setu assigns the best available': 'Setu सबसे अच्छा उपलब्ध प्रोफ़ेशनल चुनेगा',
+  'Setu recommended': 'Setu की सलाह',
+  'Skip, let Setu assign': 'छोड़ें, Setu को चुनने दें',
+  'Started after you shared the start code': 'आपके स्टार्ट कोड बताने के बाद शुरू हुआ',
+  'Tap to change': 'बदलने के लिए टैप करें',
+  'The customer can see you are on the way.': 'ग्राहक देख सकते हैं कि आप रास्ते में हैं।',
+  'The price stays the same either way.': 'दोनों तरह से दाम वही रहेगा।',
+  'Verified professionals near {area}. The price stays the same.':
+    '{area} के पास वेरिफ़ाइड प्रोफ़ेशनल। दाम वही रहेगा।',
+  'Who should do the job?': 'काम कौन करे?',
+  'Your professional accepted the booking': 'आपके प्रोफ़ेशनल ने बुकिंग स्वीकार की',
+  'Your professional has left for your address': 'आपके प्रोफ़ेशनल आपके पते के लिए निकल चुके हैं',
+  '{n} jobs': '{n} काम',
+  '{n} reviews': '{n} रिव्यू',
+  "I'll choose my professional": 'मैं अपना प्रोफ़ेशनल चुनूँगा',
+  "I'm on the way": 'मैं रास्ते में हूँ',
 };
 
 export type MessageKey = keyof typeof hi;

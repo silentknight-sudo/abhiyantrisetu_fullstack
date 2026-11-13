@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CartBar, QtyStepper } from '@/components/booking';
 import { Banner, Button, Chip, Empty, Loading, Notice, Small, TrustRow } from '@/components/ui';
@@ -22,6 +22,7 @@ export default function BookMenu() {
     params: { query: { category } },
   });
   const cart = useCart();
+  const reviews = $api.useQuery('get', '/v1/catalog/reviews', { params: { query: { category } } });
   const [group, setGroup] = useState<string | null>(null);
   const hi = locale === 'hi';
 
@@ -54,6 +55,26 @@ export default function BookMenu() {
           )}
         />
         <View style={{ padding: spacing[4], gap: spacing[4] }}>
+          {reviews.data && reviews.data.total > 0 ? (
+            <Pressable
+              accessibilityRole="button"
+              testID="category-reviews"
+              onPress={() => router.push({ pathname: '/book/reviews', params: { category } })}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+            >
+              <Text style={[typeScale.base, { color: c.text, fontFamily: font.heading }]}>
+                ★ {reviews.data.average?.toFixed(2)}
+              </Text>
+              <Text
+                style={[
+                  typeScale.sm,
+                  { color: c.text, fontFamily: font.medium, textDecorationLine: 'underline' },
+                ]}
+              >
+                {t('{n} reviews', { n: reviews.data.total })}
+              </Text>
+            </Pressable>
+          ) : null}
           <TrustRow
             items={[
               ['shield-checkmark', t('Verified pros')],

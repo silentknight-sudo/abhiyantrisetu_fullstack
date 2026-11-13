@@ -21,6 +21,9 @@ export type PartnerProfileInput = z.infer<typeof partnerProfileSchema>;
 
 export const partnerProfileUpdateSchema = partnerProfileSchema.partial();
 
+/** The partner's "Online for new jobs" switch. */
+export const partnerAvailabilitySchema = z.object({ online: z.boolean() });
+
 export const verifyPartnerSchema = z
   .object({
     status: z.enum(['verified', 'rejected', 'suspended']),

@@ -71,6 +71,7 @@ export class MatchingService {
       JOIN users u ON u.id = p.user_id
       JOIN addresses a ON a.id = ${req.addressId}
       WHERE p.verification_status = 'verified'
+        AND p.is_online
         AND u.status = 'active'
         AND p.user_id <> ${req.customerId}
         AND p.base_location IS NOT NULL

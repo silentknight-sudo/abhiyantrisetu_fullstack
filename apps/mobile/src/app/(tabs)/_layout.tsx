@@ -68,12 +68,25 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: t('Home'),
+          href: show(true),
+          tabBarIcon: icon('home-outline'),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="leads"
         options={{ title: t('Leads'), href: show(true), tabBarIcon: icon('flash-outline') }}
       />
       <Tabs.Screen
         name="jobs"
         options={{ title: t('Jobs'), tabBarIcon: icon('construct-outline') }}
+      />
+      <Tabs.Screen
+        name="payouts"
+        options={{ title: t('Earnings'), href: show(true), tabBarIcon: icon('wallet-outline') }}
       />
       <Tabs.Screen
         name="account"

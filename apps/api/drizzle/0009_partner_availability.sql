@@ -1,0 +1,1 @@
+ALTER TABLE "partners" ADD COLUMN "is_online" boolean DEFAULT true NOT NULL;

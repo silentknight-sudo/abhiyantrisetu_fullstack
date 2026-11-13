@@ -8,10 +8,12 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import {
+  partnerAvailabilitySchema,
   partnerProfileSchema,
   partnerProfileUpdateSchema,
   verifyPartnerSchema,
@@ -24,6 +26,7 @@ import { PartnersService } from './partners.service';
 
 class PartnerProfileDto extends createZodDto(partnerProfileSchema) {}
 class PartnerProfileUpdateDto extends createZodDto(partnerProfileUpdateSchema) {}
+class PartnerAvailabilityDto extends createZodDto(partnerAvailabilitySchema) {}
 class PartnerListQueryDto extends createZodDto(
   z.object({
     status: z.enum(['pending', 'in_review', 'verified', 'rejected', 'suspended']).optional(),
@@ -52,6 +55,12 @@ export class PartnersController {
   @Patch('partners/me')
   update(@CurrentUser() user: AuthUser, @Body() body: PartnerProfileUpdateDto) {
     return this.partners.updateMine(user, body);
+  }
+
+  @ZodResponse({ status: 200, type: PartnerDto })
+  @Put('partners/me/availability')
+  availability(@CurrentUser() user: AuthUser, @Body() body: PartnerAvailabilityDto) {
+    return this.partners.setOnline(user, body.online);
   }
 
   @ZodResponse({ status: 200, type: [AdminPartnerDto] })

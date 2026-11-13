@@ -344,6 +344,8 @@ export const partners = pgTable(
     tier: partnerTierEnum('tier').notNull().default('basic'),
     verificationStatus: verificationStatusEnum('verification_status').notNull().default('pending'),
     leadCredits: integer('lead_credits').notNull().default(0),
+    /** The partner's "Online for new jobs" switch; offline partners get no new leads. */
+    isOnline: boolean('is_online').notNull().default(true),
     onboardedById: uuid('onboarded_by_id').references(() => users.id), // field agent
     ...timestamps,
   },

@@ -68,6 +68,17 @@ export class PartnersService {
     return p!;
   }
 
+  /** The "Online for new jobs" switch. Offline partners are skipped by matching. */
+  async setOnline(user: AuthUser, online: boolean) {
+    const mine = await this.requireMine(user);
+    const [p] = await this.db
+      .update(partners)
+      .set({ isOnline: online })
+      .where(eq(partners.id, mine.id))
+      .returning();
+    return p!;
+  }
+
   /** Admin list, newest first, with the owner's phone so the team can call them. */
   async list(status?: PartnerRow['verificationStatus']) {
     const rows = await this.db

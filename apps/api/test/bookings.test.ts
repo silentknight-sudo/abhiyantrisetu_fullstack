@@ -213,4 +213,41 @@ describe('instant booking', () => {
       .set(bearer(proA.accessToken))
       .expect(404);
   });
+
+  it('offline partners get no new leads until they come back online', async () => {
+    await ctx
+      .http()
+      .put('/v1/partners/me/availability')
+      .set(bearer(proB.accessToken))
+      .send({ online: false })
+      .expect(200)
+      .expect((r) => expect(r.body.isOnline).toBe(false));
+    await ctx
+      .http()
+      .put('/v1/partners/me/availability')
+      .set(bearer(customer.accessToken))
+      .send({ online: false })
+      .expect(403); // customers have no partner profile
+
+    const res = await ctx
+      .http()
+      .post('/v1/bookings')
+      .set(bearer(customer.accessToken))
+      .send({
+        categoryId: catId,
+        items: [{ serviceId: tapId, quantity: 1 }],
+        slotStart: inHours(30),
+        address,
+      })
+      .expect(201);
+    expect(await leadFor(proA, res.body.id)).toBeTruthy();
+    expect(await leadFor(proB, res.body.id)).toBeUndefined();
+
+    await ctx
+      .http()
+      .put('/v1/partners/me/availability')
+      .set(bearer(proB.accessToken))
+      .send({ online: true })
+      .expect(200);
+  });
 });

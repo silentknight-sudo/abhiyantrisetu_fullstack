@@ -31,6 +31,19 @@ export default function Earnings() {
       </Screen>
     );
   const e = data.data;
+  // Earnings per day for the last 7 days (payouts excluded).
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - (6 - i));
+    const total = e.entries
+      .filter(
+        (x) => x.kind === 'earning' && new Date(x.createdAt).toDateString() === d.toDateString(),
+      )
+      .reduce((s, x) => s + x.amountPaise, 0);
+    return { label: d.toLocaleDateString('en-IN', { weekday: 'short' }), total };
+  });
+  const peak = Math.max(1, ...days.map((d) => d.total));
 
   return (
     <Screen refreshing={data.isRefetching} onRefresh={() => void data.refetch()}>
@@ -56,6 +69,45 @@ export default function Earnings() {
         <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.8)', fontFamily: font.body }]}>
           {t('Paid to your bank every week once customers confirm the work.')}
         </Text>
+        <View
+          accessibilityRole="image"
+          accessibilityLabel={t('Daily earnings, last 7 days')}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            gap: 6,
+            height: 84,
+            marginTop: spacing[2],
+          }}
+        >
+          {days.map((d, i) => (
+            <View
+              key={i}
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                gap: 4,
+                height: '100%',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <View
+                style={{
+                  width: '100%',
+                  height: Math.max(4, (d.total / peak) * 60),
+                  borderTopLeftRadius: 4,
+                  borderTopRightRadius: 4,
+                  backgroundColor: i === 6 ? c.highlight : 'rgba(255,255,255,0.28)',
+                }}
+              />
+              <Text
+                style={[typeScale.xs, { color: 'rgba(255,255,255,0.7)', fontFamily: font.body }]}
+              >
+                {d.label}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
 
       <View style={{ flexDirection: 'row', gap: spacing[3] }}>

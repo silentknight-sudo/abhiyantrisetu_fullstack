@@ -64,6 +64,13 @@
       "when": 1794077279507,
       "tag": "0008_service_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794570942306,
+      "tag": "0009_partner_availability",
+      "breakpoints": true
     }
   ]
 }

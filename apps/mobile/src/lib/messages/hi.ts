@@ -466,6 +466,31 @@ export const hi = {
   '1 item': '1 आइटम',
   Won: 'मिला',
   'Not selected': 'नहीं चुना गया',
+  'Accept a lead to see it here.': 'काम देखने के लिए कोई लीड स्वीकार करें।',
+  'Daily earnings, last 7 days': 'पिछले 7 दिनों की रोज़ की कमाई',
+  Details: 'विवरण',
+  'Earnings & payouts': 'कमाई और भुगतान',
+  'How you rank': 'आपकी रैंकिंग',
+  'Jobs completed': 'पूरे किए काम',
+  Next: 'अगला',
+  'Next payout: {amount}': 'अगला भुगतान: {amount}',
+  'No jobs today': 'आज कोई काम नहीं',
+  Offline: 'ऑफ़लाइन',
+  Online: 'ऑनलाइन',
+  'Online for new jobs': 'नए काम के लिए ऑनलाइन',
+  'New leads': 'नई लीड',
+  Upcoming: 'आने वाले',
+  Reviews: 'रिव्यू',
+  'Service area': 'सेवा क्षेत्र',
+  Working: 'काम चल रहा है',
+  'You are offline. Customers near you will not see you for new jobs.':
+    'आप ऑफ़लाइन हैं। पास के ग्राहकों को नए काम के लिए आप नहीं दिखेंगे।',
+  '{n} km': '{n} कि.मी.',
+  "Today's jobs": 'आज के काम',
+  "Ranking can't be bought. It depends on how you serve customers.":
+    'रैंकिंग खरीदी नहीं जा सकती। यह इस पर निर्भर है कि आप ग्राहकों की सेवा कैसे करते हैं।',
+  'Instant booking': 'इंस्टेंट बुकिंग',
+  'You earn {amount}': 'आपकी कमाई {amount}',
 };
 
 export type MessageKey = keyof typeof hi;

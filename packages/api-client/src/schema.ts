@@ -468,6 +468,22 @@ export interface paths {
     patch: operations['PartnersController_update_v1'];
     trace?: never;
   };
+  '/v1/partners/me/availability': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations['PartnersController_availability_v1'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/admin/partners': {
     parameters: {
       query?: never;
@@ -1466,6 +1482,7 @@ export interface components {
       /** @enum {string} */
       verificationStatus: 'pending' | 'in_review' | 'verified' | 'rejected' | 'suspended';
       leadCredits: number;
+      isOnline: boolean;
       /** Format: uuid */
       onboardedById: string | null;
       /** Format: date-time */
@@ -1500,6 +1517,9 @@ export interface components {
       serviceRadiusKm: number;
       gstin?: string;
     };
+    PartnerAvailabilityDto: {
+      online: boolean;
+    };
     AdminPartnerDto: {
       /** Format: uuid */
       id: string;
@@ -1525,6 +1545,7 @@ export interface components {
       /** @enum {string} */
       verificationStatus: 'pending' | 'in_review' | 'verified' | 'rejected' | 'suspended';
       leadCredits: number;
+      isOnline: boolean;
       /** Format: uuid */
       onboardedById: string | null;
       /** Format: date-time */
@@ -1565,6 +1586,8 @@ export interface components {
         city: string;
         pincode: string;
       };
+      /** @enum {string|null} */
+      quoteStatus: 'draft' | 'sent' | 'withdrawn' | 'expired' | 'rejected' | 'accepted' | null;
       distanceKm: number;
       /** Format: uuid */
       quoteId: string | null;
@@ -3336,6 +3359,38 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['PartnerProfileUpdateDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  PartnersController_availability_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PartnerAvailabilityDto'];
       };
     };
     responses: {

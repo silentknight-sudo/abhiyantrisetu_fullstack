@@ -197,6 +197,7 @@ export const partnerResponse = z.object({
   tier: partnerTier,
   verificationStatus,
   leadCredits: z.number().int(),
+  isOnline: z.boolean(),
   onboardedById: uuid.nullable(),
   createdAt: timestamp,
   updatedAt: timestamp,

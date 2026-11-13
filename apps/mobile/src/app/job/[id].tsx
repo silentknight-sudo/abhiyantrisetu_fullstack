@@ -1,8 +1,10 @@
+import { IS_PARTNER } from '@/lib/config';
 import { JobProgress } from '@/components/craft';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
 import { useState } from 'react';
 import { PaySection } from '@/components/PaySection';
+import { JobWork } from '@/components/JobWork';
 import { JobReview } from '@/components/Reviews';
 import {
   Badge,
@@ -42,6 +44,8 @@ export default function JobDetail() {
   const params = useLocalSearchParams<{ id: string; startCode?: string }>();
   const path = { params: { path: { id: params.id } } };
   const job = $api.useQuery('get', '/v1/jobs/{id}', path);
+  // The partner's trades pick their rate card for extras.
+  const me = $api.useQuery('get', '/v1/partners/me', {}, { enabled: IS_PARTNER, retry: false });
   const history = $api.useQuery('get', '/v1/jobs/{id}/events', path);
   const [startCode, setStartCode] = useState(params.startCode ?? null);
   const [codeInput, setCodeInput] = useState('');
@@ -226,6 +230,8 @@ export default function JobDetail() {
           />
         </Card>
       ) : null}
+
+      <JobWork jobId={j.id} viewer={j.viewerRole} state={j.state} trades={me.data?.trades ?? []} />
 
       {isCustomer ? (
         <PaySection

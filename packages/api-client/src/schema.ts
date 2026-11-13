@@ -1109,6 +1109,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/jobs/{id}/work': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['JobWorkController_get_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/extras': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_addExtra_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/extras/{extraId}/approve': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_approve_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/extras/{extraId}/decline': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_decline_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/photos': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_addPhotos_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2038,7 +2118,7 @@ export interface components {
     };
     UploadRequestDto: {
       /** @enum {string} */
-      purpose: 'requirement_photo';
+      purpose: 'requirement_photo' | 'job_photo';
       /** @enum {string} */
       contentType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/heic';
       sizeBytes: number;
@@ -2091,6 +2171,32 @@ export interface components {
     };
     ReviewReplyDto: {
       reply: string;
+    };
+    JobWorkDto: {
+      extras: {
+        /** Format: uuid */
+        id: string;
+        description: string;
+        amountPaise: number;
+        /** @enum {string} */
+        status: 'pending' | 'approved' | 'declined';
+        /** Format: date-time */
+        createdAt: string;
+      }[];
+      photos: {
+        before: string[];
+        after: string[];
+      };
+      totalPaise: number;
+    };
+    AddJobExtraDto: {
+      description: string;
+      amountPaise: number;
+    };
+    AddJobPhotosDto: {
+      /** @enum {string} */
+      kind: 'before' | 'after';
+      fileKeys: string[];
     };
     ApiError: {
       statusCode?: number;
@@ -4827,6 +4933,166 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JobViewDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_get_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_addExtra_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddJobExtraDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_approve_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        extraId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_decline_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        extraId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_addPhotos_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddJobPhotosDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
         };
       };
       /** @description Error */

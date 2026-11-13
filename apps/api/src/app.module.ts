@@ -25,6 +25,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { RevocationModule } from './common/revocation';
+import { JobWorkModule } from './modules/job-work/job-work.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 
@@ -66,6 +67,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     StorageModule,
     ReviewsModule,
     BookingsModule,
+    JobWorkModule,
   ],
   controllers: [HealthController, CatalogController],
   providers: [

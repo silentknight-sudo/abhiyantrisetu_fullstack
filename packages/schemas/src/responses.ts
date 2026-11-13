@@ -545,3 +545,18 @@ export const adminAuditResponse = z.object({
   ip: text.nullable(),
   createdAt: timestamp,
 });
+
+export const jobExtraResponse = z.object({
+  id: uuid,
+  description: z.string(),
+  amountPaise: z.number().int(),
+  status: z.enum(['pending', 'approved', 'declined']),
+  createdAt: timestamp,
+});
+
+export const jobWorkResponse = z.object({
+  extras: z.array(jobExtraResponse),
+  photos: z.object({ before: z.array(z.string()), after: z.array(z.string()) }),
+  /** The agreed total including approved extras. */
+  totalPaise: z.number().int(),
+});

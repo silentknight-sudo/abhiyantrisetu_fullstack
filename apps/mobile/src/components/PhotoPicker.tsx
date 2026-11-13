@@ -22,9 +22,12 @@ interface Photo {
  */
 export function PhotoPicker({
   max = 5,
+  purpose = 'requirement_photo',
   onChange,
 }: {
   max?: number;
+  /** What the photos are for; decides where they are stored. */
+  purpose?: 'requirement_photo' | 'job_photo';
   /** Stored keys so far, and whether any upload is still running. */
   onChange: (keys: string[], uploading: boolean) => void;
 }) {
@@ -48,7 +51,7 @@ export function PhotoPicker({
       : 'image/jpeg';
     const blob = await (await fetch(asset.uri)).blob();
     const slot = await client.api.POST('/v1/uploads', {
-      body: { purpose: 'requirement_photo', contentType, sizeBytes: blob.size },
+      body: { purpose, contentType, sizeBytes: blob.size },
     });
     if (!slot.data) throw slot.error;
     const res = await fetch(slot.data.upload.url, {

@@ -71,6 +71,13 @@
       "when": 1794570942306,
       "tag": "0009_partner_availability",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794571570649,
+      "tag": "0010_job_extras_photos",
+      "breakpoints": true
     }
   ]
 }

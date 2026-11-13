@@ -809,3 +809,37 @@ export const ledgerEntries = pgTable(
     ),
   ],
 );
+
+/** Parts or extra work a partner adds during a job; the customer approves each one. */
+export const jobExtraStatusEnum = pgEnum('job_extra_status', ['pending', 'approved', 'declined']);
+export const jobExtras = pgTable(
+  'job_extras',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    jobId: uuid('job_id')
+      .notNull()
+      .references(() => jobs.id),
+    description: text('description').notNull(),
+    amountPaise: money('amount_paise').notNull(),
+    status: jobExtraStatusEnum('status').notNull().default('pending'),
+    decidedAt: timestamp('decided_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('job_extras_job_idx').on(t.jobId)],
+);
+
+/** Before and after photos the partner takes on site. */
+export const jobPhotoKindEnum = pgEnum('job_photo_kind', ['before', 'after']);
+export const jobPhotos = pgTable(
+  'job_photos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    jobId: uuid('job_id')
+      .notNull()
+      .references(() => jobs.id),
+    kind: jobPhotoKindEnum('kind').notNull(),
+    fileKey: text('file_key').notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('job_photos_job_idx').on(t.jobId)],
+);

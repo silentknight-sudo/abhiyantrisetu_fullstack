@@ -115,7 +115,7 @@ const toggle = <T,>(xs: T[], x: T) => (xs.includes(x) ? xs.filter((y) => y !== x
 export default function NewRequirement() {
   const { t, locale } = useI18n();
   const c = usePalette();
-  const params = useLocalSearchParams<{ type?: string; category?: string }>();
+  const params = useLocalSearchParams<{ type?: string; category?: string; partners?: string }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
   );
@@ -150,7 +150,9 @@ export default function NewRequirement() {
   const [transportNeeded, setTransportNeeded] = useState(true);
   const [roadAccess, setRoadAccess] = useState<'wide' | 'narrow' | 'tight'>('wide');
   const [photos, setPhotos] = useState<string[]>([]);
-  const [partnerIds, setPartnerIds] = useState<string[]>([]);
+  const [partnerIds, setPartnerIds] = useState<string[]>(
+    params.partners ? params.partners.split(',').filter(Boolean).slice(0, 5) : [],
+  );
   const [uploading, setUploading] = useState(false);
 
   const catalog = $api.useQuery('get', '/v1/catalog/categories');
@@ -162,6 +164,17 @@ export default function NewRequirement() {
   }, [catalog.data, params.category, categoryId]);
   const categories = (catalog.data ?? []).filter((c) => c.requirementType === kind);
   const slug = catalog.data?.find((x) => x.id === categoryId)?.slug;
+  // A profession picked on Find a Professional sets the consultation topic.
+  useEffect(() => {
+    const byProfession: Record<string, (typeof TOPICS)[number][0]> = {
+      architect: 'architecture',
+      'interior-designer': 'interior',
+      'structural-engineer': 'structural',
+      'civil-engineer': 'cost_estimate',
+      'vastu-consultant': 'vastu',
+    };
+    if (kind === 'consult' && slug && byProfession[slug]) setTopic(byProfession[slug]);
+  }, [kind, slug]);
   const create = $api.useMutation('post', '/v1/requirements', {
     onSuccess: (req) => {
       void queryClient.invalidateQueries({ queryKey: ['get', '/v1/requirements'] });

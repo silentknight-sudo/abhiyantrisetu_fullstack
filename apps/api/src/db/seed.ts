@@ -100,6 +100,20 @@ const CATEGORIES: { slug: string; type: RequirementType; en: string; hi: string;
       hi: 'इंटीरियर डिज़ाइनर',
       icon: 'sofa',
     },
+    {
+      slug: 'civil-engineer',
+      type: 'consult',
+      en: 'Civil engineer',
+      hi: 'सिविल इंजीनियर',
+      icon: 'hard-hat',
+    },
+    {
+      slug: 'vastu-consultant',
+      type: 'consult',
+      en: 'Vastu consultant',
+      hi: 'वास्तु सलाहकार',
+      icon: 'compass',
+    },
   ];
 
 export async function seed(url: string) {

@@ -95,12 +95,14 @@ const SECTOR_KEY = 'setu.sector';
 
 /** Fixed-price trades open the booking menu; everything else goes to the quote form. */
 const post = (type: Type, category?: string) =>
-  category && BOOKABLE[category]
-    ? router.push({ pathname: '/book/[category]', params: { category } })
-    : router.push({
-        pathname: '/requirement/new',
-        params: { type, ...(category ? { category } : {}) },
-      });
+  type === 'consult'
+    ? router.push('/professionals')
+    : category && BOOKABLE[category]
+      ? router.push({ pathname: '/book/[category]', params: { category } })
+      : router.push({
+          pathname: '/requirement/new',
+          params: { type, ...(category ? { category } : {}) },
+        });
 
 export default function Home() {
   const { t, d } = useI18n();

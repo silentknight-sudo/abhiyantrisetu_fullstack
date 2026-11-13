@@ -636,6 +636,28 @@ export const hi = {
   'Narrow lane': 'संकरी गली',
   'Tight site': 'तंग साइट',
   '{n} hours a day': 'रोज़ {n} घंटे',
+  '+ Shortlist': '+ शॉर्टलिस्ट',
+  'Civil engineer': 'सिविल इंजीनियर',
+  'Vastu consultant': 'वास्तु सलाहकार',
+  'Estimates, supervision, quality checks': 'अनुमान, देखरेख, क्वालिटी जाँच',
+  'Fees are starting points. Each professional sends a proposal; you pay per deliverable.':
+    'फ़ीस शुरुआती है। हर प्रोफ़ेशनल प्रस्ताव भेजेगा; आप हर डिलीवरेबल पर भुगतान करेंगे।',
+  'Find a professional': 'प्रोफ़ेशनल खोजें',
+  'Full home interiors, modular kitchen, 3D': 'पूरे घर का इंटीरियर, मॉड्यूलर किचन, 3D',
+  'House design, elevation, approval drawings': 'घर का डिज़ाइन, एलिवेशन, मंज़ूरी के ड्रॉइंग',
+  'Licence or degree checked': 'लाइसेंस या डिग्री जाँची गई',
+  'Near {area}': '{area} के पास',
+  'No verified professional here yet': 'यहाँ अभी कोई वेरिफ़ाइड प्रोफ़ेशनल नहीं',
+  'Pay per deliverable': 'हर डिलीवरेबल पर भुगतान',
+  'Plot, plan and home Vastu review': 'प्लॉट, नक्शे और घर का वास्तु रिव्यू',
+  'Post your brief anyway: Setu brings in professionals and tells you when proposals arrive.':
+    'फिर भी अपना ब्रीफ़ पोस्ट करें: Setu प्रोफ़ेशनल लाएगा और प्रस्ताव आने पर बताएगा।',
+  'Real portfolio': 'असली पोर्टफ़ोलियो',
+  'Request proposals from Setu matches': 'Setu के चुने प्रोफ़ेशनल से प्रस्ताव माँगें',
+  'Request proposals from {n}': '{n} से प्रस्ताव माँगें',
+  Shortlisted: 'शॉर्टलिस्ट किया',
+  'Structure design, extra-floor safety': 'स्ट्रक्चर डिज़ाइन, अतिरिक्त मंज़िल की सुरक्षा',
+  'Who do you need?': 'आपको किसकी ज़रूरत है?',
 };
 
 export type MessageKey = keyof typeof hi;

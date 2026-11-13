@@ -14,6 +14,8 @@ export const TRADES = [
   'interior-designer',
   'architect',
   'structural-engineer',
+  'civil-engineer',
+  'vastu-consultant',
   'material-supplier',
   'equipment-rental',
 ] as const;
@@ -41,6 +43,8 @@ export const CATEGORY_TRADES: Record<string, readonly Trade[]> = {
   'structural-engineer': ['structural-engineer'],
   architect: ['architect'],
   'interior-designer': ['interior-designer'],
+  'civil-engineer': ['civil-engineer', 'structural-engineer'],
+  'vastu-consultant': ['vastu-consultant'],
 };
 
 /** Fallback when a requirement has no category. */
@@ -49,7 +53,13 @@ export const DEFAULT_TRADES_BY_TYPE: Record<RequirementType, readonly Trade[]> =
   renovation: ['contractor', 'mason', 'interior-designer'],
   material_rfq: ['material-supplier'],
   equipment: ['equipment-rental'],
-  consult: ['architect', 'structural-engineer', 'interior-designer'],
+  consult: [
+    'architect',
+    'structural-engineer',
+    'interior-designer',
+    'civil-engineer',
+    'vastu-consultant',
+  ],
 };
 
 export function tradesFor(type: RequirementType, categorySlug?: string | null): readonly Trade[] {

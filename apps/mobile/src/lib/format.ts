@@ -179,6 +179,8 @@ const TRADE_NAMES = {
   'interior-designer': 'Interior designer',
   architect: 'Architect',
   'structural-engineer': 'Structural engineer',
+  'civil-engineer': 'Civil engineer',
+  'vastu-consultant': 'Vastu consultant',
   'material-supplier': 'Material supplier',
   'equipment-rental': 'Equipment rental',
 } as const;

@@ -1655,6 +1655,8 @@ export interface components {
         | 'interior-designer'
         | 'architect'
         | 'structural-engineer'
+        | 'civil-engineer'
+        | 'vastu-consultant'
         | 'material-supplier'
         | 'equipment-rental'
       )[];
@@ -1715,6 +1717,8 @@ export interface components {
         | 'interior-designer'
         | 'architect'
         | 'structural-engineer'
+        | 'civil-engineer'
+        | 'vastu-consultant'
         | 'material-supplier'
         | 'equipment-rental'
       )[];
@@ -2857,6 +2861,8 @@ export interface operations {
                 deliveryBy?: string;
                 /** @default false */
                 needsUnloading?: boolean;
+                /** @default false */
+                gstInvoice?: boolean;
               };
             }
           | {
@@ -2893,6 +2899,19 @@ export interface operations {
                 durationDays: number;
                 /** @default true */
                 withOperator?: boolean;
+                /**
+                 * @default day
+                 * @enum {string}
+                 */
+                rentBy?: 'hour' | 'day' | 'month' | 'trip';
+                hoursPerDay?: number;
+                /** @default false */
+                fuelIncluded?: boolean;
+                /** @default true */
+                transportNeeded?: boolean;
+                /** @enum {string} */
+                roadAccess?: 'wide' | 'narrow' | 'tight';
+                workType?: string;
                 /** Format: date */
                 startDate: string;
                 spec?: string;

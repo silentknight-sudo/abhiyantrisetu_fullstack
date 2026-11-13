@@ -9,7 +9,7 @@ import type { AuthUser } from '../../common/auth';
 import { ENV, type Env } from '../../config/env';
 import { STORAGE_PROVIDER, type StorageProvider } from './storage.provider';
 
-export const UPLOAD_PURPOSES = ['requirement_photo', 'job_photo'] as const;
+export const UPLOAD_PURPOSES = ['requirement_photo', 'job_photo', 'partner_document'] as const;
 export type UploadPurpose = (typeof UPLOAD_PURPOSES)[number];
 
 /** Image types we accept, and the extension each is stored under. */

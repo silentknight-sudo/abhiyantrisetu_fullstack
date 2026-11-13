@@ -153,6 +153,7 @@ export default function LeadDetail() {
           <Title>{t('Your quote')}</Title>
           <QuoteBuilder
             gstRegistered={Boolean(partner.data?.gstin)}
+            budget={{ minPaise: r.budgetMinPaise, maxPaise: r.budgetMaxPaise }}
             submitLabel={t('Send quote')}
             busy={busy}
             error={error}
@@ -226,6 +227,7 @@ export default function LeadDetail() {
         <QuoteBuilder
           initial={quote.data}
           gstRegistered={Boolean(partner.data?.gstin)}
+          budget={{ minPaise: r.budgetMinPaise, maxPaise: r.budgetMaxPaise }}
           submitLabel={t('Send revised quote')}
           withMessage
           busy={busy}

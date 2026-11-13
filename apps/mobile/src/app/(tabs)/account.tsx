@@ -151,7 +151,14 @@ export default function Account() {
           onPress={() => router.push('/notifications')}
         />
         {IS_PARTNER ? (
-          <MenuRow icon="wallet" label={t('Earnings')} onPress={() => router.push('/earnings')} />
+          <>
+            <MenuRow icon="wallet" label={t('Earnings')} onPress={() => router.push('/earnings')} />
+            <MenuRow
+              icon="document-lock"
+              label={t('My documents')}
+              onPress={() => router.push('/documents')}
+            />
+          </>
         ) : (
           <>
             <MenuRow icon="sparkles" label="Setu AI" onPress={() => router.push('/assistant')} />

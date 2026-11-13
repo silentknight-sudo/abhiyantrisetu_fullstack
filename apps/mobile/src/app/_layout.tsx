@@ -96,6 +96,7 @@ function Routes() {
         <Stack.Screen name="book/reviews" options={{ title: t('Reviews') }} />
         <Stack.Screen name="professionals" options={{ title: t('Find a professional') }} />
         <Stack.Screen name="refer" options={{ title: t('Refer and earn') }} />
+        <Stack.Screen name="documents" options={{ title: t('My documents') }} />
         <Stack.Screen name="care-plans" options={{ title: t('Care plans') }} />
         <Stack.Screen name="society" options={{ title: t('Societies and builders') }} />
         <Stack.Screen

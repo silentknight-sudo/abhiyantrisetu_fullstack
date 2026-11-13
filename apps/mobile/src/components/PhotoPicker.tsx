@@ -27,7 +27,7 @@ export function PhotoPicker({
 }: {
   max?: number;
   /** What the photos are for; decides where they are stored. */
-  purpose?: 'requirement_photo' | 'job_photo';
+  purpose?: 'requirement_photo' | 'job_photo' | 'partner_document';
   /** Stored keys so far, and whether any upload is still running. */
   onChange: (keys: string[], uploading: boolean) => void;
 }) {

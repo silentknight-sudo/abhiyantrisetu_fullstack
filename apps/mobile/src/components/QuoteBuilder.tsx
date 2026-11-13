@@ -31,6 +31,7 @@ export function QuoteBuilder({
   error,
   onSubmit,
   withMessage,
+  budget,
 }: {
   initial?: Quote;
   gstRegistered: boolean;
@@ -39,6 +40,8 @@ export function QuoteBuilder({
   error: string | null;
   onSubmit: (body: QuoteBody, message?: string) => void;
   withMessage?: boolean;
+  /** The customer's budget, to show whether the quote fits. */
+  budget?: { minPaise?: number | null; maxPaise?: number | null };
 }) {
   const { t } = useI18n();
   const [lines, setLines] = useState<Line[]>(
@@ -200,6 +203,19 @@ export function QuoteBuilder({
           <Title>{t('Customer pays')}</Title>
           <Title>{rupees(totals.total)}</Title>
         </Row>
+        {budget?.maxPaise ? (
+          totals.total > budget.maxPaise ? (
+            <Notice tone="info">
+              {t('Above the customer’s budget of {amount}. Explain why in the note.', {
+                amount: rupees(budget.maxPaise),
+              })}
+            </Notice>
+          ) : (
+            <Small muted={false}>
+              {t('Within the customer’s budget of {amount} ✓', { amount: rupees(budget.maxPaise) })}
+            </Small>
+          )
+        ) : null}
       </Card>
       {localError || error ? <Notice>{localError ?? error}</Notice> : null}
       <Button

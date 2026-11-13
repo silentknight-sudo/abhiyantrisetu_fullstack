@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Badge, Button, Empty, Notice, PageHeader, Table, Td, inputCls } from '@/components/ui';
 import { $api, errorMessage, queryClient } from '@/lib/api';
 import { day, tradeLabel } from '@/lib/format';
+import { ExpiringDocs, PartnerDocs } from '@/components/PartnerDocs';
 
 const FILTERS = [
   ['pending', 'New'],
@@ -28,6 +29,7 @@ export default function Partners() {
     null,
   );
   const [reason, setReason] = useState('');
+  const [docsFor, setDocsFor] = useState<string | null>(null);
   const verify = $api.useMutation('post', '/v1/admin/partners/{id}/verification', {
     onSuccess: () => {
       setActing(null);
@@ -48,6 +50,7 @@ export default function Partners() {
         title="Partners"
         lead="Check each partner's documents and call them before verifying. Only verified partners receive leads; every decision is written to the audit log."
       />
+      <ExpiringDocs />
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map(([v, l]) => (
           <button
@@ -70,6 +73,17 @@ export default function Partners() {
               <Td>
                 <div className="font-semibold">{p.displayName}</div>
                 <div className="text-xs text-text-muted">{p.businessName ?? p.ownerName ?? ''}</div>
+                <button
+                  className="mt-1 text-xs font-semibold underline"
+                  onClick={() => setDocsFor(docsFor === p.id ? null : p.id)}
+                >
+                  {docsFor === p.id ? 'Hide documents' : 'Documents'}
+                </button>
+                {docsFor === p.id ? (
+                  <div className="mt-2 min-w-[32rem]">
+                    <PartnerDocs partnerId={p.id} />
+                  </div>
+                ) : null}
               </Td>
               <Td>{p.trades.map(tradeLabel).join(', ')}</Td>
               <Td>

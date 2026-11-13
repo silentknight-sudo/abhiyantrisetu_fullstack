@@ -34,3 +34,31 @@ export const verifyPartnerSchema = z
     message: 'Give a reason when rejecting or suspending',
     path: ['reason'],
   });
+
+export const PARTNER_DOC_KINDS = [
+  'aadhaar',
+  'pan',
+  'bank_account',
+  'police_verification',
+  'gst_certificate',
+  'selfie',
+  'other',
+] as const;
+export type PartnerDocKind = (typeof PARTNER_DOC_KINDS)[number];
+
+export const uploadPartnerDocSchema = z.object({
+  kind: z.enum(PARTNER_DOC_KINDS),
+  fileKey: z.string().min(1).max(300),
+  /** For documents that expire, e.g. police verification. */
+  expiresOn: z.iso.date().optional(),
+});
+
+export const reviewPartnerDocSchema = z
+  .object({
+    status: z.enum(['approved', 'rejected']),
+    note: z.string().trim().max(300).optional(),
+  })
+  .refine((v) => v.status === 'approved' || (v.note && v.note.length >= 3), {
+    message: 'Say why the document is rejected',
+    path: ['note'],
+  });

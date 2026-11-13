@@ -755,6 +755,46 @@ export const hi = {
   'Your data, your choice': 'आपका डेटा, आपकी मर्ज़ी',
   "Setu needs your consent to process your data under India's DPDP Act. You can change the optional choices anytime in Account.":
     'भारत के DPDP अधिनियम के तहत आपका डेटा प्रोसेस करने के लिए Setu को आपकी सहमति चाहिए। वैकल्पिक विकल्प आप कभी भी खाते में बदल सकते हैं।',
+  'A document expires in {n} days. Renew it to keep your badge.':
+    'एक दस्तावेज़ {n} दिनों में समाप्त हो रहा है। बैज बनाए रखने के लिए नवीनीकरण करें।',
+  Aadhaar: 'आधार',
+  'Bank account or UPI for payouts': 'भुगतान के लिए बैंक खाता या UPI',
+  'Because you added a GSTIN': 'क्योंकि आपने GSTIN जोड़ा है',
+  'Being checked': 'जाँच हो रही है',
+  'Cancelled cheque or passbook page': 'रद्द चेक या पासबुक का पन्ना',
+  'Checked by Setu': 'Setu ने जाँचा',
+  'Clear photo of the card': 'कार्ड की साफ़ फ़ोटो',
+  'Documents are stored privately. Customers see only the badges, never the documents.':
+    'दस्तावेज़ निजी रखे जाते हैं। ग्राहक सिर्फ़ बैज देखते हैं, दस्तावेज़ कभी नहीं।',
+  'Documents uploaded': 'दस्तावेज़ अपलोड हुए',
+  'Expired. Renew to keep your badge and leads.':
+    'समाप्त। बैज और लीड बनाए रखने के लिए नवीनीकरण करें।',
+  'Expires in {n} days': '{n} दिनों में समाप्त',
+  'Front and back, or the DigiLocker copy': 'आगे और पीछे, या DigiLocker कॉपी',
+  'GST certificate': 'GST प्रमाणपत्र',
+  'Live selfie': 'लाइव सेल्फ़ी',
+  'My documents': 'मेरे दस्तावेज़',
+  'Needed for work inside homes': 'घरों के अंदर काम के लिए ज़रूरी',
+  'Optional, earns a badge': 'वैकल्पिक, बैज मिलता है',
+  'PAN card': 'पैन कार्ड',
+  'Police verification': 'पुलिस वेरिफ़िकेशन',
+  'Profile live': 'प्रोफ़ाइल लाइव',
+  Replace: 'बदलें',
+  Required: 'ज़रूरी',
+  'Skill certificate or work photos': 'कौशल प्रमाणपत्र या काम की फ़ोटो',
+  'Submit for checking': 'जाँच के लिए भेजें',
+  Upload: 'अपलोड करें',
+  'Valid until': 'कब तक मान्य',
+  Verification: 'वेरिफ़िकेशन',
+  'Your home screen warns you 30 days before a document expires.':
+    'दस्तावेज़ समाप्त होने से 30 दिन पहले होम स्क्रीन पर चेतावनी दिखती है।',
+  'Your face, clearly visible': 'आपका चेहरा, साफ़ दिखता हुआ',
+  '{n} documents still needed before you can get leads.':
+    'लीड पाने से पहले {n} दस्तावेज़ और चाहिए।',
+  '{n} months': '{n} महीने',
+  'Above the customer’s budget of {amount}. Explain why in the note.':
+    'ग्राहक के बजट {amount} से ज़्यादा। नोट में कारण बताएं।',
+  'Within the customer’s budget of {amount} ✓': 'ग्राहक के बजट {amount} के अंदर ✓',
 };
 
 export type MessageKey = keyof typeof hi;

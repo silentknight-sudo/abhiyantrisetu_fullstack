@@ -764,4 +764,44 @@ export const hinglish: Record<MessageKey, string> = {
   'Your data, your choice': 'Aapka data, aapki marzi',
   "Setu needs your consent to process your data under India's DPDP Act. You can change the optional choices anytime in Account.":
     'India ke DPDP Act ke tahat aapka data process karne ke liye Setu ko aapki consent chahiye. Optional choices aap kabhi bhi Account mein badal sakte hain.',
+  'A document expires in {n} days. Renew it to keep your badge.':
+    'Ek document {n} din mein expire ho raha hai. Badge rakhne ke liye renew karein.',
+  Aadhaar: 'Aadhaar',
+  'Bank account or UPI for payouts': 'Payout ke liye bank account ya UPI',
+  'Because you added a GSTIN': 'Kyunki aapne GSTIN joda hai',
+  'Being checked': 'Check ho raha hai',
+  'Cancelled cheque or passbook page': 'Cancelled cheque ya passbook page',
+  'Checked by Setu': 'Setu ne check kiya',
+  'Clear photo of the card': 'Card ki saaf photo',
+  'Documents are stored privately. Customers see only the badges, never the documents.':
+    'Documents private rakhe jaate hain. Customers sirf badges dekhte hain, documents kabhi nahi.',
+  'Documents uploaded': 'Documents upload hue',
+  'Expired. Renew to keep your badge and leads.':
+    'Expire ho gaya. Badge aur leads ke liye renew karein.',
+  'Expires in {n} days': '{n} din mein expire',
+  'Front and back, or the DigiLocker copy': 'Aage aur peeche, ya DigiLocker copy',
+  'GST certificate': 'GST certificate',
+  'Live selfie': 'Live selfie',
+  'My documents': 'Mere documents',
+  'Needed for work inside homes': 'Gharon ke andar kaam ke liye zaroori',
+  'Optional, earns a badge': 'Optional, badge milta hai',
+  'PAN card': 'PAN card',
+  'Police verification': 'Police verification',
+  'Profile live': 'Profile live',
+  Replace: 'Badlein',
+  Required: 'Zaroori',
+  'Skill certificate or work photos': 'Skill certificate ya kaam ki photos',
+  'Submit for checking': 'Check ke liye bhejein',
+  Upload: 'Upload karein',
+  'Valid until': 'Kab tak valid',
+  Verification: 'Verification',
+  'Your home screen warns you 30 days before a document expires.':
+    'Document expire hone se 30 din pehle home screen par warning dikhti hai.',
+  'Your face, clearly visible': 'Aapka chehra, saaf dikhta hua',
+  '{n} documents still needed before you can get leads.':
+    'Leads paane se pehle {n} documents aur chahiye.',
+  '{n} months': '{n} mahine',
+  'Above the customer’s budget of {amount}. Explain why in the note.':
+    'Customer ke budget {amount} se zyada. Note mein wajah batayein.',
+  'Within the customer’s budget of {amount} ✓': 'Customer ke budget {amount} ke andar ✓',
 };

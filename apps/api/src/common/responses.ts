@@ -13,6 +13,9 @@ import {
   authSessionResponse,
   categoryResponse,
   catalogServiceResponse,
+  partnerDocumentResponse,
+  partnerDocumentsResponse,
+  expiringDocumentResponse,
   referralResponse,
   carePlanResponse,
   amcSubscriptionResponse,
@@ -64,6 +67,9 @@ export class CategoryReviewsDto extends createZodDto(categoryReviewsResponse, { 
 export class ReferralDto extends createZodDto(referralResponse, { codec: true }) {}
 export class CarePlanDto extends createZodDto(carePlanResponse, { codec: true }) {}
 export class AmcSubscriptionDto extends createZodDto(amcSubscriptionResponse, { codec: true }) {}
+export class PartnerDocumentDto extends createZodDto(partnerDocumentResponse, { codec: true }) {}
+export class PartnerDocumentsDto extends createZodDto(partnerDocumentsResponse, { codec: true }) {}
+export class ExpiringDocumentDto extends createZodDto(expiringDocumentResponse, { codec: true }) {}
 export class CatalogServiceDto extends createZodDto(catalogServiceResponse, { codec: true }) {}
 export class CategoryDto extends createZodDto(categoryResponse, { codec: true }) {}
 export class RequirementDto extends createZodDto(requirementResponse, { codec: true }) {}

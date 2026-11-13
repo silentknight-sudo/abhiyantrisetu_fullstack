@@ -45,6 +45,17 @@ export default function PartnerDashboard() {
   const newLeads = (leads.data ?? []).filter((l) => l.status === 'sent').length;
   const verified = p?.verificationStatus === 'verified';
   const online = p?.isOnline ?? true;
+  const docs = $api.useQuery('get', '/v1/partners/me/documents');
+  const expiring = (docs.data?.documents ?? []).filter(
+    (x) => x.expiresInDays != null && x.expiresInDays <= 30,
+  );
+  const docAlert = docs.data?.missing.length
+    ? t('{n} documents still needed before you can get leads.', { n: docs.data.missing.length })
+    : expiring.length
+      ? t('A document expires in {n} days. Renew it to keep your badge.', {
+          n: Math.max(0, Math.min(...expiring.map((x) => x.expiresInDays ?? 0))),
+        })
+      : null;
 
   async function toggle(next: boolean) {
     await client.api.PUT('/v1/partners/me/availability', { body: { online: next } });
@@ -110,6 +121,15 @@ export default function PartnerDashboard() {
           <Notice tone="info">
             {t('You are offline. Customers near you will not see you for new jobs.')}
           </Notice>
+        ) : null}
+        {docAlert ? (
+          <Pressable
+            accessibilityRole="button"
+            testID="docs-alert"
+            onPress={() => router.push('/documents')}
+          >
+            <Notice tone="info">{docAlert} ›</Notice>
+          </Pressable>
         ) : null}
         {p && !verified ? (
           <Notice tone="info">

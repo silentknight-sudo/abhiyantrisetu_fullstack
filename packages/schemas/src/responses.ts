@@ -646,3 +646,39 @@ export const amcSubscriptionResponse = z.object({
   nextVisit: text.nullable(),
   createdAt: timestamp,
 });
+
+export const partnerDocumentResponse = z.object({
+  id: uuid,
+  kind: z.enum([
+    'aadhaar',
+    'pan',
+    'bank_account',
+    'police_verification',
+    'gst_certificate',
+    'selfie',
+    'other',
+  ]),
+  status: z.enum(['pending', 'approved', 'rejected', 'expired']),
+  expiresOn: text.nullable(),
+  /** Days until it expires (negative once expired); null when it does not expire. */
+  expiresInDays: z.number().int().nullable(),
+  note: text.nullable(),
+  /** Short-lived link to view the file: staff and the partner only. */
+  url: text.nullable(),
+  updatedAt: timestamp,
+});
+
+export const partnerDocumentsResponse = z.object({
+  documents: z.array(partnerDocumentResponse),
+  /** Kinds this partner must provide for their trades. */
+  required: z.array(z.string()),
+  missing: z.array(z.string()),
+  /** Verification steps for the status tracker. */
+  steps: z.array(z.object({ key: z.string(), done: z.boolean() })),
+});
+
+export const expiringDocumentResponse = partnerDocumentResponse.extend({
+  partnerId: uuid,
+  partnerName: z.string(),
+  phone: z.string(),
+});

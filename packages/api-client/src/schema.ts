@@ -564,6 +564,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/partners/me/documents': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['DocumentsController_mine_v1'];
+    put?: never;
+    post: operations['DocumentsController_upload_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/partners/{id}/documents': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['DocumentsController_forPartner_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/documents/{id}/review': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['DocumentsController_review_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/admin/documents/expiring': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['DocumentsController_expiring_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/uploads': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['StorageController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/v1/partner/leads': {
     parameters: {
       query?: never;
@@ -1055,22 +1135,6 @@ export interface paths {
     get: operations['ManageController_audit_v1'];
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/uploads': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations['StorageController_create_v1'];
     delete?: never;
     options?: never;
     head?: never;
@@ -1851,6 +1915,114 @@ export interface components {
       phone: string;
       ownerName: string | null;
     };
+    PartnerDocumentsDto: {
+      documents: {
+        /** Format: uuid */
+        id: string;
+        /** @enum {string} */
+        kind:
+          | 'aadhaar'
+          | 'pan'
+          | 'bank_account'
+          | 'police_verification'
+          | 'gst_certificate'
+          | 'selfie'
+          | 'other';
+        /** @enum {string} */
+        status: 'pending' | 'approved' | 'rejected' | 'expired';
+        expiresOn: string | null;
+        expiresInDays: number | null;
+        note: string | null;
+        url: string | null;
+        /** Format: date-time */
+        updatedAt: string;
+      }[];
+      required: string[];
+      missing: string[];
+      steps: {
+        key: string;
+        done: boolean;
+      }[];
+    };
+    UploadDocDto: {
+      /** @enum {string} */
+      kind:
+        | 'aadhaar'
+        | 'pan'
+        | 'bank_account'
+        | 'police_verification'
+        | 'gst_certificate'
+        | 'selfie'
+        | 'other';
+      fileKey: string;
+      /** Format: date */
+      expiresOn?: string;
+    };
+    PartnerDocumentDto: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      kind:
+        | 'aadhaar'
+        | 'pan'
+        | 'bank_account'
+        | 'police_verification'
+        | 'gst_certificate'
+        | 'selfie'
+        | 'other';
+      /** @enum {string} */
+      status: 'pending' | 'approved' | 'rejected' | 'expired';
+      expiresOn: string | null;
+      expiresInDays: number | null;
+      note: string | null;
+      url: string | null;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    ExpiringDocumentDto: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      kind:
+        | 'aadhaar'
+        | 'pan'
+        | 'bank_account'
+        | 'police_verification'
+        | 'gst_certificate'
+        | 'selfie'
+        | 'other';
+      /** @enum {string} */
+      status: 'pending' | 'approved' | 'rejected' | 'expired';
+      expiresOn: string | null;
+      expiresInDays: number | null;
+      note: string | null;
+      url: string | null;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: uuid */
+      partnerId: string;
+      partnerName: string;
+      phone: string;
+    };
+    UploadRequestDto: {
+      /** @enum {string} */
+      purpose: 'requirement_photo' | 'job_photo' | 'partner_document';
+      /** @enum {string} */
+      contentType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/heic';
+      sizeBytes: number;
+    };
+    UploadSlotDto: {
+      fileKey: string;
+      upload: {
+        /** @enum {string} */
+        method: 'PUT';
+        url: string;
+        headers: {
+          [key: string]: string;
+        };
+      };
+      expiresInSeconds: number;
+    };
     LeadInboxItemDto: {
       /** Format: uuid */
       id: string;
@@ -2336,25 +2508,6 @@ export interface components {
       ip: string | null;
       /** Format: date-time */
       createdAt: string;
-    };
-    UploadRequestDto: {
-      /** @enum {string} */
-      purpose: 'requirement_photo' | 'job_photo';
-      /** @enum {string} */
-      contentType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/heic';
-      sizeBytes: number;
-    };
-    UploadSlotDto: {
-      fileKey: string;
-      upload: {
-        /** @enum {string} */
-        method: 'PUT';
-        url: string;
-        headers: {
-          [key: string]: string;
-        };
-      };
-      expiresInSeconds: number;
     };
     CreateReviewDto: {
       rating: number;
@@ -3988,6 +4141,196 @@ export interface operations {
       };
     };
   };
+  DocumentsController_mine_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerDocumentsDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  DocumentsController_upload_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UploadDocDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerDocumentsDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  DocumentsController_forPartner_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerDocumentsDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  DocumentsController_review_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status: 'approved' | 'rejected';
+          note?: string;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PartnerDocumentDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  DocumentsController_expiring_v1: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ExpiringDocumentDto'][];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  StorageController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UploadRequestDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UploadSlotDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
   QuotesController_leads_v1: {
     parameters: {
       query?: never;
@@ -5083,38 +5426,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AdminAuditDto'][];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ApiError'];
-        };
-      };
-    };
-  };
-  StorageController_create_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UploadRequestDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UploadSlotDto'];
         };
       };
       /** @description Error */

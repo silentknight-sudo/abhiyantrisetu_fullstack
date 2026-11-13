@@ -9,7 +9,12 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { addJobExtraSchema, addJobPhotosSchema } from '@setu/schemas';
+import {
+  addJobExtraSchema,
+  addJobPhotosSchema,
+  milestoneChangesSchema,
+  milestoneReadySchema,
+} from '@setu/schemas';
 import { createZodDto, ZodResponse } from 'nestjs-zod';
 import { type AuthUser, CurrentUser } from '../../common/auth';
 import { JobWorkDto } from '../../common/responses';
@@ -17,6 +22,8 @@ import { JobWorkService } from './job-work.service';
 
 class AddJobExtraDto extends createZodDto(addJobExtraSchema) {}
 class AddJobPhotosDto extends createZodDto(addJobPhotosSchema) {}
+class MilestoneReadyDto extends createZodDto(milestoneReadySchema) {}
+class MilestoneChangesDto extends createZodDto(milestoneChangesSchema) {}
 
 @ApiTags('jobs')
 @ApiBearerAuth()
@@ -73,5 +80,43 @@ export class JobWorkController {
     @Body() body: AddJobPhotosDto,
   ) {
     return this.work.addPhotos(user, id, body);
+  }
+
+  /** Partner: mark a milestone ready, with photos. */
+  @ZodResponse({ status: 200, type: JobWorkDto })
+  @Post('milestones/:milestoneId/ready')
+  @HttpCode(200)
+  ready(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('milestoneId', ParseUUIDPipe) milestoneId: string,
+    @Body() body: MilestoneReadyDto,
+  ) {
+    return this.work.milestoneReady(user, id, milestoneId, body);
+  }
+
+  /** Customer: approve a ready milestone; its money is released to the partner. */
+  @ZodResponse({ status: 200, type: JobWorkDto })
+  @Post('milestones/:milestoneId/approve')
+  @HttpCode(200)
+  approveMilestone(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('milestoneId', ParseUUIDPipe) milestoneId: string,
+  ) {
+    return this.work.milestoneApprove(user, id, milestoneId);
+  }
+
+  /** Customer: ask for fixes on a ready milestone. */
+  @ZodResponse({ status: 200, type: JobWorkDto })
+  @Post('milestones/:milestoneId/changes')
+  @HttpCode(200)
+  changes(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('milestoneId', ParseUUIDPipe) milestoneId: string,
+    @Body() body: MilestoneChangesDto,
+  ) {
+    return this.work.milestoneChanges(user, id, milestoneId, body.note);
   }
 }

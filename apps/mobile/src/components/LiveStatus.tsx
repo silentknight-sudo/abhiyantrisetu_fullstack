@@ -23,12 +23,14 @@ export function LiveStatus({ job }: { job: Job }) {
     ['Job started', 'Started after you shared the start code', job.startedAt],
     ['Completed', 'Check the work, then confirm to release payment', job.completedAt],
   ];
-  const current = steps.findIndex(([, , at]) => !at);
+  // A step is done if it, or anything after it, has happened (e.g. no "on the way" tap).
+  const isDone = (i: number) => steps.slice(i).some(([, , at]) => Boolean(at));
+  const current = steps.findIndex((_, i) => !isDone(i));
   return (
     <Card>
       <Title>{t('Live status')}</Title>
       {steps.map(([title, body, at], i) => {
-        const done = Boolean(at);
+        const done = isDone(i);
         const now = i === current;
         return (
           <View key={title} style={{ flexDirection: 'row', gap: spacing[3] }}>
@@ -55,7 +57,7 @@ export function LiveStatus({ job }: { job: Job }) {
             </View>
             <View style={{ flex: 1, paddingBottom: spacing[2] }}>
               <Small muted={!done && !now}>{t(title)}</Small>
-              <Small>{done ? when(at!) : t(body)}</Small>
+              <Small>{at ? when(at) : done ? '' : t(body)}</Small>
             </View>
           </View>
         );

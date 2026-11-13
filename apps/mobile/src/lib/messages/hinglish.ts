@@ -589,4 +589,27 @@ export const hinglish: Record<MessageKey, string> = {
   'My projects': 'Mere projects',
   'No active projects': 'Koi active project nahi',
   'Nothing completed yet': 'Abhi kuch poora nahi hua',
+  'Approve milestone': 'Milestone approve karein',
+  'Ask for fixes': 'Sudhaar maangein',
+  'Fixes asked': 'Sudhaar maanga gaya',
+  'Fund the current milestone before work on it. Setu holds the money and releases it only when you approve.':
+    'Is milestone ka kaam shuru hone se pehle payment karein. Setu paisa rakhta hai aur aapki manzoori par hi release karta hai.',
+  'Fund {amount}': '{amount} jama karein',
+  Funded: 'Funded',
+  'MILESTONE {n} OF {total}': 'MILESTONE {n} / {total}',
+  'Mark ready (add photos)': 'Ready mark karein (photos jodein)',
+  Milestones: 'Milestones',
+  'Not funded yet': 'Abhi jama nahi',
+  'Not started': 'Shuru nahi hua',
+  'Note for the customer (optional)': 'Customer ke liye note (optional)',
+  'Ready for your approval': 'Aapki manzoori ke liye taiyaar',
+  'Released {released} · in Setu Safe {held} · balance {balance}':
+    'Released {released} · Setu Safe mein {held} · baaki {balance}',
+  'Send for approval': 'Approval ke liye bhejein',
+  'Send to professional': 'Professional ko bhejein',
+  'Setu Safe': 'Setu Safe',
+  'Upload photos before marking a milestone ready. Money is released when the customer approves.':
+    'Milestone ready batane se pehle photos upload karein. Customer ki manzoori par paisa release hota hai.',
+  'What needs fixing?': 'Kya sudhaarna hai?',
+  '{percent}% of contract · {amount}': 'Contract ka {percent}% · {amount}',
 };

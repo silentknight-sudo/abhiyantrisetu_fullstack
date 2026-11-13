@@ -31,7 +31,13 @@ import {
 import { PaymentsService } from './payments.service';
 
 class RecordPayoutDto extends createZodDto(recordPayoutSchema) {}
-class CreateOrderDto extends createZodDto(z.object({ jobId: z.uuid() })) {}
+class CreateOrderDto extends createZodDto(
+  z.object({
+    jobId: z.uuid(),
+    /** Pay part of what is owed, e.g. one milestone; whole balance when left out. */
+    amountPaise: z.number().int().min(100).optional(),
+  }),
+) {}
 class VerifyDto extends createZodDto(
   z.object({
     razorpayOrderId: z.string().min(1).max(64),
@@ -60,7 +66,7 @@ export class PaymentsController {
   @ApiBearerAuth()
   @Post('payments/orders')
   createOrder(@CurrentUser() user: AuthUser, @Body() body: CreateOrderDto) {
-    return this.payments.createOrder(user, body.jobId);
+    return this.payments.createOrder(user, body.jobId, body.amountPaise);
   }
 
   @ZodResponse({ status: 200, type: PaymentVerifiedDto })

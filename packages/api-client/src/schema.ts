@@ -1237,6 +1237,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/v1/jobs/{id}/milestones/{milestoneId}/ready': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_ready_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/milestones/{milestoneId}/approve': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_approveMilestone_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/v1/jobs/{id}/milestones/{milestoneId}/changes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['JobWorkController_changes_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1975,6 +2023,7 @@ export interface components {
     CreateOrderDto: {
       /** Format: uuid */
       jobId: string;
+      amountPaise?: number;
     };
     PaymentOrderDto: {
       /** Format: uuid */
@@ -2268,6 +2317,24 @@ export interface components {
         /** Format: date-time */
         createdAt: string;
       }[];
+      milestones: {
+        /** Format: uuid */
+        id: string;
+        seq: number;
+        title: string;
+        percent: number;
+        amountPaise: number;
+        /** @enum {string} */
+        status: 'pending' | 'ready' | 'changes_requested' | 'approved';
+        photoUrls: string[];
+        note: string | null;
+        funded: boolean;
+        /** Format: date-time */
+        readyAt: string | null;
+        /** Format: date-time */
+        approvedAt: string | null;
+      }[];
+      paidPaise: number;
       photos: {
         before: string[];
         after: string[];
@@ -2282,6 +2349,13 @@ export interface components {
       /** @enum {string} */
       kind: 'before' | 'after';
       fileKeys: string[];
+    };
+    MilestoneReadyDto: {
+      fileKeys: string[];
+      note?: string;
+    };
+    MilestoneChangesDto: {
+      note: string;
     };
     ApiError: {
       statusCode?: number;
@@ -5271,6 +5345,107 @@ export interface operations {
     };
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_ready_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        milestoneId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MilestoneReadyDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_approveMilestone_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        milestoneId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JobWorkDto'];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ApiError'];
+        };
+      };
+    };
+  };
+  JobWorkController_changes_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        milestoneId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MilestoneChangesDto'];
+      };
+    };
+    responses: {
+      200: {
         headers: {
           [name: string]: unknown;
         };

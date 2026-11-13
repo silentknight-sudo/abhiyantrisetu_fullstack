@@ -555,8 +555,25 @@ export const jobExtraResponse = z.object({
   createdAt: timestamp,
 });
 
+export const jobMilestoneResponse = z.object({
+  id: uuid,
+  seq: z.number().int(),
+  title: z.string(),
+  percent: z.number().int(),
+  amountPaise: z.number().int(),
+  status: z.enum(['pending', 'ready', 'changes_requested', 'approved']),
+  photoUrls: z.array(z.string()),
+  note: text.nullable(),
+  /** Paid into Setu Safe (this and every earlier milestone covered). */
+  funded: z.boolean(),
+  readyAt: timestamp.nullable(),
+  approvedAt: timestamp.nullable(),
+});
+
 export const jobWorkResponse = z.object({
   extras: z.array(jobExtraResponse),
+  milestones: z.array(jobMilestoneResponse),
+  paidPaise: z.number().int(),
   photos: z.object({ before: z.array(z.string()), after: z.array(z.string()) }),
   /** The agreed total including approved extras. */
   totalPaise: z.number().int(),

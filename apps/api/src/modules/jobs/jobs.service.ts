@@ -26,7 +26,16 @@ import { assertTransition } from '../../common/transition-error';
 import { ENV, type Env } from '../../config/env';
 import type { Db, Tx } from '../../db/client';
 import { DB } from '../../db/db.module';
-import { addresses, jobEvents, jobs, partners, requirements, users } from '../../db/schema';
+import {
+  addresses,
+  jobEvents,
+  jobMilestones,
+  jobs,
+  partners,
+  quotes,
+  requirements,
+  users,
+} from '../../db/schema';
 import { RequirementsService } from '../requirements/requirements.service';
 
 type JobRow = typeof jobs.$inferSelect;
@@ -129,6 +138,24 @@ export class JobsService {
       actorId: input.actor.id,
       payload: { quoteId: input.quoteId ?? null, agreedTotalPaise: input.agreedTotalPaise },
     });
+    // A quote with a milestone plan becomes the project's payment stages.
+    if (input.quoteId) {
+      const [q] = await tx
+        .select({ milestones: quotes.milestones })
+        .from(quotes)
+        .where(eq(quotes.id, input.quoteId));
+      const plan = (q?.milestones ?? []) as { title: string; percent: number }[];
+      let assigned = 0;
+      const rows = plan.map((m, i) => {
+        const amount =
+          i === plan.length - 1
+            ? input.agreedTotalPaise - assigned
+            : Math.round((input.agreedTotalPaise * m.percent) / 100);
+        assigned += amount;
+        return { jobId, seq: i + 1, title: m.title, percent: m.percent, amountPaise: amount };
+      });
+      if (rows.length) await tx.insert(jobMilestones).values(rows);
+    }
     return { job: { ...job!, startCodeHash: undefined }, startCode };
   }
 

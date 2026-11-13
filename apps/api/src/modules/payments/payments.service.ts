@@ -91,7 +91,8 @@ export class PaymentsService {
     return txnId;
   }
 
-  private async capturedTotal(db: Db | Tx, jobId: string) {
+  /** What the customer has paid on a job (captured payments). */
+  async capturedTotal(db: Db | Tx, jobId: string) {
     const [row] = await db
       .select({ n: sql<string>`coalesce(sum(${payments.amountPaise}), 0)` })
       .from(payments)
@@ -100,10 +101,11 @@ export class PaymentsService {
   }
 
   /**
-   * Opens (or reuses) a Razorpay order for what the customer still owes on the job.
-   * Returns what the checkout needs: order id, amount and the public key id.
+   * Opens (or reuses) a Razorpay order for what the customer still owes on the job, or
+   * for `amountPaise` of it (one milestone). Returns what the checkout needs: order id,
+   * amount and the public key id.
    */
-  async createOrder(user: AuthUser, jobId: string) {
+  async createOrder(user: AuthUser, jobId: string, amountPaise?: number) {
     this.assertEnabled();
     return this.db.transaction(async (tx) => {
       const [job] = await tx.select().from(jobs).where(eq(jobs.id, jobId)).for('update');
@@ -111,9 +113,13 @@ export class PaymentsService {
       if (!(PAYABLE_STATES as readonly string[]).includes(job.state)) {
         throw new ConflictException(`A ${job.state} job cannot take payments`);
       }
-      const outstanding = job.agreedTotalPaise - (await this.capturedTotal(tx, jobId));
-      if (outstanding <= 0)
+      const owed = job.agreedTotalPaise - (await this.capturedTotal(tx, jobId));
+      if (owed <= 0)
         throw new ConflictException({ code: 'ALREADY_PAID', message: 'This job is fully paid' });
+      if (amountPaise !== undefined && amountPaise > owed) {
+        throw new BadRequestException('That is more than what is still owed');
+      }
+      const outstanding = amountPaise ?? owed;
 
       const [open] = await tx
         .select()
@@ -279,6 +285,32 @@ export class PaymentsService {
           memo: 'Job closed',
         },
       );
+    });
+  }
+
+  /**
+   * Releases up to `amountPaise` of what is held for a job to its partner (an approved
+   * milestone), less the platform fee. Returns the amount released.
+   */
+  async releaseAmount(jobId: string, amountPaise: number, memo: string): Promise<number> {
+    return this.db.transaction(async (tx) => {
+      const [job] = await tx.select().from(jobs).where(eq(jobs.id, jobId)).for('update');
+      if (!job) return 0;
+      const [bal] = await tx
+        .select({
+          n: sql<string>`coalesce(sum(${ledgerEntries.creditPaise} - ${ledgerEntries.debitPaise}), 0)`,
+        })
+        .from(ledgerEntries)
+        .where(eq(ledgerEntries.account, LedgerAccounts.heldForJob(jobId)));
+      const amount = Math.min(Number(bal?.n ?? 0), amountPaise);
+      if (amount <= 0) return 0;
+      await this.post(
+        tx,
+        'release',
+        releaseLines(jobId, job.partnerId, amount, this.env.PLATFORM_FEE_BPS),
+        { jobId, memo },
+      );
+      return amount;
     });
   }
 

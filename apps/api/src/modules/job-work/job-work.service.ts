@@ -6,13 +6,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { AddJobExtraInput, AddJobPhotosInput } from '@setu/schemas';
+import type { AddJobExtraInput, AddJobPhotosInput, MilestoneReadyInput } from '@setu/schemas';
 import { and, asc, count, eq, sql } from 'drizzle-orm';
 import type { AuthUser } from '../../common/auth';
 import type { Db } from '../../db/client';
 import { DB } from '../../db/db.module';
-import { events, jobExtras, jobPhotos, jobs } from '../../db/schema';
+import { events, jobExtras, jobMilestones, jobPhotos, jobs } from '../../db/schema';
 import { JobsService } from '../jobs/jobs.service';
+import { PaymentsService } from '../payments/payments.service';
 import { StorageService } from '../storage/storage.service';
 
 const MAX_PENDING_EXTRAS = 10;
@@ -28,6 +29,7 @@ export class JobWorkService {
     @Inject(DB) private readonly db: Db,
     @Inject(JobsService) private readonly jobs: JobsService,
     @Inject(StorageService) private readonly storage: StorageService,
+    @Inject(PaymentsService) private readonly payments: PaymentsService,
   ) {}
 
   /** 404 unless the caller is the job's customer, partner or staff. */
@@ -37,7 +39,7 @@ export class JobWorkService {
 
   async work(user: AuthUser, jobId: string) {
     const job = await this.view(user, jobId);
-    const [extras, photos] = await Promise.all([
+    const [extras, photos, stages, paidPaise] = await Promise.all([
       this.db
         .select({
           id: jobExtras.id,
@@ -54,11 +56,36 @@ export class JobWorkService {
         .from(jobPhotos)
         .where(eq(jobPhotos.jobId, jobId))
         .orderBy(asc(jobPhotos.createdAt)),
+      this.db
+        .select()
+        .from(jobMilestones)
+        .where(eq(jobMilestones.jobId, jobId))
+        .orderBy(asc(jobMilestones.seq)),
+      this.payments.capturedTotal(this.db, jobId),
     ]);
+    let cumulative = 0;
+    const milestones = stages.map((m) => {
+      cumulative += m.amountPaise;
+      return {
+        id: m.id,
+        seq: m.seq,
+        title: m.title,
+        percent: m.percent,
+        amountPaise: m.amountPaise,
+        status: m.status,
+        photoUrls: this.storage.viewUrls(m.photos),
+        note: m.note,
+        funded: paidPaise >= cumulative,
+        readyAt: m.readyAt,
+        approvedAt: m.approvedAt,
+      };
+    });
     const keys = (kind: 'before' | 'after') =>
       photos.filter((p) => p.kind === kind).map((p) => p.fileKey);
     return {
       extras,
+      milestones,
+      paidPaise,
       photos: {
         before: this.storage.viewUrls(keys('before')),
         after: this.storage.viewUrls(keys('after')),
@@ -145,6 +172,98 @@ export class JobWorkService {
       .insert(jobPhotos)
       .values(input.fileKeys.map((fileKey) => ({ jobId, kind: input.kind, fileKey })))
       .onConflictDoNothing({ target: jobPhotos.fileKey });
+    return this.work(user, jobId);
+  }
+
+  // ---------- milestones ----------
+
+  private async milestone(jobId: string, milestoneId: string) {
+    const stages = await this.db
+      .select()
+      .from(jobMilestones)
+      .where(eq(jobMilestones.jobId, jobId))
+      .orderBy(asc(jobMilestones.seq));
+    const m = stages.find((x) => x.id === milestoneId);
+    if (!m) throw new NotFoundException();
+    return { m, stages };
+  }
+
+  /** Partner: this stage is done; photos are required so the customer can check it. */
+  async milestoneReady(
+    user: AuthUser,
+    jobId: string,
+    milestoneId: string,
+    input: MilestoneReadyInput,
+  ) {
+    const job = await this.view(user, jobId);
+    if (job.viewerRole !== 'partner') throw new ForbiddenException('Only the partner can do this');
+    if (job.state !== 'in_progress') throw new ConflictException('Start the job first');
+    this.storage.assertOwned(user.id, 'job_photo', input.fileKeys);
+    const { m, stages } = await this.milestone(jobId, milestoneId);
+    if (!['pending', 'changes_requested'].includes(m.status)) {
+      throw new ConflictException('This milestone is already waiting for approval or approved');
+    }
+    if (stages.some((x) => x.seq < m.seq && x.status !== 'approved')) {
+      throw new ConflictException('Finish the earlier milestones first');
+    }
+    await this.db
+      .update(jobMilestones)
+      .set({
+        status: 'ready',
+        photos: input.fileKeys,
+        note: input.note ?? null,
+        readyAt: new Date(),
+      })
+      .where(eq(jobMilestones.id, milestoneId));
+    return this.work(user, jobId);
+  }
+
+  /** Customer: approve a ready, funded milestone; its money is released to the partner. */
+  async milestoneApprove(user: AuthUser, jobId: string, milestoneId: string) {
+    const job = await this.view(user, jobId);
+    if (job.viewerRole !== 'customer')
+      throw new ForbiddenException('Only the customer can approve');
+    const { m, stages } = await this.milestone(jobId, milestoneId);
+    if (m.status !== 'ready')
+      throw new ConflictException('This milestone is not ready for approval');
+    const upTo = stages.filter((x) => x.seq <= m.seq).reduce((s, x) => s + x.amountPaise, 0);
+    if ((await this.payments.capturedTotal(this.db, jobId)) < upTo) {
+      throw new ConflictException({
+        code: 'MILESTONE_NOT_FUNDED',
+        message: 'Fund this milestone first. The money stays in Setu Safe until you approve.',
+      });
+    }
+    const [updated] = await this.db
+      .update(jobMilestones)
+      .set({ status: 'approved', approvedAt: new Date() })
+      .where(and(eq(jobMilestones.id, milestoneId), eq(jobMilestones.status, 'ready')))
+      .returning({ id: jobMilestones.id });
+    if (!updated) throw new ConflictException('Already answered');
+    await this.payments.releaseAmount(
+      jobId,
+      m.amountPaise,
+      `Milestone ${m.seq} approved: ${m.title}`,
+    );
+    await this.db.insert(events).values({
+      userId: user.id,
+      name: 'milestone_approved',
+      properties: { jobId, milestoneId, amountPaise: m.amountPaise },
+    });
+    return this.work(user, jobId);
+  }
+
+  /** Customer: send a ready milestone back with what needs fixing. */
+  async milestoneChanges(user: AuthUser, jobId: string, milestoneId: string, note: string) {
+    const job = await this.view(user, jobId);
+    if (job.viewerRole !== 'customer')
+      throw new ForbiddenException('Only the customer can do this');
+    const { m } = await this.milestone(jobId, milestoneId);
+    if (m.status !== 'ready')
+      throw new ConflictException('This milestone is not ready for approval');
+    await this.db
+      .update(jobMilestones)
+      .set({ status: 'changes_requested', note })
+      .where(eq(jobMilestones.id, milestoneId));
     return this.work(user, jobId);
   }
 }

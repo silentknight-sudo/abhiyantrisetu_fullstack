@@ -31,3 +31,13 @@ export const addJobPhotosSchema = z.object({
   fileKeys: z.array(z.string().min(1).max(300)).min(1).max(6),
 });
 export type AddJobPhotosInput = z.infer<typeof addJobPhotosSchema>;
+
+export const milestoneReadySchema = z.object({
+  fileKeys: z.array(z.string().min(1).max(300)).min(1, 'Add at least one photo').max(6),
+  note: z.string().trim().max(500).optional(),
+});
+export type MilestoneReadyInput = z.infer<typeof milestoneReadySchema>;
+
+export const milestoneChangesSchema = z.object({
+  note: z.string().trim().min(3, 'Say what needs fixing').max(500),
+});

@@ -845,3 +845,33 @@ export const jobPhotos = pgTable(
   },
   (t) => [index('job_photos_job_idx').on(t.jobId)],
 );
+
+/** Stages of a quoted project, from the accepted quote's milestone plan. */
+export const milestoneStatusEnum = pgEnum('milestone_status', [
+  'pending',
+  'ready',
+  'changes_requested',
+  'approved',
+]);
+export const jobMilestones = pgTable(
+  'job_milestones',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    jobId: uuid('job_id')
+      .notNull()
+      .references(() => jobs.id),
+    seq: smallint('seq').notNull(),
+    title: text('title').notNull(),
+    percent: smallint('percent').notNull(),
+    amountPaise: money('amount_paise').notNull(),
+    status: milestoneStatusEnum('status').notNull().default('pending'),
+    /** Photos the partner attached when marking it ready (file keys). */
+    photos: jsonb('photos').$type<string[]>().notNull().default([]),
+    /** The partner's note when ready, or the customer's when asking for changes. */
+    note: text('note'),
+    readyAt: timestamp('ready_at', { withTimezone: true }),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex('job_milestones_job_seq_uq').on(t.jobId, t.seq)],
+);

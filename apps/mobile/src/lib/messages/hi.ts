@@ -583,6 +583,29 @@ export const hi = {
   'My projects': 'मेरे प्रोजेक्ट',
   'No active projects': 'कोई चालू प्रोजेक्ट नहीं',
   'Nothing completed yet': 'अभी कुछ पूरा नहीं हुआ',
+  'Approve milestone': 'माइलस्टोन मंज़ूर करें',
+  'Ask for fixes': 'सुधार माँगें',
+  'Fixes asked': 'सुधार माँगा गया',
+  'Fund the current milestone before work on it. Setu holds the money and releases it only when you approve.':
+    'इस माइलस्टोन का काम शुरू होने से पहले भुगतान करें। Setu पैसा रखता है और आपकी मंज़ूरी पर ही जारी करता है।',
+  'Fund {amount}': '{amount} जमा करें',
+  Funded: 'जमा',
+  'MILESTONE {n} OF {total}': 'माइलस्टोन {n} / {total}',
+  'Mark ready (add photos)': 'तैयार बताएं (फ़ोटो जोड़ें)',
+  Milestones: 'माइलस्टोन',
+  'Not funded yet': 'अभी जमा नहीं',
+  'Not started': 'शुरू नहीं हुआ',
+  'Note for the customer (optional)': 'ग्राहक के लिए नोट (वैकल्पिक)',
+  'Ready for your approval': 'आपकी मंज़ूरी के लिए तैयार',
+  'Released {released} · in Setu Safe {held} · balance {balance}':
+    'जारी {released} · Setu Safe में {held} · बाकी {balance}',
+  'Send for approval': 'मंज़ूरी के लिए भेजें',
+  'Send to professional': 'प्रोफ़ेशनल को भेजें',
+  'Setu Safe': 'Setu Safe',
+  'Upload photos before marking a milestone ready. Money is released when the customer approves.':
+    'माइलस्टोन को तैयार बताने से पहले फ़ोटो अपलोड करें। ग्राहक की मंज़ूरी पर पैसा जारी होता है।',
+  'What needs fixing?': 'क्या सुधारना है?',
+  '{percent}% of contract · {amount}': 'कॉन्ट्रैक्ट का {percent}% · {amount}',
 };
 
 export type MessageKey = keyof typeof hi;

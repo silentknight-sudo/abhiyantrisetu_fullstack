@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
+import { Milestones } from './Milestones';
 import { PhotoPicker } from './PhotoPicker';
 import { Badge, Button, Card, Chip, Chips, Field, Notice, Row, Small, Title } from './ui';
 import { $api, client, queryClient } from '@/lib/api';
@@ -36,6 +37,8 @@ const RATE_CARD: Record<string, [MessageKey, number][]> = {
 const LABOUR: [MessageKey, number] = ['Extra labour (30 min)', 149];
 
 type Work = {
+  milestones: Parameters<typeof Milestones>[0]['milestones'];
+  paidPaise: number;
   extras: {
     id: string;
     description: string;
@@ -134,6 +137,13 @@ export function JobWork({
 
   return (
     <>
+      <Milestones
+        jobId={jobId}
+        viewer={viewer}
+        state={state}
+        milestones={w.milestones}
+        paidPaise={w.paidPaise}
+      />
       {showExtras ? (
         <Card>
           <Row>

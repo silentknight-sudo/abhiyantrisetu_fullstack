@@ -85,6 +85,13 @@
       "when": 1794573546694,
       "tag": "0011_on_the_way",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794574182293,
+      "tag": "0012_job_milestones",
+      "breakpoints": true
     }
   ]
 }

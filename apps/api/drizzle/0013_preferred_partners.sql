@@ -1,0 +1,1 @@
+ALTER TABLE "requirements" ADD COLUMN "preferred_partner_ids" uuid[];

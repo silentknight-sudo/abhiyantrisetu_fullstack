@@ -17,6 +17,7 @@ import {
   Title,
 } from '@/components/ui';
 import { PhotoPicker } from '@/components/PhotoPicker';
+import { ChooseWhoQuotes, CostRange } from '@/components/RequestHelpers';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import { type MessageKey, useI18n } from '@/lib/i18n';
@@ -131,6 +132,7 @@ export default function NewRequirement() {
   const [durationDays, setDurationDays] = useState('3');
   const [withOperator, setWithOperator] = useState(true);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [partnerIds, setPartnerIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
   const catalog = $api.useQuery('get', '/v1/catalog/categories');
@@ -141,6 +143,7 @@ export default function NewRequirement() {
     if (hit) setCategoryId(hit.id);
   }, [catalog.data, params.category, categoryId]);
   const categories = (catalog.data ?? []).filter((c) => c.requirementType === kind);
+  const slug = catalog.data?.find((x) => x.id === categoryId)?.slug;
   const create = $api.useMutation('post', '/v1/requirements', {
     onSuccess: (req) => {
       void queryClient.invalidateQueries({ queryKey: ['get', '/v1/requirements'] });
@@ -205,6 +208,7 @@ export default function NewRequirement() {
       categoryId,
       details,
       budgetMaxPaise: rupees > 0 ? rupees * 100 : undefined,
+      partnerIds: partnerIds.length ? partnerIds : undefined,
       address: {
         line1,
         sector: sector.name,
@@ -440,6 +444,16 @@ export default function NewRequirement() {
         </Card>
       ) : null}
 
+      {kind === 'service' && slug === 'painting' ? (
+        <Field
+          label={t('Carpet area (sq ft, optional)')}
+          value={areaSqft}
+          onChangeText={setAreaSqft}
+          keyboardType="number-pad"
+        />
+      ) : null}
+      <CostRange slug={slug} areaSqft={Number(areaSqft) || 0} />
+
       <Field
         label={t('Budget up to (₹, optional)')}
         value={budget}
@@ -475,6 +489,13 @@ export default function NewRequirement() {
         />
         <Small>{t('Professionals only see your sector until you hire them.')}</Small>
       </Card>
+
+      <ChooseWhoQuotes
+        slug={slug}
+        at={gps ?? { lat: sector.lat, lng: sector.lng }}
+        selected={partnerIds}
+        onChange={setPartnerIds}
+      />
 
       {error ? <Notice>{error}</Notice> : null}
       <Button

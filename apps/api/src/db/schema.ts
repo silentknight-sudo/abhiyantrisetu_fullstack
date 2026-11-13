@@ -406,6 +406,8 @@ export const requirements = pgTable(
     matchedAt: timestamp('matched_at', { withTimezone: true }),
     firstQuoteAt: timestamp('first_quote_at', { withTimezone: true }),
     hiredAt: timestamp('hired_at', { withTimezone: true }),
+    /** Professionals the customer chose to quote; null lets matching pick. */
+    preferredPartnerIds: uuid('preferred_partner_ids').array(),
     ...timestamps,
   },
   (t) => [

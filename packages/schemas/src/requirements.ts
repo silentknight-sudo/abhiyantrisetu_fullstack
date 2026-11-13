@@ -96,6 +96,8 @@ const base = {
   budgetMinPaise: paiseSchema.optional(),
   budgetMaxPaise: paiseSchema.optional(),
   orgId: z.string().uuid().optional(),
+  /** Up to 5 professionals the customer picked to quote; empty lets Setu match. */
+  partnerIds: z.array(z.string().uuid()).max(5, 'Pick up to 5 professionals').optional(),
 };
 
 export const createRequirementSchema = z

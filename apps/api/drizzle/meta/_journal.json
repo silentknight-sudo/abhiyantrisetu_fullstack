@@ -92,6 +92,13 @@
       "when": 1794574182293,
       "tag": "0012_job_milestones",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794574661525,
+      "tag": "0013_preferred_partners",
+      "breakpoints": true
     }
   ]
 }

@@ -52,6 +52,7 @@ export class MatchingService {
         addressId: requirements.addressId,
         categorySlug: categories.slug,
         details: requirements.details,
+        preferredPartnerIds: requirements.preferredPartnerIds,
       })
       .from(requirements)
       .leftJoin(categories, eq(categories.id, requirements.categoryId))
@@ -65,8 +66,9 @@ export class MatchingService {
     )}]::text[]`;
 
     // A booking where the customer chose their professional goes to that partner only.
-    const preferred = (req.details as { booking?: { preferredPartnerId?: string } }).booking
+    const booked = (req.details as { booking?: { preferredPartnerId?: string } }).booking
       ?.preferredPartnerId;
+    const preferred = booked ? [booked] : (req.preferredPartnerIds ?? []);
     const candidates = (await this.db.execute(sql`
       SELECT p.id, p.service_radius_km, p.rating_avg, p.rating_count, p.avg_response_minutes,
              p.acceptance_rate, p.tier,
@@ -81,7 +83,14 @@ export class MatchingService {
         AND p.base_location IS NOT NULL
         AND p.trades && ${tradeArray}
         AND ST_DWithin(p.base_location, a.location, p.service_radius_km * 1000)
-        ${preferred ? sql`AND p.id = ${preferred}` : sql``}
+        ${
+          preferred.length
+            ? sql`AND p.id IN (${sql.join(
+                preferred.map((id) => sql`${id}`),
+                sql`, `,
+              )})`
+            : sql``
+        }
       ORDER BY distance_km
       LIMIT 50
     `)) as unknown as Candidate[];

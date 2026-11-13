@@ -612,4 +612,11 @@ export const hinglish: Record<MessageKey, string> = {
     'Milestone ready batane se pehle photos upload karein. Customer ki manzoori par paisa release hota hai.',
   'What needs fixing?': 'Kya sudhaarna hai?',
   '{percent}% of contract · {amount}': 'Contract ka {percent}% · {amount}',
+  'Choose who quotes (optional)': 'Kaun quote de, chunein (optional)',
+  'Pick up to 5, or leave it to Setu to match the best nearby.':
+    '5 tak chunein, ya Setu ko paas ke best chunne dein.',
+  'Standard finish, Greater Noida rates. Real quotes may differ after a site visit.':
+    'Standard finish, Greater Noida rates. Site visit ke baad asli quotes alag ho sakte hain.',
+  'Typical cost for your answers': 'Aapke jawabon ke hisaab se aam kharcha',
+  '{n} selected · only they get your request': '{n} chune · sirf unhe aapki request milegi',
 };

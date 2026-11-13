@@ -25,6 +25,7 @@ import {
 
 /** Open (unhired, uncancelled) requests one customer may have at a time. */
 export const MAX_OPEN_REQUESTS = 5;
+import { ProsService } from '../pros/pros.service';
 import { StorageService } from '../storage/storage.service';
 
 /** Emitted after a requirement is committed. Payload: { requirementId }. */
@@ -36,6 +37,7 @@ export class RequirementsService {
     @Inject(DB) private readonly db: Db,
     @Inject(EventEmitter2) private readonly bus: EventEmitter2,
     @Inject(StorageService) private readonly storage: StorageService,
+    @Inject(ProsService) private readonly pros: ProsService,
   ) {}
 
   /** A requirement as clients see it: its photos as short-lived links. */
@@ -75,6 +77,15 @@ export class RequirementsService {
           HttpStatus.TOO_MANY_REQUESTS,
         );
       }
+      if (input.partnerIds?.length && !fromBooking) {
+        if (!input.categoryId)
+          throw new BadRequestException('Pick a category to choose professionals');
+        const at =
+          input.address?.location ?? (await this.pros.locationOf(input.addressId!, user.id));
+        for (const id of new Set(input.partnerIds)) {
+          await this.pros.assertBookable(id, input.categoryId, at, user.id);
+        }
+      }
       let addressId = input.addressId;
       if (addressId) {
         const [owned] = await tx
@@ -113,6 +124,8 @@ export class RequirementsService {
           addressId,
           budgetMinPaise: input.budgetMinPaise,
           budgetMaxPaise: input.budgetMaxPaise,
+          preferredPartnerIds:
+            !fromBooking && input.partnerIds?.length ? [...new Set(input.partnerIds)] : null,
         })
         .returning();
       await tx.insert(requirementEvents).values({

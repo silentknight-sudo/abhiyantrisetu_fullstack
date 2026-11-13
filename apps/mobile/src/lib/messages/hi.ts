@@ -606,6 +606,13 @@ export const hi = {
     'माइलस्टोन को तैयार बताने से पहले फ़ोटो अपलोड करें। ग्राहक की मंज़ूरी पर पैसा जारी होता है।',
   'What needs fixing?': 'क्या सुधारना है?',
   '{percent}% of contract · {amount}': 'कॉन्ट्रैक्ट का {percent}% · {amount}',
+  'Choose who quotes (optional)': 'कौन कोटेशन दे, चुनें (वैकल्पिक)',
+  'Pick up to 5, or leave it to Setu to match the best nearby.':
+    '5 तक चुनें, या Setu को पास के सबसे अच्छे चुनने दें।',
+  'Standard finish, Greater Noida rates. Real quotes may differ after a site visit.':
+    'स्टैंडर्ड फ़िनिश, ग्रेटर नोएडा के रेट। साइट विज़िट के बाद असली कोटेशन अलग हो सकते हैं।',
+  'Typical cost for your answers': 'आपके जवाबों के हिसाब से आम खर्च',
+  '{n} selected · only they get your request': '{n} चुने · सिर्फ़ उन्हें आपकी रिक्वेस्ट मिलेगी',
 };
 
 export type MessageKey = keyof typeof hi;

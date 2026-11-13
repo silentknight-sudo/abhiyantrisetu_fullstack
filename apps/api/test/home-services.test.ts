@@ -211,3 +211,34 @@ describe('live tracking and reviews', () => {
     expect(pros.body[0]).toMatchObject({ jobsDone: 1, ratingCount: 1 });
   });
 });
+
+describe('choose who quotes on a requirement', () => {
+  const post = (body: object) =>
+    ctx
+      .http()
+      .post('/v1/requirements')
+      .set(as(customer))
+      .set('x-forwarded-for', freshIp())
+      .send({
+        type: 'service',
+        title: 'Bathroom leak',
+        categoryId: catId,
+        address,
+        details: { description: 'Water leaking under the wash basin' },
+        ...body,
+      });
+
+  it('sends the requirement only to the picked professionals', async () => {
+    const res = await post({ partnerIds: [ids.near] }).expect(201);
+    expect(await leadOf(near, res.body.id)).toBeTruthy();
+    const all = await ctx.db.select().from(leads).where(eq(leads.requirementId, res.body.id));
+    expect(all).toHaveLength(1);
+  });
+
+  it('refuses ineligible picks, more than five, and picks without a category', async () => {
+    await post({ partnerIds: [ids.far] }).expect(400);
+    await post({ partnerIds: [ids.elec] }).expect(400);
+    await post({ partnerIds: Array.from({ length: 6 }, () => ids.near) }).expect(400);
+    await post({ categoryId: undefined, partnerIds: [ids.near] }).expect(400);
+  });
+});

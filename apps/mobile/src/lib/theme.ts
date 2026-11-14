@@ -4,23 +4,23 @@ import { useColorScheme } from 'react-native';
 export { radius, spacing, typeScale };
 
 /**
- * "Craft" palette for the apps: deep indigo like hand-block print, terracotta and saffron
- * like a clay diya, on warm handmade-paper backgrounds. The website keeps the shared
- * navy/orange brand tokens; only the apps use this.
+ * Brand palette from the logo: navy #1A3A52 and orange #FF9F43, on warm sand surfaces
+ * (the shared @setu/ui-tokens system). The `craft` names are kept so imports still work:
+ * indigo = navy, terracotta = orange, saffron = light orange, paper = sand.
  */
 export const craft = {
   indigo: {
-    900: '#14123A',
-    800: '#1E1B4F',
-    700: '#2A2668',
-    600: '#3B3790',
-    300: '#A7A3E8',
-    100: '#E7E5FA',
+    900: '#0A1823',
+    800: '#1A3A52',
+    700: '#2E5675',
+    600: '#4E7898',
+    300: '#ABC2D4',
+    100: '#EEF3F7',
   },
-  terracotta: { 700: '#9E3A16', 600: '#C2491D', 500: '#D9572B', 300: '#F29B76', 100: '#FCE4D8' },
-  saffron: { 600: '#D98B06', 500: '#F4A62A', 300: '#FAD07F', 100: '#FEF1D6' },
-  paper: { 50: '#FFFBF4', 100: '#FBF3E6', 200: '#F3E6D1', 300: '#E8D5B8', 600: '#7A6650' },
-  leaf: '#1F8A5B',
+  terracotta: { 700: '#A65408', 600: '#D06B0B', 500: '#F2861F', 300: '#FFCF9E', 100: '#FFE6CC' },
+  saffron: { 600: '#D06B0B', 500: '#FF9F43', 300: '#FFCF9E', 100: '#FFF5EA' },
+  paper: { 50: '#FBF7F0', 100: '#F6EFE3', 200: '#EFE4D2', 300: '#E4D4BB', 600: '#7A6E62' },
+  leaf: '#17804A',
 };
 
 type SemanticKey =
@@ -51,9 +51,9 @@ const light: Record<SemanticKey, string> = {
   primary: craft.indigo[800],
   primaryHover: craft.indigo[900],
   onPrimary: '#FFFFFF',
-  accent: craft.terracotta[500],
-  accentHover: craft.terracotta[600],
-  onAccent: '#FFFFFF',
+  accent: craft.saffron[500],
+  accentHover: craft.terracotta[500],
+  onAccent: craft.indigo[800],
   highlight: craft.saffron[500],
   highlightBg: craft.saffron[100],
   background: craft.paper[100],
@@ -76,25 +76,25 @@ const dark: Record<SemanticKey, string> = {
   primary: craft.indigo[300],
   primaryHover: craft.indigo[100],
   onPrimary: craft.indigo[900],
-  accent: '#E8693D',
-  accentHover: craft.terracotta[300],
-  onAccent: '#FFFFFF',
+  accent: craft.saffron[500],
+  accentHover: '#FFB870',
+  onAccent: craft.indigo[900],
   highlight: craft.saffron[500],
   highlightBg: '#3A2A08',
-  background: '#110F2E',
-  surface: '#1B1842',
-  surfaceMuted: '#262257',
-  border: '#34306E',
-  text: '#FBF3E6',
-  textMuted: '#BDB6D9',
-  success: '#3DBE83',
-  successBg: '#0F2E21',
-  danger: '#F06A5E',
-  dangerBg: '#3A1714',
-  warning: craft.saffron[500],
-  warningBg: '#3A2A08',
-  info: craft.indigo[300],
-  infoBg: '#1E1B4F',
+  background: '#0A1823',
+  surface: '#102434',
+  surfaceMuted: '#152F43',
+  border: '#1A3A52',
+  text: '#F7F8FA',
+  textMuted: '#C1C7CF',
+  success: '#1F9D55',
+  successBg: '#0F2E1E',
+  danger: '#D93B3B',
+  dangerBg: '#3A1515',
+  warning: '#E6A100',
+  warningBg: '#3A2C05',
+  info: '#2F6FDE',
+  infoBg: '#0E2247',
 };
 
 export type Palette = Record<SemanticKey, string>;
@@ -118,7 +118,7 @@ export const font = {
 
 /** Warm, slightly offset shadow, like paper cut-outs; elevation for Android. */
 export const shadow = {
-  shadowColor: '#5A3A1A',
+  shadowColor: '#1A3A52',
   shadowOpacity: 0.12,
   shadowRadius: 14,
   shadowOffset: { width: 0, height: 6 },

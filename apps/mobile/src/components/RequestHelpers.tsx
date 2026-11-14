@@ -20,7 +20,7 @@ export function CostRange({ slug, areaSqft }: { slug?: string; areaSqft: number 
         : null;
   if (!e) return null;
   return (
-    <View style={{ borderRadius: 18, backgroundColor: '#1E1B4F', padding: spacing[4], gap: 4 }}>
+    <View style={{ borderRadius: 18, backgroundColor: '#1A3A52', padding: spacing[4], gap: 4 }}>
       <Text
         style={[
           typeScale.xs,

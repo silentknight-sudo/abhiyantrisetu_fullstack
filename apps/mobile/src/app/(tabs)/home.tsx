@@ -34,7 +34,6 @@ import {
 import { $api } from '@/lib/api';
 import { BANNERS } from '@/lib/banners';
 import { BOOKABLE } from '@/lib/cart';
-import { Jaali } from '@/components/craft';
 import { jobTone, rupees } from '@/lib/format';
 import { type MessageKey, useI18n } from '@/lib/i18n';
 import { secureStorage } from '@/lib/storage';
@@ -120,7 +119,6 @@ export default function Home() {
   const jobs = $api.useQuery('get', '/v1/jobs');
   const inbox = $api.useQuery('get', '/v1/me/notifications');
   const active = (jobs.data ?? []).filter((j) => !['closed', 'cancelled'].includes(j.state));
-  const firstName = me.data?.name?.split(' ')[0];
 
   // The area the customer is browsing for, remembered on this device.
   const [sector, setSector] = useState<string>(SECTORS[0]!.name);
@@ -169,13 +167,10 @@ export default function Home() {
           paddingTop: insets.top + spacing[3],
           paddingHorizontal: spacing[4],
           paddingBottom: spacing[8],
-          borderBottomLeftRadius: 32,
-          borderBottomRightRadius: 32,
           gap: spacing[4],
           overflow: 'hidden',
         }}
       >
-        <Jaali opacity={0.14} />
         <Row>
           <Pressable
             accessibilityRole="button"
@@ -225,14 +220,19 @@ export default function Home() {
         <View style={{ gap: 2 }}>
           <Text
             style={[
-              typeScale['3xl'],
+              typeScale['2xl'],
               { color: '#fff', fontFamily: font.headingHeavy, letterSpacing: -0.6 },
             ]}
           >
-            {firstName ? t('Namaste, {name}', { name: firstName }) : t('Namaste')}
+            {t('Build, Renovate, Repair & Maintain')}
           </Text>
-          <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.8)', fontFamily: font.body }]}>
-            {t('Book a fixed-price pro in minutes, or post a job and compare quotes.')}
+          <Text
+            style={[
+              typeScale['2xl'],
+              { color: c.accent, fontFamily: font.headingHeavy, letterSpacing: -0.6 },
+            ]}
+          >
+            {t('All in one trusted platform')}
           </Text>
         </View>
 
@@ -269,6 +269,29 @@ export default function Home() {
           >
             <Ionicons name="sparkles" size={20} color={c.accentHover} />
           </Pressable>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing[2] }}>
+          {(
+            [
+              'Verified professionals',
+              'Multiple quotes',
+              'Compare & choose',
+              'End-to-end support',
+            ] as const
+          ).map((x) => (
+            <View
+              key={x}
+              style={{ width: '50%', flexDirection: 'row', alignItems: 'center', gap: spacing[2] }}
+            >
+              <Ionicons name="checkmark-circle" size={16} color="#fff" />
+              <Text
+                numberOfLines={1}
+                style={[typeScale.xs, { flex: 1, color: '#fff', fontFamily: font.semibold }]}
+              >
+                {t(x)}
+              </Text>
+            </View>
+          ))}
         </View>
       </View>
 

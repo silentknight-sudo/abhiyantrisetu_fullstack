@@ -813,6 +813,11 @@ export const hi = {
   'If you are in danger, call 112 first.': 'अगर आप ख़तरे में हैं, तो पहले 112 पर कॉल करें।',
   'Setu is not fully live in {sector} yet. You can still post; quotes may take longer.':
     'सेतु अभी {sector} में पूरी तरह शुरू नहीं हुआ है। आप फिर भी पोस्ट कर सकते हैं; कोटेशन आने में देर लग सकती है।',
+  'All in one trusted platform': 'सब कुछ एक भरोसेमंद प्लेटफ़ॉर्म पर',
+  'Verified professionals': 'वेरिफ़ाइड प्रोफ़ेशनल',
+  'Multiple quotes': 'कई कोटेशन',
+  'Compare & choose': 'तुलना करें और चुनें',
+  'End-to-end support': 'शुरू से अंत तक मदद',
 };
 
 export type MessageKey = keyof typeof hi;

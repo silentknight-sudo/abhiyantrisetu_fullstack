@@ -25,6 +25,6 @@ export function checkoutOptions(order: PaymentOrder, prefill: CheckoutPrefill) {
     name: 'Abhiyantri Setu',
     description: 'Job payment (held until you confirm the work)',
     prefill: { name: prefill.name ?? undefined, contact: prefill.contact },
-    theme: { color: '#1A3A52' },
+    theme: { color: '#0F1E3D' },
   };
 }

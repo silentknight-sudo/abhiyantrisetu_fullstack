@@ -86,7 +86,7 @@ export function Milestones({
   return (
     <Card>
       <Title>{t('Milestones')}</Title>
-      <View style={{ borderRadius: 16, backgroundColor: '#1A3A52', padding: spacing[4], gap: 4 }}>
+      <View style={{ borderRadius: 16, backgroundColor: '#0F1E3D', padding: spacing[4], gap: 4 }}>
         <Text
           style={[
             typeScale.xs,

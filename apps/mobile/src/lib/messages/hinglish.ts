@@ -822,4 +822,9 @@ export const hinglish: Record<MessageKey, string> = {
   'If you are in danger, call 112 first.': 'Agar aap khatre mein hain, toh pehle 112 call karein.',
   'Setu is not fully live in {sector} yet. You can still post; quotes may take longer.':
     'Setu abhi {sector} mein poori tarah live nahi hai. Aap phir bhi post kar sakte hain; quotes aane mein der lag sakti hai.',
+  'All in one trusted platform': 'Sab kuch ek trusted platform par',
+  'Verified professionals': 'Verified professionals',
+  'Multiple quotes': 'Kai quotes',
+  'Compare & choose': 'Compare karein aur chunein',
+  'End-to-end support': 'Shuru se ant tak support',
 };

@@ -71,7 +71,7 @@ export default function CarePlans() {
   return (
     <Screen refreshing={mine.isRefetching} onRefresh={() => void mine.refetch()}>
       <Stack.Screen options={{ title: t('Care plans') }} />
-      <View style={{ borderRadius: 22, backgroundColor: '#1A3A52', padding: spacing[5], gap: 4 }}>
+      <View style={{ borderRadius: 22, backgroundColor: '#0F1E3D', padding: spacing[5], gap: 4 }}>
         <Text style={[typeScale.xl, { color: '#fff', fontFamily: font.headingHeavy }]}>
           {t('Set it once. Setu books the visits.')}
         </Text>

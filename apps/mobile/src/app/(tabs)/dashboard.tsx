@@ -147,7 +147,7 @@ export default function PartnerDashboard() {
             shadow,
             {
               borderRadius: 22,
-              backgroundColor: '#1A3A52',
+              backgroundColor: '#0F1E3D',
               padding: spacing[5],
               gap: spacing[2],
             },

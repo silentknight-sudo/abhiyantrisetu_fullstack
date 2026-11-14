@@ -4,23 +4,23 @@ import { useColorScheme } from 'react-native';
 export { radius, spacing, typeScale };
 
 /**
- * Brand palette from the logo: navy #1A3A52 and orange #FF9F43, on warm sand surfaces
- * (the shared @setu/ui-tokens system). The `craft` names are kept so imports still work:
- * indigo = navy, terracotta = orange, saffron = light orange, paper = sand.
+ * Brand palette from the logo: deep navy with a bright orange, on cool light-grey screens
+ * with white cards. The `craft` names are kept so imports still work: indigo = navy,
+ * terracotta/saffron = orange, paper = cool greys.
  */
 export const craft = {
   indigo: {
-    900: '#0A1823',
-    800: '#1A3A52',
-    700: '#2E5675',
-    600: '#4E7898',
-    300: '#ABC2D4',
-    100: '#EEF3F7',
+    900: '#0A1530',
+    800: '#0F1E3D',
+    700: '#1B2E57',
+    600: '#2A4275',
+    300: '#AEB9D0',
+    100: '#EEF1F7',
   },
-  terracotta: { 700: '#A65408', 600: '#D06B0B', 500: '#F2861F', 300: '#FFCF9E', 100: '#FFE6CC' },
-  saffron: { 600: '#D06B0B', 500: '#FF9F43', 300: '#FFCF9E', 100: '#FFF5EA' },
-  paper: { 50: '#FBF7F0', 100: '#F6EFE3', 200: '#EFE4D2', 300: '#E4D4BB', 600: '#7A6E62' },
-  leaf: '#17804A',
+  terracotta: { 700: '#B4530A', 600: '#D9650B', 500: '#EE7A12', 300: '#F9C08A', 100: '#FDEBDA' },
+  saffron: { 600: '#D9650B', 500: '#F28C28', 300: '#F9C08A', 100: '#FFF4EA' },
+  paper: { 50: '#FFFFFF', 100: '#F4F6F9', 200: '#EEF1F5', 300: '#E2E6EC', 600: '#5B6475' },
+  leaf: '#16A34A',
 };
 
 type SemanticKey =
@@ -51,23 +51,23 @@ const light: Record<SemanticKey, string> = {
   primary: craft.indigo[800],
   primaryHover: craft.indigo[900],
   onPrimary: '#FFFFFF',
-  accent: craft.saffron[500],
-  accentHover: craft.terracotta[500],
-  onAccent: craft.indigo[800],
+  accent: craft.terracotta[500],
+  accentHover: craft.terracotta[600],
+  onAccent: '#FFFFFF',
   highlight: craft.saffron[500],
   highlightBg: craft.saffron[100],
   background: craft.paper[100],
-  surface: craft.paper[50],
+  surface: '#FFFFFF',
   surfaceMuted: craft.paper[200],
   border: craft.paper[300],
-  text: craft.indigo[900],
+  text: '#111827',
   textMuted: craft.paper[600],
   success: craft.leaf,
-  successBg: '#E3F4EA',
-  danger: '#C0362C',
-  dangerBg: '#FBE7E4',
-  warning: craft.saffron[600],
-  warningBg: craft.saffron[100],
+  successBg: '#E8F7EE',
+  danger: '#DC2626',
+  dangerBg: '#FDECEC',
+  warning: '#D97706',
+  warningBg: '#FEF3E2',
   info: craft.indigo[600],
   infoBg: craft.indigo[100],
 };
@@ -77,14 +77,14 @@ const dark: Record<SemanticKey, string> = {
   primaryHover: craft.indigo[100],
   onPrimary: craft.indigo[900],
   accent: craft.saffron[500],
-  accentHover: '#FFB870',
-  onAccent: craft.indigo[900],
+  accentHover: craft.terracotta[300],
+  onAccent: '#FFFFFF',
   highlight: craft.saffron[500],
   highlightBg: '#3A2A08',
-  background: '#0A1823',
-  surface: '#102434',
-  surfaceMuted: '#152F43',
-  border: '#1A3A52',
+  background: '#0A1530',
+  surface: '#0F1E3D',
+  surfaceMuted: '#1B2E57',
+  border: '#2A4275',
   text: '#F7F8FA',
   textMuted: '#C1C7CF',
   success: '#1F9D55',
@@ -104,13 +104,13 @@ export function usePalette(): Palette {
 }
 
 /**
- * Baloo 2 for headings (Indian-designed, rounded, strong in Devanagari too); Inter for
+ * Plus Jakarta Sans for headings; Inter for
  * body text. Loaded in the root layout.
  */
 export const font = {
-  heading: 'Baloo2_700Bold',
-  headingHeavy: 'Baloo2_800ExtraBold',
-  headingSemi: 'Baloo2_600SemiBold',
+  heading: 'PlusJakartaSans_700Bold',
+  headingHeavy: 'PlusJakartaSans_800ExtraBold',
+  headingSemi: 'PlusJakartaSans_600SemiBold',
   body: 'Inter_400Regular',
   medium: 'Inter_500Medium',
   semibold: 'Inter_600SemiBold',
@@ -118,8 +118,8 @@ export const font = {
 
 /** Warm, slightly offset shadow, like paper cut-outs; elevation for Android. */
 export const shadow = {
-  shadowColor: '#1A3A52',
-  shadowOpacity: 0.12,
+  shadowColor: '#0F1E3D',
+  shadowOpacity: 0.06,
   shadowRadius: 14,
   shadowOffset: { width: 0, height: 6 },
   elevation: 3,

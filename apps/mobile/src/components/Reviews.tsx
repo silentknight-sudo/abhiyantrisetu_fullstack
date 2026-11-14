@@ -36,7 +36,7 @@ export function Stars({
             style={{
               fontSize: size,
               lineHeight: size + 4,
-              color: n <= value ? c.highlight : c.border,
+              color: n <= value ? c.accent : c.border,
             }}
           >
             ★

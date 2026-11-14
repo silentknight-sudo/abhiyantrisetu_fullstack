@@ -101,13 +101,14 @@ export function CraftHeader({
         stamp,
         {
           borderRadius: 26,
-          backgroundColor: '#111113',
+          backgroundColor: craft.indigo[800],
           padding: spacing[5],
           gap: spacing[2],
           overflow: 'hidden',
         },
       ]}
     >
+      <Jaali opacity={0.18} />
       <View
         style={{
           position: 'absolute',
@@ -117,7 +118,7 @@ export function CraftHeader({
           height: 140,
           borderRadius: 70,
           backgroundColor: craft.saffron[500],
-          opacity: 0.35,
+          opacity: 0.22,
         }}
       />
       {eyebrow ? (

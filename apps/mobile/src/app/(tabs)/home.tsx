@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  Image,
   Pressable,
   ScrollView,
   Text,
@@ -33,12 +32,13 @@ import {
   TrustRow,
 } from '@/components/ui';
 import { $api } from '@/lib/api';
-import { BANNERS, CATEGORY_IMAGES } from '@/lib/banners';
+import { BANNERS } from '@/lib/banners';
 import { BOOKABLE } from '@/lib/cart';
+import { Jaali } from '@/components/craft';
 import { jobTone, rupees } from '@/lib/format';
 import { type MessageKey, useI18n } from '@/lib/i18n';
 import { secureStorage } from '@/lib/storage';
-import { font, shadow, spacing, typeScale, usePalette } from '@/lib/theme';
+import { craft, font, shadow, spacing, typeScale, usePalette } from '@/lib/theme';
 
 type Type = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
@@ -56,6 +56,14 @@ const CATEGORIES: { slug: string; type: Type; icon: IconName; label: MessageKey 
   { slug: 'cement-steel', type: 'material_rfq', icon: 'cube', label: 'Buy materials' },
   { slug: 'earthmoving', type: 'equipment', icon: 'car', label: 'Equipment rental' },
 ];
+
+/** Shortcut tiles cycle through clay, saffron, indigo and leaf tints like painted tiles. */
+const TILE_TINTS = [
+  [craft.terracotta[100], craft.terracotta[300]],
+  [craft.saffron[100], craft.saffron[300]],
+  [craft.indigo[100], craft.indigo[300]],
+  ['#E3F4EA', '#9BD6B8'],
+] as const;
 
 const STARTS: { type: Type; icon: IconName; title: MessageKey; body: MessageKey }[] = [
   {
@@ -157,16 +165,17 @@ export default function Home() {
       {/* Header: location, alerts, profile */}
       <View
         style={{
-          backgroundColor: c.surface,
+          backgroundColor: c.primary,
           paddingTop: insets.top + spacing[3],
           paddingHorizontal: spacing[4],
-          paddingBottom: spacing[5],
-          borderBottomWidth: 1,
-          borderBottomColor: c.border,
+          paddingBottom: spacing[8],
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
           gap: spacing[4],
           overflow: 'hidden',
         }}
       >
+        <Jaali opacity={0.14} />
         <Row>
           <Pressable
             accessibilityRole="button"
@@ -174,13 +183,15 @@ export default function Home() {
             onPress={() => setPicking(!picking)}
             style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2], flex: 1 }}
           >
-            <Ionicons name="location" size={20} color={c.highlight} />
+            <Ionicons name="location" size={20} color={c.accent} />
             <View>
-              <Text style={[typeScale.base, { color: c.text, fontFamily: font.heading }]}>
+              <Text style={[typeScale.base, { color: '#fff', fontFamily: font.heading }]}>
                 {sector}
-                <Ionicons name="chevron-down" size={14} color={c.text} />
+                <Ionicons name="chevron-down" size={14} color="#fff" />
               </Text>
-              <Text style={[typeScale.xs, { color: c.textMuted, fontFamily: font.body }]}>
+              <Text
+                style={[typeScale.xs, { color: 'rgba(255,255,255,0.7)', fontFamily: font.body }]}
+              >
                 {t('Greater Noida')}
               </Text>
             </View>
@@ -191,7 +202,7 @@ export default function Home() {
             onPress={() => router.push('/notifications')}
             style={{ padding: spacing[2] }}
           >
-            <Ionicons name="notifications-outline" size={24} color={c.text} />
+            <Ionicons name="notifications-outline" size={24} color="#fff" />
             {inbox.data?.length ? (
               <View
                 style={{
@@ -201,7 +212,7 @@ export default function Home() {
                   width: 9,
                   height: 9,
                   borderRadius: 5,
-                  backgroundColor: c.highlight,
+                  backgroundColor: c.accent,
                 }}
               />
             ) : null}
@@ -215,12 +226,12 @@ export default function Home() {
           <Text
             style={[
               typeScale['3xl'],
-              { color: c.text, fontFamily: font.headingHeavy, letterSpacing: -0.6 },
+              { color: '#fff', fontFamily: font.headingHeavy, letterSpacing: -0.6 },
             ]}
           >
             {firstName ? t('Namaste, {name}', { name: firstName }) : t('Namaste')}
           </Text>
-          <Text style={[typeScale.sm, { color: c.textMuted, fontFamily: font.body }]}>
+          <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.8)', fontFamily: font.body }]}>
             {t('Book a fixed-price pro in minutes, or post a job and compare quotes.')}
           </Text>
         </View>
@@ -232,10 +243,8 @@ export default function Home() {
               flexDirection: 'row',
               alignItems: 'center',
               gap: spacing[2],
-              backgroundColor: c.surfaceMuted,
-              borderWidth: 1,
-              borderColor: c.border,
-              borderRadius: 14,
+              backgroundColor: c.surface,
+              borderRadius: 16,
               paddingHorizontal: spacing[4],
               minHeight: 52,
             },
@@ -325,7 +334,7 @@ export default function Home() {
           paddingTop: spacing[2],
         }}
       >
-        {CATEGORIES.map((x) => (
+        {CATEGORIES.map((x, i) => (
           <Pressable
             key={x.slug}
             accessibilityRole="button"
@@ -336,28 +345,18 @@ export default function Home() {
               style={[
                 shadow,
                 {
-                  width: 68,
-                  height: 68,
-                  borderRadius: 18,
-                  backgroundColor: c.surfaceMuted,
-                  borderWidth: 1,
-                  borderColor: c.border,
+                  width: 62,
+                  height: 62,
+                  borderRadius: 22,
+                  backgroundColor: TILE_TINTS[i % TILE_TINTS.length]![0],
+                  borderWidth: 1.5,
+                  borderColor: TILE_TINTS[i % TILE_TINTS.length]![1],
                   alignItems: 'center',
                   justifyContent: 'center',
-                  overflow: 'hidden',
                 },
               ]}
             >
-              {CATEGORY_IMAGES[x.slug] ? (
-                <Image
-                  source={CATEGORY_IMAGES[x.slug]!}
-                  resizeMode="cover"
-                  accessibilityIgnoresInvertColors
-                  style={{ width: '100%', height: '100%' }}
-                />
-              ) : (
-                <Ionicons name={x.icon} size={26} color={c.text} />
-              )}
+              <Ionicons name={x.icon} size={26} color={craft.indigo[800]} />
             </View>
             <Text
               numberOfLines={2}

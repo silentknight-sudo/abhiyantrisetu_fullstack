@@ -48,7 +48,7 @@ export function Welcome({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#111113' }}>
+    <View style={{ flex: 1, backgroundColor: '#1E1B4F' }}>
       {!last ? (
         <>
           <Image source={BANNERS[SLIDES[i]!.image]} resizeMode="cover" style={fill} />

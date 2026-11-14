@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { font, radius, shadow, spacing, stamp, typeScale, usePalette } from '@/lib/theme';
+import { Jaali } from './craft';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -389,13 +390,14 @@ export function Banner({
     <View style={{ height, borderRadius: rounded ? 24 : 0, overflow: 'hidden' }}>
       <Image source={image} resizeMode="cover" style={fill} />
       <LinearGradient
-        colors={['rgba(0,0,0,0.82)', 'rgba(0,0,0,0.45)', 'rgba(0,0,0,0)']}
+        colors={['rgba(20,18,58,0.94)', 'rgba(20,18,58,0.6)', 'rgba(20,18,58,0.05)']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={StyleSheet.absoluteFill}
       />
+      <Jaali opacity={0.12} style={{ right: '45%' }} />
       <View style={{ flex: 1, justifyContent: 'flex-end', padding: spacing[5], gap: spacing[1] }}>
-        {eyebrow ? <Eyebrow color={c.highlight}>{eyebrow}</Eyebrow> : null}
+        {eyebrow ? <Eyebrow color={c.accent}>{eyebrow}</Eyebrow> : null}
         <Text
           style={[
             typeScale['2xl'],
@@ -413,11 +415,11 @@ export function Banner({
           </Text>
         ) : null}
         {cta ? (
-          <View style={[styles.bannerCta, { backgroundColor: '#FFFFFF' }]}>
-            <Text style={[typeScale.sm, { color: '#111113', fontFamily: font.semibold }]}>
+          <View style={[styles.bannerCta, { backgroundColor: c.accent }]}>
+            <Text style={[typeScale.sm, { color: c.onAccent, fontFamily: font.semibold }]}>
               {cta}
             </Text>
-            <Ionicons name="arrow-forward" size={14} color="#111113" />
+            <Ionicons name="arrow-forward" size={14} color={c.onAccent} />
           </View>
         ) : null}
       </View>

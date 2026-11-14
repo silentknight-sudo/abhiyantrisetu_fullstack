@@ -143,7 +143,7 @@ export function CartBar({
           <Text style={[typeScale.base, { color: '#fff', fontFamily: font.heading }]}>
             {loading ? t('Booking…') : action}
           </Text>
-          <Ionicons name="arrow-forward" size={18} color={c.highlight} />
+          <Ionicons name="arrow-forward" size={18} color={c.accent} />
         </View>
       </Pressable>
     </View>

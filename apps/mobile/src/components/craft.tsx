@@ -108,7 +108,6 @@ export function CraftHeader({
         },
       ]}
     >
-      <Jaali opacity={0.18} />
       <View
         style={{
           position: 'absolute',

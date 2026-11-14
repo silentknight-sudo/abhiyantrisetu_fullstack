@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { font, radius, shadow, spacing, stamp, typeScale, usePalette } from '@/lib/theme';
-import { Jaali } from './craft';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -390,12 +389,11 @@ export function Banner({
     <View style={{ height, borderRadius: rounded ? 24 : 0, overflow: 'hidden' }}>
       <Image source={image} resizeMode="cover" style={fill} />
       <LinearGradient
-        colors={['rgba(20,18,58,0.94)', 'rgba(20,18,58,0.6)', 'rgba(20,18,58,0.05)']}
+        colors={['rgba(15,30,61,0.94)', 'rgba(15,30,61,0.6)', 'rgba(15,30,61,0.05)']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={StyleSheet.absoluteFill}
       />
-      <Jaali opacity={0.12} style={{ right: '45%' }} />
       <View style={{ flex: 1, justifyContent: 'flex-end', padding: spacing[5], gap: spacing[1] }}>
         {eyebrow ? <Eyebrow color={c.accent}>{eyebrow}</Eyebrow> : null}
         <Text

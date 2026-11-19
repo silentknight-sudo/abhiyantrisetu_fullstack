@@ -389,7 +389,7 @@ export function Banner({
     <View style={{ height, borderRadius: rounded ? 24 : 0, overflow: 'hidden' }}>
       <Image source={image} resizeMode="cover" style={fill} />
       <LinearGradient
-        colors={['rgba(15,30,61,0.94)', 'rgba(15,30,61,0.6)', 'rgba(15,30,61,0.05)']}
+        colors={['rgba(19,33,63,0.94)', 'rgba(19,33,63,0.6)', 'rgba(19,33,63,0.05)']}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={StyleSheet.absoluteFill}

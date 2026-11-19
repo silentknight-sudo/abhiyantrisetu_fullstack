@@ -59,7 +59,7 @@ export default function Refer() {
       <View
         style={{
           borderRadius: 22,
-          backgroundColor: '#0F1E3D',
+          backgroundColor: '#13213F',
           padding: spacing[5],
           gap: spacing[2],
         }}

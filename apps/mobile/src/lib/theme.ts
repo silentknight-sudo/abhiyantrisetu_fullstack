@@ -10,16 +10,16 @@ export { radius, spacing, typeScale };
  */
 export const craft = {
   indigo: {
-    900: '#0A1530',
-    800: '#0F1E3D',
+    900: '#0B1530',
+    800: '#13213F',
     700: '#1B2E57',
     600: '#2A4275',
     300: '#AEB9D0',
     100: '#EEF1F7',
   },
-  terracotta: { 700: '#B4530A', 600: '#D9650B', 500: '#EE7A12', 300: '#F9C08A', 100: '#FDEBDA' },
-  saffron: { 600: '#D9650B', 500: '#F28C28', 300: '#F9C08A', 100: '#FFF4EA' },
-  paper: { 50: '#FFFFFF', 100: '#F4F6F9', 200: '#EEF1F5', 300: '#E2E6EC', 600: '#5B6475' },
+  terracotta: { 700: '#8F4307', 600: '#A64A07', 500: '#C2560A', 300: '#F9C08A', 100: '#FDEBDA' },
+  saffron: { 600: '#C2560A', 500: '#F7923F', 300: '#F9C08A', 100: '#FFF4EA' },
+  paper: { 50: '#FFFFFF', 100: '#F4F6F9', 200: '#EEF0F4', 300: '#DDE1E7', 600: '#5C6573' },
   leaf: '#16A34A',
 };
 
@@ -60,7 +60,7 @@ const light: Record<SemanticKey, string> = {
   surface: '#FFFFFF',
   surfaceMuted: craft.paper[200],
   border: craft.paper[300],
-  text: '#111827',
+  text: '#13213F',
   textMuted: craft.paper[600],
   success: craft.leaf,
   successBg: '#E8F7EE',
@@ -82,7 +82,7 @@ const dark: Record<SemanticKey, string> = {
   highlight: craft.saffron[500],
   highlightBg: '#3A2A08',
   background: '#0A1530',
-  surface: '#0F1E3D',
+  surface: '#13213F',
   surfaceMuted: '#1B2E57',
   border: '#2A4275',
   text: '#F7F8FA',
@@ -118,7 +118,7 @@ export const font = {
 
 /** Warm, slightly offset shadow, like paper cut-outs; elevation for Android. */
 export const shadow = {
-  shadowColor: '#0F1E3D',
+  shadowColor: '#13213F',
   shadowOpacity: 0.06,
   shadowRadius: 14,
   shadowOffset: { width: 0, height: 6 },

@@ -32,7 +32,7 @@ import {
   TrustRow,
 } from '@/components/ui';
 import { $api } from '@/lib/api';
-import { BANNERS } from '@/lib/banners';
+import { PILLAR_ORDER, PILLAR_TILE, PILLARS, type PillarKey } from '@/lib/pillars';
 import { BOOKABLE } from '@/lib/cart';
 import { jobTone, rupees } from '@/lib/format';
 import { type MessageKey, useI18n } from '@/lib/i18n';
@@ -64,36 +64,36 @@ const TILE_TINTS = [
   ['#E3F4EA', '#9BD6B8'],
 ] as const;
 
-const STARTS: { type: Type; icon: IconName; title: MessageKey; body: MessageKey }[] = [
+const STARTS: { pillar: PillarKey; icon: IconName; title: MessageKey; body: MessageKey }[] = [
   {
-    type: 'service',
+    pillar: 'build',
+    icon: 'hammer',
+    title: 'Build & renovate',
+    body: 'New construction, kitchen, bathroom, full home',
+  },
+  {
+    pillar: 'home',
     icon: 'construct',
     title: 'Repair & maintain',
     body: 'Plumber, electrician, AC, carpenter, painter',
   },
   {
-    type: 'renovation',
-    icon: 'hammer',
-    title: 'Renovate',
-    body: 'Kitchen, bathroom, flooring, full home',
-  },
-  {
-    type: 'consult',
-    icon: 'compass',
-    title: 'Ask an expert',
-    body: 'Structural, architect, interior, cost estimate',
-  },
-  {
-    type: 'material_rfq',
+    pillar: 'materials',
     icon: 'cube',
     title: 'Buy materials',
     body: 'Cement, steel, sand, bricks, tiles',
   },
   {
-    type: 'equipment',
+    pillar: 'equipment',
     icon: 'car',
     title: 'Rent equipment',
     body: 'JCB, mixer, scaffolding, with or without operator',
+  },
+  {
+    pillar: 'professionals',
+    icon: 'compass',
+    title: 'Find professionals',
+    body: 'Architect, engineer, interior, cost estimate',
   },
 ];
 
@@ -143,15 +143,6 @@ export default function Home() {
         x.label.toLowerCase().includes(q),
     );
   }, [query, t]);
-
-  const [page, setPage] = useState(0);
-  const onBannerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
-    setPage(Math.round(e.nativeEvent.contentOffset.x / (BANNER_W + spacing[3])));
-  const banners = [
-    [BANNERS.homeServices, 'Home services', 'Verified pros at your door', 'service'],
-    [BANNERS.buildHome, 'Build a house', 'Pay stage by stage', 'renovation'],
-    [BANNERS.renovation, 'Renovate', 'Itemised quotes in 24 hours', 'renovation'],
-  ] as const;
 
   return (
     <Screen
@@ -255,7 +246,7 @@ export default function Home() {
             testID="home-search"
             value={query}
             onChangeText={setQuery}
-            placeholder={t('Search for a service, e.g. plumber')}
+            placeholder={t('Search painter, cement, JCB, architect…')}
             placeholderTextColor={c.textMuted}
             style={[
               typeScale.base,
@@ -347,90 +338,93 @@ export default function Home() {
         </Padded>
       ) : null}
 
-      {/* Category shortcuts */}
+      {/* The five pillars */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: spacing[4],
-          gap: spacing[4],
+          gap: spacing[3],
           paddingTop: spacing[2],
         }}
       >
-        {CATEGORIES.map((x, i) => (
+        {PILLAR_ORDER.map((k, i) => (
           <Pressable
-            key={x.slug}
+            key={k}
             accessibilityRole="button"
-            onPress={() => post(x.type, x.slug)}
-            style={{ width: 72, alignItems: 'center', gap: spacing[2] }}
+            testID={`pillar-${k}`}
+            onPress={() => router.push({ pathname: '/pillar/[key]', params: { key: k } })}
+            style={({ pressed }) => [
+              shadow,
+              {
+                width: 104,
+                padding: spacing[3],
+                gap: spacing[2],
+                borderRadius: 18,
+                backgroundColor: i === 0 ? c.highlightBg : c.surface,
+                borderWidth: 1.5,
+                borderColor: i === 0 ? c.accent : c.border,
+                alignItems: 'center',
+                transform: [{ scale: pressed ? 0.97 : 1 }],
+              },
+            ]}
           >
             <View
-              style={[
-                shadow,
-                {
-                  width: 62,
-                  height: 62,
-                  borderRadius: 22,
-                  backgroundColor: TILE_TINTS[i % TILE_TINTS.length]![0],
-                  borderWidth: 1.5,
-                  borderColor: TILE_TINTS[i % TILE_TINTS.length]![1],
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
-              ]}
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 14,
+                backgroundColor: i === 0 ? c.surface : c.surfaceMuted,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              <Ionicons name={x.icon} size={26} color={craft.indigo[800]} />
+              <Ionicons name={PILLARS[k].icon} size={26} color={i === 0 ? c.accent : c.primary} />
             </View>
             <Text
               numberOfLines={2}
               style={[
                 typeScale.xs,
-                { color: c.text, fontFamily: font.medium, textAlign: 'center' },
+                { color: c.text, fontFamily: font.semibold, textAlign: 'center' },
               ]}
             >
-              {t(x.label)}
+              {t(PILLAR_TILE[k])}
             </Text>
           </Pressable>
         ))}
       </ScrollView>
 
-      {/* Promo banners with page dots */}
-      <View style={{ gap: spacing[2] }}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={BANNER_W + spacing[3]}
-          decelerationRate="fast"
-          onScroll={onBannerScroll}
-          scrollEventThrottle={32}
-          contentContainerStyle={{ paddingHorizontal: spacing[4], gap: spacing[3] }}
+      {/* Post a requirement, straight under the pillars */}
+      <Padded>
+        <Pressable
+          accessibilityRole="button"
+          testID="post-requirement"
+          onPress={() => router.push('/requirement/new')}
+          style={({ pressed }) => [
+            shadow,
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing[3],
+              padding: spacing[4],
+              borderRadius: 18,
+              backgroundColor: c.accent,
+              transform: [{ scale: pressed ? 0.98 : 1 }],
+            },
+          ]}
         >
-          {banners.map(([image, eyebrow, title, type]) => (
-            <View key={eyebrow} style={{ width: BANNER_W }}>
-              <Banner
-                image={image}
-                eyebrow={t(eyebrow)}
-                title={t(title)}
-                cta={t('Get a quote')}
-                onPress={() => post(type)}
-              />
-            </View>
-          ))}
-        </ScrollView>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
-          {banners.map((_, i) => (
-            <View
-              key={i}
-              style={{
-                width: i === page ? 18 : 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: i === page ? c.accent : c.border,
-              }}
-            />
-          ))}
-        </View>
-      </View>
+          <Ionicons name="add-circle" size={30} color="#fff" />
+          <View style={{ flex: 1 }}>
+            <Text style={[typeScale.lg, { color: '#fff', fontFamily: font.heading }]}>
+              {t('Post a requirement')}
+            </Text>
+            <Text style={[typeScale.sm, { color: 'rgba(255,255,255,0.9)', fontFamily: font.body }]}>
+              {t('Describe the work, get 2+ quotes within 24 hours')}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#fff" />
+        </Pressable>
+      </Padded>
 
       <Padded>
         {/* Tools */}
@@ -510,22 +504,14 @@ export default function Home() {
         <Grid>
           {STARTS.map((s, i) => (
             <Tile
-              key={s.type}
+              key={s.pillar}
               icon={s.icon}
               tone={i === 0 ? 'orange' : 'navy'}
               title={t(s.title)}
               caption={t(s.body)}
-              onPress={() => post(s.type)}
-              testID={i === 0 ? 'post-requirement' : undefined}
+              onPress={() => router.push({ pathname: '/pillar/[key]', params: { key: s.pillar } })}
             />
           ))}
-          <Tile
-            icon="add"
-            tone="orange"
-            title={t('Post a requirement')}
-            caption={t('Describe the work')}
-            onPress={() => router.push('/requirement/new')}
-          />
         </Grid>
 
         {/* How Setu Safe works */}
@@ -545,7 +531,7 @@ export default function Home() {
               ],
               [
                 'shield-checkmark',
-                'Pay safely',
+                'Pay safely by milestone',
                 'Your money is held by Setu until you confirm the work.',
               ],
             ] as const
@@ -566,15 +552,6 @@ export default function Home() {
             </View>
           ))}
         </Card>
-
-        <TrustRow
-          items={[
-            ['shield-checkmark', t('Verified')],
-            ['wallet', t('Pay safely')],
-            ['flash', t('Quick response')],
-            ['star', t('Real reviews')],
-          ]}
-        />
       </Padded>
     </Screen>
   );

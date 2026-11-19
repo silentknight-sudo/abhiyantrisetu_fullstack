@@ -115,12 +115,17 @@ const toggle = <T,>(xs: T[], x: T) => (xs.includes(x) ? xs.filter((y) => y !== x
 export default function NewRequirement() {
   const { t, locale } = useI18n();
   const c = usePalette();
-  const params = useLocalSearchParams<{ type?: string; category?: string; partners?: string }>();
+  const params = useLocalSearchParams<{
+    type?: string;
+    category?: string;
+    partners?: string;
+    title?: string;
+  }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
   );
   const [categoryId, setCategoryId] = useState<string | undefined>();
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(params.title ?? '');
   const [description, setDescription] = useState('');
   const [urgency, setUrgency] = useState<(typeof URGENCY)[number][0]>('flexible');
   const [propertyType, setPropertyType] = useState<(typeof PROPERTY)[number][0]>('apartment');

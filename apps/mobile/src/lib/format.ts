@@ -96,6 +96,7 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
     transportNeeded?: boolean;
     roadAccess?: 'wide' | 'narrow' | 'tight';
     option?: string;
+    answers?: Record<string, string>;
     supplies?: 'customer' | 'setu' | 'unsure';
     visitAt?: string;
     startBy?: 'this_week' | 'two_weeks' | 'next_month';
@@ -123,6 +124,11 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
   if (d.propertyType) lines.push(t('Property: {value}', { value: pretty(d.propertyType) }));
   if (d.scope?.length) lines.push(t('Areas: {value}', { value: d.scope.join(', ') }));
   if (d.areaSqft) lines.push(t('Area: {n} sq ft', { n: d.areaSqft }));
+  for (const [q, a] of Object.entries(d.answers ?? {})) {
+    lines.push(
+      `${t(q as never).replace(/[?？]$/, '')}: ${a.replace(/^[^0-9].*$/, (x) => t(x as never))}`,
+    );
+  }
   if (d.option) lines.push(t('Option: {value}', { value: d.option }));
   if (d.supplies) {
     lines.push(

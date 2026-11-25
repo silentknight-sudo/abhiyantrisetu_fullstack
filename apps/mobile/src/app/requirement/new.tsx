@@ -25,11 +25,12 @@ import {
 } from '@/components/ui';
 import { PhotoPicker } from '@/components/PhotoPicker';
 import { ChooseWhoQuotes, CostRange } from '@/components/RequestHelpers';
+import { QUESTIONS } from '@/lib/questions';
 import { $api, queryClient } from '@/lib/api';
 import { errorMessage } from '@/lib/errors';
 import { type MessageKey, useI18n } from '@/lib/i18n';
 import { rupees } from '@/lib/format';
-import { usePalette } from '@/lib/theme';
+import { spacing, usePalette } from '@/lib/theme';
 
 /** The next three days, morning and evening, for the measurement visit. */
 function VISIT_SLOTS() {
@@ -203,6 +204,27 @@ export default function NewRequirement() {
   }, [catalog.data, params.category, categoryId]);
   const categories = (catalog.data ?? []).filter((c) => c.requirementType === kind);
   const slug = catalog.data?.find((x) => x.id === categoryId)?.slug;
+  // The category's questions for professionals; answers are kept per question.
+  const questions = (slug && QUESTIONS[slug]) || [];
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const answer = (q: string, v: string) =>
+    setAnswers((a) => {
+      const next = { ...a };
+      if (v) next[q] = v;
+      else delete next[q];
+      return next;
+    });
+  const filled = Object.fromEntries(
+    questions
+      .filter((qn) => answers[qn.q])
+      .map((qn) => [
+        qn.q,
+        'unit' in qn && qn.unit ? `${answers[qn.q]} ${qn.unit}` : answers[qn.q]!,
+      ]),
+  );
+  // A different category asks different questions.
+  useEffect(() => setAnswers({}), [slug]);
+  const withAnswers = Object.keys(filled).length ? { answers: filled } : {};
   // A profession picked on Find a Professional sets the consultation topic.
   useEffect(() => {
     const byProfession: Record<string, (typeof TOPICS)[number][0]> = {
@@ -242,12 +264,13 @@ export default function NewRequirement() {
     setError(null);
     const details =
       kind === 'service'
-        ? { description, urgency, photos }
+        ? { description, urgency, photos, ...withAnswers }
         : kind === 'renovation'
           ? {
               propertyType,
               scope,
               description,
+              ...withAnswers,
               areaSqft: areaSqft ? Number(areaSqft) : undefined,
               ...(params.option ? { option: params.option } : {}),
               ...(params.supplies ? { supplies: params.supplies } : {}),
@@ -256,7 +279,7 @@ export default function NewRequirement() {
               photos,
             }
           : kind === 'consult'
-            ? { topic, description }
+            ? { topic, description, ...withAnswers }
             : kind === 'material_rfq'
               ? {
                   items: materials
@@ -331,6 +354,39 @@ export default function NewRequirement() {
               />
             ))}
           </Chips>
+        </Card>
+      ) : null}
+
+      {questions.length ? (
+        <Card>
+          <Title>{t('Details the professional needs')}</Title>
+          <Small>
+            {t('Answer what you can. It helps you get accurate quotes without a call.')}
+          </Small>
+          {questions.map((qn) => (
+            <View key={qn.q} style={{ gap: spacing[2] }}>
+              {'options' in qn ? <Small muted={false}>{t(qn.q)}</Small> : null}
+              {'options' in qn ? (
+                <Chips>
+                  {qn.options.map((o) => (
+                    <Chip
+                      key={o}
+                      label={t(o)}
+                      selected={answers[qn.q] === o}
+                      onPress={() => answer(qn.q, answers[qn.q] === o ? '' : o)}
+                    />
+                  ))}
+                </Chips>
+              ) : (
+                <Field
+                  label={qn.unit ? `${t(qn.q)} (${t(qn.unit)})` : t(qn.q)}
+                  value={answers[qn.q] ?? ''}
+                  onChangeText={(v) => answer(qn.q, v.replace(/[^0-9]/g, ''))}
+                  keyboardType="number-pad"
+                />
+              )}
+            </View>
+          ))}
         </Card>
       ) : null}
 

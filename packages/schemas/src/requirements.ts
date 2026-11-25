@@ -4,10 +4,16 @@ import { addressInputSchema, fileKeySchema, paiseSchema } from './common';
 
 const photos = z.array(fileKeySchema).max(10).default([]);
 const description = z.string().trim().min(10, 'Tell us a little more (10+ characters)').max(2000);
+/** Answers to the category's questions for professionals, e.g. {"AC type": "Split"}. */
+const answers = z
+  .record(z.string().trim().min(1).max(60), z.string().trim().min(1).max(120))
+  .refine((o) => Object.keys(o).length <= 15, 'Too many answers')
+  .optional();
 
 export const serviceDetailsSchema = z.object({
   serviceId: z.string().uuid().optional(),
   description,
+  answers,
   urgency: z.enum(['asap', 'today', 'this_week', 'flexible']).default('flexible'),
   photos,
   /** Set only by POST /v1/bookings; rejected on a hand-posted requirement. */
@@ -19,6 +25,7 @@ export const renovationDetailsSchema = z.object({
   scope: z.array(z.string().trim().min(2).max(60)).min(1, 'Pick at least one area of work').max(20),
   areaSqft: z.number().int().positive().max(1_000_000).optional(),
   description,
+  answers,
   wantsSiteVisit: z.boolean().default(true),
   /** The option picked on the service page, e.g. "Vitrified 2×2 ft". */
   option: z.string().trim().max(80).optional(),
@@ -92,6 +99,7 @@ export const equipmentDetailsSchema = z.object({
 export const consultDetailsSchema = z.object({
   topic: z.enum(['structural', 'architecture', 'interior', 'vastu', 'cost_estimate', 'other']),
   description,
+  answers,
   mode: z.enum(['site_visit', 'call']).default('site_visit'),
 });
 

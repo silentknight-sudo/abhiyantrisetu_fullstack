@@ -3242,6 +3242,9 @@ export interface operations {
                 /** Format: uuid */
                 serviceId?: string;
                 description: string;
+                answers?: {
+                  [key: string]: string;
+                };
                 /**
                  * @default flexible
                  * @enum {string}
@@ -3298,6 +3301,9 @@ export interface operations {
                 scope: string[];
                 areaSqft?: number;
                 description: string;
+                answers?: {
+                  [key: string]: string;
+                };
                 /** @default true */
                 wantsSiteVisit?: boolean;
                 option?: string;
@@ -3451,6 +3457,9 @@ export interface operations {
                 topic:
                   'structural' | 'architecture' | 'interior' | 'vastu' | 'cost_estimate' | 'other';
                 description: string;
+                answers?: {
+                  [key: string]: string;
+                };
                 /**
                  * @default site_visit
                  * @enum {string}

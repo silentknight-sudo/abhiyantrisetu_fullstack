@@ -48,6 +48,32 @@ describe('renovation service flow', () => {
     });
   });
 
+  it('keeps the answers to the category questions, and limits their size', async () => {
+    const res = await post({
+      propertyType: 'apartment',
+      scope: ['Flooring'],
+      description: 'Tiles in the living room please',
+      answers: { 'Current floor': 'Old tiles', 'Tile size': '2×2 ft' },
+    }).expect(201);
+    expect(res.body.details.answers).toEqual({
+      'Current floor': 'Old tiles',
+      'Tile size': '2×2 ft',
+    });
+    const many = Object.fromEntries(Array.from({ length: 16 }, (_, i) => [`Q${i}`, 'A']));
+    await post({
+      propertyType: 'apartment',
+      scope: ['Flooring'],
+      description: 'Tiles in the living room please',
+      answers: many,
+    }).expect(400);
+    await post({
+      propertyType: 'apartment',
+      scope: ['Flooring'],
+      description: 'Tiles in the living room please',
+      answers: { Q: 'x'.repeat(200) },
+    }).expect(400);
+  });
+
   it('rejects an unknown material choice or start date', async () => {
     const base = {
       propertyType: 'apartment',

@@ -3,7 +3,8 @@ import type { ImageSourcePropType } from 'react-native';
 /** Photos for cards and tiles (generated with Canva). Missing keys fall back to an icon. */
 const IMAGES: Record<string, ImageSourcePropType> = {
   plumber: require('../../assets/cards/plumber.png'),
-  electrician: require('../../assets/categories/electrical.jpg'),
+  electrician: require('../../assets/cards/electrician.png'),
+  'ro-and-purifier': require('../../assets/cards/ro-and-purifier.png'),
   carpenter: require('../../assets/categories/carpentry.jpg'),
   'ac-technician': require('../../assets/categories/ac-repair.jpg'),
   painter: require('../../assets/categories/painting.jpg'),

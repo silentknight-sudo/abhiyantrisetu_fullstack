@@ -9,6 +9,7 @@ const IMAGES: Record<string, ImageSourcePropType> = {
   'ac-technician': require('../../assets/categories/ac-repair.jpg'),
   painter: require('../../assets/categories/painting.jpg'),
   // GENERATED (keep this line: new photos are added below it)
+  'masonry-and-civil': require('../../assets/cards/masonry-and-civil.png'),
   'drilling-and-breaking': require('../../assets/cards/drilling-and-breaking.png'),
   'compaction': require('../../assets/cards/compaction.png'),
   'water-tankers': require('../../assets/cards/water-tankers.png'),

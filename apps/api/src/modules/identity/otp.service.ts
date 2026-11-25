@@ -74,7 +74,10 @@ export class OtpService {
       }
     }
 
-    const code = numericCode(OTP_POLICY.digits);
+    // The store-review number gets its fixed code and no SMS (see REVIEW_LOGIN).
+    const [reviewPhone, reviewCode] = (this.env.REVIEW_LOGIN ?? '').split(':');
+    const isReview = Boolean(reviewPhone) && phone === reviewPhone;
+    const code = isReview ? reviewCode! : numericCode(OTP_POLICY.digits);
     // Only the newest challenge is valid; retire earlier ones for this phone.
     await this.db
       .update(otpChallenges)
@@ -86,7 +89,7 @@ export class OtpService {
       expiresAt: new Date(Date.now() + OTP_POLICY.ttlMs),
       ip,
     });
-    await this.sms.sendOtp(phone, code, locale);
+    if (!isReview) await this.sms.sendOtp(phone, code, locale);
 
     return {
       expiresInSeconds: OTP_POLICY.ttlMs / 1000,

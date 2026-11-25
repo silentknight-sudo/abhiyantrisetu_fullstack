@@ -13,6 +13,14 @@ const envSchema = z
     ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
     REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
     // disabled: login is switched off (pre-launch, before DLT approval); OTP requests get a 503.
+    /**
+     * Optional store-review login, "+91XXXXXXXXXX:123456": that one number gets this fixed
+     * code and no SMS, so Google Play / App Store reviewers can sign in. Leave unset otherwise.
+     */
+    REVIEW_LOGIN: z
+      .string()
+      .regex(/^\+91[6-9]\d{9}:\d{6}$/, 'REVIEW_LOGIN must look like +919999900001:482913')
+      .optional(),
     SMS_PROVIDER: z.enum(['console', 'msg91', 'disabled']).default('console'),
     MSG91_AUTH_KEY: z.string().optional(),
     MSG91_OTP_TEMPLATE_ID: z.string().optional(),

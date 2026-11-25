@@ -95,6 +95,10 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
     fuelIncluded?: boolean;
     transportNeeded?: boolean;
     roadAccess?: 'wide' | 'narrow' | 'tight';
+    option?: string;
+    supplies?: 'customer' | 'setu' | 'unsure';
+    visitAt?: string;
+    startBy?: 'this_week' | 'two_weeks' | 'next_month';
     booking?: {
       items: { name: string; quantity: number; unitPricePaise: number }[];
       slotStart: string;
@@ -119,6 +123,29 @@ export function detailLines(details: Record<string, unknown>, t: Translate): str
   if (d.propertyType) lines.push(t('Property: {value}', { value: pretty(d.propertyType) }));
   if (d.scope?.length) lines.push(t('Areas: {value}', { value: d.scope.join(', ') }));
   if (d.areaSqft) lines.push(t('Area: {n} sq ft', { n: d.areaSqft }));
+  if (d.option) lines.push(t('Option: {value}', { value: d.option }));
+  if (d.supplies) {
+    lines.push(
+      d.supplies === 'customer'
+        ? t('Customer has the material')
+        : d.supplies === 'setu'
+          ? t('Quote should include material')
+          : t('Material: not decided'),
+    );
+  }
+  if (d.visitAt) lines.push(t('Measurement visit: {when}', { when: when(d.visitAt) }));
+  if (d.startBy) {
+    lines.push(
+      t('Start: {value}', {
+        value:
+          d.startBy === 'this_week'
+            ? t('This week')
+            : d.startBy === 'two_weeks'
+              ? t('Within 2 weeks')
+              : t('Next month'),
+      }),
+    );
+  }
   if (d.topic) lines.push(t('Topic: {value}', { value: pretty(d.topic) }));
   if (d.mode) lines.push(t('Consultation: {value}', { value: pretty(d.mode) }));
   for (const i of d.items ?? []) {

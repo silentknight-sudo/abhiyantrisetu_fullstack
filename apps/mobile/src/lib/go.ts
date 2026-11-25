@@ -5,6 +5,8 @@ import type { Go } from './pillars';
 export function openGo(go: Go, t: (k: never) => string) {
   if ('book' in go) {
     router.push({ pathname: '/book/[category]', params: { category: go.book } });
+  } else if ('service' in go) {
+    router.push({ pathname: '/service/[slug]', params: { slug: go.service } });
   } else if ('href' in go) {
     router.push(go.href);
   } else {

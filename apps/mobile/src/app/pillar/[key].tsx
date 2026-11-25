@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Fragment, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { Button, Screen } from '@/components/ui';
+import { cardImage, imageKey } from '@/lib/cardImages';
 import { openGo } from '@/lib/go';
 import { useI18n } from '@/lib/i18n';
 import { PILLARS, type PillarKey } from '@/lib/pillars';
@@ -10,6 +11,14 @@ import { font, spacing, typeScale, usePalette } from '@/lib/theme';
 
 /** Soft tints for icon tiles, cycled so a row of cards does not look flat. */
 const TINTS = ['#EEF1F5', '#FDEEE1', '#E9EEF7', '#E7F4EC', '#FFF3E2', '#EDE8F7'];
+
+/** A card's photo: its own, else its service page's, else its booking category's. */
+const cardKey = (card: { label: string; go: object }) => {
+  const own = imageKey(card.label);
+  if (cardImage(own)) return own;
+  const g = card.go as { service?: string; book?: string };
+  return g.service ?? g.book ?? own;
+};
 
 /** One pillar (Build & Renovate, Home Services, …): search, what are you looking for, rows. */
 export default function PillarScreen() {
@@ -141,9 +150,18 @@ export default function PillarScreen() {
                   backgroundColor: TINTS[i % TINTS.length],
                   alignItems: 'center',
                   justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
               >
-                <Ionicons name={g.icon} size={28} color={c.primary} />
+                {cardImage(imageKey(g.label)) ? (
+                  <Image
+                    source={cardImage(imageKey(g.label))!}
+                    accessibilityIgnoresInvertColors
+                    style={{ width: 64, height: 64 }}
+                  />
+                ) : (
+                  <Ionicons name={g.icon} size={28} color={c.primary} />
+                )}
               </View>
               <Text
                 numberOfLines={2}
@@ -217,9 +235,18 @@ export default function PillarScreen() {
                       backgroundColor: TINTS[(si + ci) % TINTS.length],
                       alignItems: 'center',
                       justifyContent: 'center',
+                      overflow: 'hidden',
                     }}
                   >
-                    <Ionicons name={card.icon} size={48} color={c.primary} />
+                    {cardImage(cardKey(card)) ? (
+                      <Image
+                        source={cardImage(cardKey(card))!}
+                        accessibilityIgnoresInvertColors
+                        style={{ width: 150, height: 150 }}
+                      />
+                    ) : (
+                      <Ionicons name={card.icon} size={48} color={c.primary} />
+                    )}
                     {card.meta ? (
                       <View
                         style={{

@@ -20,6 +20,13 @@ export const renovationDetailsSchema = z.object({
   areaSqft: z.number().int().positive().max(1_000_000).optional(),
   description,
   wantsSiteVisit: z.boolean().default(true),
+  /** The option picked on the service page, e.g. "Vitrified 2×2 ft". */
+  option: z.string().trim().max(80).optional(),
+  /** Who supplies the material (tiles, paint…). */
+  supplies: z.enum(['customer', 'setu', 'unsure']).optional(),
+  /** Preferred time for the free measurement visit. */
+  visitAt: z.iso.datetime().optional(),
+  startBy: z.enum(['this_week', 'two_weeks', 'next_month']).optional(),
   photos,
 });
 

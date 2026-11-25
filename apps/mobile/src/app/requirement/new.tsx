@@ -31,6 +31,29 @@ import { type MessageKey, useI18n } from '@/lib/i18n';
 import { rupees } from '@/lib/format';
 import { usePalette } from '@/lib/theme';
 
+/** The next three days, morning and evening, for the measurement visit. */
+function VISIT_SLOTS() {
+  const out: { iso: string; label: string }[] = [];
+  for (let d = 1; d <= 3; d++) {
+    for (const h of [10, 16]) {
+      const at = new Date();
+      at.setDate(at.getDate() + d);
+      at.setHours(h, 0, 0, 0);
+      out.push({
+        iso: at.toISOString(),
+        label: at.toLocaleString('en-IN', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          hour: 'numeric',
+          hour12: true,
+        }),
+      });
+    }
+  }
+  return out;
+}
+
 type Kind = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 
 const KINDS: { kind: Kind; label: MessageKey }[] = [
@@ -120,6 +143,10 @@ export default function NewRequirement() {
     category?: string;
     partners?: string;
     title?: string;
+    option?: string;
+    scope?: string;
+    supplies?: 'customer' | 'setu' | 'unsure';
+    area?: string;
   }>();
   const [kind, setKind] = useState<Kind>(
     KINDS.some((k) => k.kind === params.type) ? (params.type as Kind) : 'service',
@@ -129,8 +156,12 @@ export default function NewRequirement() {
   const [description, setDescription] = useState('');
   const [urgency, setUrgency] = useState<(typeof URGENCY)[number][0]>('flexible');
   const [propertyType, setPropertyType] = useState<(typeof PROPERTY)[number][0]>('apartment');
-  const [scope, setScope] = useState<string[]>([]);
-  const [areaSqft, setAreaSqft] = useState('');
+  const [scope, setScope] = useState<string[]>(
+    params.scope ? params.scope.split(',').filter(Boolean) : [],
+  );
+  const [areaSqft, setAreaSqft] = useState(params.area ?? '');
+  const [visitAt, setVisitAt] = useState<string | null>(null);
+  const [startBy, setStartBy] = useState<'this_week' | 'two_weeks' | 'next_month'>('two_weeks');
   const [topic, setTopic] = useState<(typeof TOPICS)[number][0]>('structural');
   const [budget, setBudget] = useState('');
   const [sector, setSector] = useState<(typeof SECTORS)[number]>(SECTORS[0]);
@@ -218,6 +249,10 @@ export default function NewRequirement() {
               scope,
               description,
               areaSqft: areaSqft ? Number(areaSqft) : undefined,
+              ...(params.option ? { option: params.option } : {}),
+              ...(params.supplies ? { supplies: params.supplies } : {}),
+              ...(visitAt ? { visitAt } : {}),
+              startBy,
               photos,
             }
           : kind === 'consult'
@@ -338,6 +373,37 @@ export default function NewRequirement() {
             onChangeText={setAreaSqft}
             keyboardType="number-pad"
           />
+          {params.option ? <Small>{t('Option: {value}', { value: params.option })}</Small> : null}
+        </Card>
+      ) : null}
+
+      {kind === 'renovation' ? (
+        <Card>
+          <Title>{t('Free measurement visit')}</Title>
+          <Small>{t('Pick a time. The professional confirms it before coming.')}</Small>
+          <Chips>
+            {VISIT_SLOTS().map((v) => (
+              <Chip
+                key={v.iso}
+                testID={`visit-${v.iso}`}
+                label={v.label}
+                selected={visitAt === v.iso}
+                onPress={() => setVisitAt(visitAt === v.iso ? null : v.iso)}
+              />
+            ))}
+          </Chips>
+          <Small>{t('When do you want to start?')}</Small>
+          <Chips>
+            {(
+              [
+                ['this_week', 'This week'],
+                ['two_weeks', 'Within 2 weeks'],
+                ['next_month', 'Next month'],
+              ] as const
+            ).map(([k, l]) => (
+              <Chip key={k} label={t(l)} selected={startBy === k} onPress={() => setStartBy(k)} />
+            ))}
+          </Chips>
         </Card>
       ) : null}
 

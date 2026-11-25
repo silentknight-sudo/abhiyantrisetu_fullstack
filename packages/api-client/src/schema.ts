@@ -3300,6 +3300,13 @@ export interface operations {
                 description: string;
                 /** @default true */
                 wantsSiteVisit?: boolean;
+                option?: string;
+                /** @enum {string} */
+                supplies?: 'customer' | 'setu' | 'unsure';
+                /** Format: date-time */
+                visitAt?: string;
+                /** @enum {string} */
+                startBy?: 'this_week' | 'two_weeks' | 'next_month';
                 /** @default [] */
                 photos?: string[];
               };

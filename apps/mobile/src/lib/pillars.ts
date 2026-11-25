@@ -6,6 +6,7 @@ type Type = 'service' | 'renovation' | 'consult' | 'material_rfq' | 'equipment';
 /** Where a tile or card leads: the fixed-price menu, the quote form, or a screen. */
 export type Go =
   | { book: string }
+  | { service: string }
   | { req: Type; category?: string; title?: MessageKey }
   | { href: '/professionals' | '/calculator' | '/assistant' };
 
@@ -75,9 +76,9 @@ export const PILLARS: Record<PillarKey, Pillar> = {
             label: 'Full bathroom renovation',
             meta: 'Package',
             icon: 'water',
-            go: reno('Full bathroom renovation'),
+            go: { service: 'bathroom-renovation' },
           },
-          { label: 'Bathroom retiling', icon: 'grid', go: reno('Bathroom retiling') },
+          { label: 'Bathroom retiling', icon: 'grid', go: { service: 'bathroom-retiling' } },
           {
             label: 'Sanitary & fittings upgrade',
             icon: 'water-outline',
@@ -94,12 +95,12 @@ export const PILLARS: Record<PillarKey, Pillar> = {
             label: 'House construction',
             meta: '5 milestones',
             icon: 'business',
-            go: reno('House construction', 'house-construction'),
+            go: { service: 'house-construction' },
           },
           {
             label: 'Grey structure only',
             icon: 'cube',
-            go: reno('Grey structure only', 'house-construction'),
+            go: { service: 'house-construction' },
           },
           { label: 'Extra floor', icon: 'layers', go: reno('Extra floor', 'house-construction') },
         ],
@@ -112,17 +113,17 @@ export const PILLARS: Record<PillarKey, Pillar> = {
             label: 'Full home repaint',
             meta: 'Package',
             icon: 'color-palette',
-            go: reno('Full home repaint', 'painting'),
+            go: { service: 'home-repaint' },
           },
           {
             label: 'Single room / wall',
             icon: 'brush',
-            go: reno('Single room / wall', 'painting'),
+            go: { service: 'room-paint' },
           },
           {
             label: 'Exterior building',
             icon: 'business',
-            go: reno('Exterior building', 'painting'),
+            go: { service: 'exterior-paint' },
           },
         ],
       },
@@ -133,17 +134,17 @@ export const PILLARS: Record<PillarKey, Pillar> = {
           {
             label: 'Terrace waterproofing',
             icon: 'umbrella',
-            go: reno('Terrace waterproofing', 'waterproofing'),
+            go: { service: 'terrace-waterproofing' },
           },
           {
             label: 'Terrace tile + waterproofing',
             icon: 'grid',
-            go: reno('Terrace tile + waterproofing', 'waterproofing'),
+            go: { service: 'terrace-waterproofing' },
           },
           {
             label: 'Bathroom waterproofing',
             icon: 'water',
-            go: reno('Bathroom waterproofing', 'waterproofing'),
+            go: { service: 'bathroom-waterproofing' },
           },
         ],
       },
@@ -155,14 +156,14 @@ export const PILLARS: Record<PillarKey, Pillar> = {
             label: 'Floor tile fitting',
             meta: 'Free measurement',
             icon: 'grid',
-            go: reno('Floor tile fitting'),
+            go: { service: 'floor-tiles' },
           },
           {
             label: 'Old tile removal & relay',
             icon: 'refresh',
-            go: reno('Old tile removal & relay'),
+            go: { service: 'tile-relay' },
           },
-          { label: 'Wall tile fitting', icon: 'apps', go: reno('Wall tile fitting') },
+          { label: 'Wall tile fitting', icon: 'apps', go: { service: 'wall-tiles' } },
         ],
       },
       {
@@ -172,9 +173,9 @@ export const PILLARS: Record<PillarKey, Pillar> = {
           {
             label: 'Modular kitchen',
             icon: 'restaurant',
-            go: reno('Modular kitchen', 'modular-kitchen'),
+            go: { service: 'modular-kitchen' },
           },
-          { label: 'Modular wardrobe', icon: 'file-tray-stacked', go: reno('Modular wardrobe') },
+          { label: 'Modular wardrobe', icon: 'file-tray-stacked', go: { service: 'wardrobe' } },
           { label: 'Loft & storage', icon: 'albums', go: reno('Loft & storage') },
         ],
       },
